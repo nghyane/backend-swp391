@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend for an admission consulting platform, providing RESTful APIs and chatbot interface for exploring majors, campuses, tuition, scholarships, dormitories, and admission methods.",
   "main": "index.js",
   "scripts": {
     "dev": "vite-node src/server.ts",
@@ -9,7 +9,7 @@
     "start": "node dist/server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Nghia <hoangvananhnghia@gmail.com>",
   "license": "ISC",
   "type": "module",
   "dependencies": {
