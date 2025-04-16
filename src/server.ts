@@ -1,12 +1,12 @@
+import env from "./config/env"; // Load environment variables
 import app from "./app";
-import { config } from "./config/app.config";
 import { initDb, closeDb } from "./db";
 
 const startServer = async () => {
   await initDb();
 
-  const server = app.listen(config.port, () =>
-    console.log(`🚀 Server running on http://localhost:${config.port}`)
+  const server = app.listen(Number(env.PORT), () =>
+    console.log(`🚀 Server running on http://localhost:${env.PORT}`)
   );
 
   process.on("SIGINT", async () => {

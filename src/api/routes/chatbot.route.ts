@@ -7,8 +7,4 @@ const router = Router();
 router.get("/webhook", chatbotController.verifyWebhook);
 router.post("/webhook", chatbotController.receiveMessage);
 
-// Additional chatbot routes
-router.post("/send", chatbotController.sendMessageToUser);
-router.get("/history/:facebookUserId", chatbotController.getConversationHistory);
-
 export default router;

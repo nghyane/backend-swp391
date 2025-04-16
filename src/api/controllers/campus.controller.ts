@@ -12,6 +12,8 @@ const getAllCampuses = async (req: Request, res: Response): Promise<void> => {
   // 1. Fetch all campuses from database
   // 2. Format response data
   // 3. Return campuses array
+
+
 };
 
 /**
