@@ -112,7 +112,11 @@ export const internalUsers = pgTable("internal_users", {
  */
 export const sessions = pgTable("sessions", {
   session_id: varchar("session_id", { length: 64 }).primaryKey(),
-  fb_user_id: varchar("fb_user_id", { length: 64 }),
+
+  platform: varchar("platform", { length: 64 }),
+  user_id: varchar("user_id", { length: 64 }),
+  hubspot_contact_id: varchar("hubspot_contact_id", { length: 64 }),
+  
   anonymous: boolean("anonymous").default(true),
 });
 
