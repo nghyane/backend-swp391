@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import * as majorService from "../../services/major.service";
-import { Major, MajorFilterOptions } from "../../types/major.types";
+import { MajorFilterOptions } from "../../types/major.types";
 import { catch$ } from "../../utils/catch";
-import { NotFoundError } from "../../utils/errors";
 
 export const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name, code, description } = req.query;

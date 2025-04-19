@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { FacebookWebhookEvent, FacebookMessageResponse, FacebookSendMessageRequest } from "../../types/facebook.types";
 import { catch$ } from "../../utils/catch";
 
 // Controller for Facebook Messenger webhook integration

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import * as campusService from "../../services/campus.service";
 import { Campus, CampusFilterOptions } from "../../types/campus.types";
 import { catch$ } from "../../utils/catch";
-import { NotFoundError } from "../../utils/errors";
 
 export const getAllCampuses = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name, address } = req.query;

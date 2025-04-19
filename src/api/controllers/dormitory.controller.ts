@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as dormitoryService from "../../services/dormitory.service";
-import { Dormitory, DormitoryFilterOptions } from "../../types/dormitory.types";
+import { DormitoryFilterOptions } from "../../types/dormitory.types";
 import { catch$ } from "../../utils/catch";
 
 export const getAllDormitories = catch$(async (req: Request, res: Response): Promise<void> => {

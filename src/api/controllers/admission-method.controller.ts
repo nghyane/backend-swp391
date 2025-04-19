@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import * as admissionMethodService from "../../services/admission-method.service";
 import { AdmissionMethod, AdmissionMethodFilterOptions } from "../../types/admission-method.types";
 import { catch$ } from "../../utils/catch";
-import { NotFoundError } from "../../utils/errors";
 
 
 export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
