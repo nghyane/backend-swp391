@@ -9,50 +9,43 @@ import { Dormitory, DormitoryFilterOptions } from "../types/dormitory.types";
  * @returns Danh sách ký túc xá thỏa mãn điều kiện lọc
  */
 export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = {}): Promise<Dormitory[]> => {
-  try {
-    // Xây dựng điều kiện lọc
-    const filters = [];
-    
-    if (filterOptions.name) {
-      filters.push(like(dormitories.name, `%${filterOptions.name}%`));
-    }
-    
-    if (filterOptions.campusId) {
-      filters.push(eq(dormitories.campus_id, filterOptions.campusId));
-    }
-    
-    // Sử dụng API db.query.find
-    return await db.query.dormitories.findMany({
-      where: filters.length > 0 ? and(...filters) : undefined,
-      with: {
-        campus: true
-      }
-    });
-  } catch (error) {
-    console.error("Error getting dormitories:", error);
-    throw new Error("Failed to retrieve dormitories");
+  // Xây dựng điều kiện lọc
+  const filters = [];
+  
+  if (filterOptions.name) {
+    filters.push(like(dormitories.name, `%${filterOptions.name}%`));
   }
+  
+  if (filterOptions.campusId) {
+    filters.push(eq(dormitories.campus_id, filterOptions.campusId));
+  }
+  
+  // Sử dụng API db.query.find
+  return await db.query.dormitories.findMany({
+    where: filters.length > 0 ? and(...filters) : undefined,
+    with: {
+      campus: true
+    }
+  });
 };
 
 /**
  * Lấy thông tin ký túc xá theo ID
  * @param id - ID của ký túc xá
- * @returns Thông tin ký túc xá hoặc null nếu không tìm thấy
+ * @returns Thông tin ký túc xá
  */
-export const getDormitoryById = async (id: number): Promise<Dormitory | null> => {
-  try {
-    // Sử dụng API db.query.find
-    const result = await db.query.dormitories.findFirst({
-      where: eq(dormitories.id, id),
-      with: {
-        campus: true
-      }
-    });
-    
-    // Chuyển đổi undefined thành null để phù hợp với kiểu trả về
-    return result || null;
-  } catch (error) {
-    console.error("Error getting dormitory by ID:", error);
-    throw new Error("Failed to retrieve dormitory");
+export const getDormitoryById = async (id: number): Promise<Dormitory> => {
+  // Sử dụng API db.query.find
+  const result = await db.query.dormitories.findFirst({
+    where: eq(dormitories.id, id),
+    with: {
+      campus: true
+    }
+  });
+  
+  if (!result) {
+    throw new Error("Dormitory not found");
   }
+  
+  return result;
 };
