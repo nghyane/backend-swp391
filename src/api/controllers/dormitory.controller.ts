@@ -11,22 +11,22 @@ import { DormitoryFilterOptions } from "../../types/dormitory.types";
  */
 const getAllDormitories = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Trích xuất tham số lọc từ query
+    // Trích xuất tham số lọc từ query (validator đã đảm bảo các giá trị hợp lệ)
     const filters: DormitoryFilterOptions = {};
     
     if (req.query.name) {
       filters.name = req.query.name as string;
     }
     
-    if (req.query.campusId && !isNaN(Number(req.query.campusId))) {
+    if (req.query.campusId) {
       filters.campusId = Number(req.query.campusId);
     }
     
-    if (req.query.priceMin && !isNaN(Number(req.query.priceMin))) {
+    if (req.query.priceMin) {
       filters.priceMin = Number(req.query.priceMin);
     }
     
-    if (req.query.priceMax && !isNaN(Number(req.query.priceMax))) {
+    if (req.query.priceMax) {
       filters.priceMax = Number(req.query.priceMax);
     }
     
@@ -53,17 +53,8 @@ const getAllDormitories = async (req: Request, res: Response): Promise<void> => 
  */
 const getDormitoryById = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Lấy dormitory ID từ params
+    // Lấy dormitory ID từ params (validator đã đảm bảo ID hợp lệ)
     const dormitoryId = Number(req.params.id);
-    
-    // Kiểm tra ID có hợp lệ không
-    if (isNaN(dormitoryId)) {
-      res.status(400).json({
-        success: false,
-        message: "Invalid dormitory ID format"
-      });
-      return;
-    }
     
     try {
       // Lấy thông tin ký túc xá từ service
