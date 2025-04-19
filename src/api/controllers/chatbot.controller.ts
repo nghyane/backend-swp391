@@ -10,6 +10,9 @@ import { FacebookWebhookEvent, FacebookMessageResponse, FacebookSendMessageReque
  * Verify webhook for Facebook Messenger integration
  */
 const verifyWebhook = async (req: Request, res: Response): Promise<void> => {
+  
+
+
   // TODO: Implement webhook verification
   // 1. Extract verification token and challenge from query params
   const { "hub.mode": mode, "hub.challenge": challenge, "hub.verify_token": verifyToken } = req.query;
