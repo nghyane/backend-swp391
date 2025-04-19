@@ -1,27 +1,71 @@
 import { Request, Response } from "express";
+import { majorService } from "../../services/major.service";
 
 /**
  * Controller for major-related endpoints.
  */
 
 /**
- * Get all majors with optional filtering
+ * Get all majors
  */
 const getAllMajors = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting all majors
-  // 1. Extract filter parameters from request query
-  // 2. Fetch majors from database with filtering
-  // 3. Return majors array
+  try {
+    // Fetch all majors from database
+    const majors = await majorService.getAllMajors();
+    
+    // Return majors array
+    res.json({
+      success: true,
+      data: majors
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
 };
 
 /**
  * Get major by ID
  */
 const getMajorById = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting major by ID
-  // 1. Extract major ID from request params
-  // 2. Fetch major from database
-  // 3. Return major or 404 if not found
+  try {
+    // Extract major ID from request params
+    const id = Number(req.params.id);
+    
+    // Validate ID
+    if (isNaN(id)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid major ID format'
+      });
+      return;
+    }
+    
+    // Fetch major from database
+    const major = await majorService.getMajorById(id);
+    
+    // Return 404 if major not found
+    if (!major) {
+      res.status(404).json({
+        success: false,
+        error: 'Major not found'
+      });
+      return;
+    }
+    
+    // Return major data
+    res.json({
+      success: true,
+      data: major
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
 };
 
 /**
