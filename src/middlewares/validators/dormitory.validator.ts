@@ -1,9 +1,6 @@
 import { query } from "express-validator";
 import { validateCustomQueries } from "./common.validator";
 
-/**
- * Validator cho các tham số query của dormitory
- */
 export const validateDormitoryQueries = () => {
   const customValidators = [
     query("campusId")
@@ -24,7 +21,6 @@ export const validateDormitoryQueries = () => {
       .withMessage("Maximum price must be a non-negative integer")
       .toInt(),
     
-    // Đảm bảo priceMax >= priceMin nếu cả hai đều được cung cấp
     query("priceMax")
       .optional()
       .custom((value, { req }) => {

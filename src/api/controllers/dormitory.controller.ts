@@ -2,38 +2,17 @@ import { Request, Response } from "express";
 import * as dormitoryService from "../../services/dormitory.service";
 import { DormitoryFilterOptions } from "../../types/dormitory.types";
 
-/**
- * Controller for dormitory-related endpoints.
- */
-
-/**
- * Get all dormitories with optional filtering
- */
 const getAllDormitories = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Trích xuất tham số lọc từ query (validator đã đảm bảo các giá trị hợp lệ)
     const filters: DormitoryFilterOptions = {};
     
-    if (req.query.name) {
-      filters.name = req.query.name as string;
-    }
+    if (req.query.name) filters.name = req.query.name as string;
+    if (req.query.campusId) filters.campusId = Number(req.query.campusId);
+    if (req.query.priceMin) filters.priceMin = Number(req.query.priceMin);
+    if (req.query.priceMax) filters.priceMax = Number(req.query.priceMax);
     
-    if (req.query.campusId) {
-      filters.campusId = Number(req.query.campusId);
-    }
-    
-    if (req.query.priceMin) {
-      filters.priceMin = Number(req.query.priceMin);
-    }
-    
-    if (req.query.priceMax) {
-      filters.priceMax = Number(req.query.priceMax);
-    }
-    
-    // Lấy danh sách ký túc xá từ service
     const dormitories = await dormitoryService.getAllDormitories(filters);
     
-    // Trả về kết quả
     res.status(200).json({
       success: true,
       data: dormitories,
@@ -48,36 +27,24 @@ const getAllDormitories = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-/**
- * Get dormitory by ID
- */
 const getDormitoryById = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Lấy dormitory ID từ params (validator đã đảm bảo ID hợp lệ)
     const dormitoryId = Number(req.params.id);
+    const dormitory = await dormitoryService.getDormitoryById(dormitoryId);
     
-    try {
-      // Lấy thông tin ký túc xá từ service
-      const dormitory = await dormitoryService.getDormitoryById(dormitoryId);
-      
-      // Trả về kết quả
-      res.status(200).json({
-        success: true,
-        data: dormitory
-      });
-    } catch (error) {
-      // Xử lý trường hợp không tìm thấy ký túc xá
-      if ((error as Error).message === "Dormitory not found") {
-        res.status(404).json({
-          success: false,
-          message: "Dormitory not found"
-        });
-      } else {
-        throw error; // Re-throw để xử lý ở catch bên ngoài
-      }
-    }
+    res.status(200).json({
+      success: true,
+      data: dormitory
+    });
   } catch (error) {
-    // Xử lý lỗi chung
+    if ((error as Error).message === "Dormitory not found") {
+      res.status(404).json({
+        success: false,
+        message: "Dormitory not found"
+      });
+      return;
+    }
+    
     res.status(500).json({
       success: false,
       message: "Failed to retrieve dormitory",
@@ -86,27 +53,14 @@ const getDormitoryById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/**
- * Get dormitory availability
- */
 const getDormitoryAvailability = async (req: Request, res: Response): Promise<void> => {
   // TODO: Implement getting dormitory availability
-  // 1. Extract dormitory ID from request params
-  // 2. Fetch availability information
-  // 3. Return availability data
 };
 
-/**
- * Get dormitory facilities
- */
 const getDormitoryFacilities = async (req: Request, res: Response): Promise<void> => {
   // TODO: Implement getting dormitory facilities
-  // 1. Extract dormitory ID from request params
-  // 2. Fetch facilities information
-  // 3. Return facilities data
 };
 
-// Export all controller functions
 export const dormitoryController = {
   getAllDormitories,
   getDormitoryById,
