@@ -1,22 +1,34 @@
 import { Request, Response } from "express";
 import { majorService } from "../../services/major.service";
+import { MajorFilterOptions } from "../../types/major.types";
 
 /**
  * Controller for major-related endpoints.
  */
 
 /**
- * Get all majors
+ * Get all majors with optional filtering
  */
 const getAllMajors = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Fetch all majors from database
-    const majors = await majorService.getAllMajors();
+    const { name, code, description } = req.query;
     
-    // Return majors array
+    const filters: MajorFilterOptions = {
+      ...(name ? { name: String(name) } : {}),
+      ...(code ? { code: String(code) } : {}),
+      ...(description ? { description: String(description) } : {})
+    };
+    
+    const hasFilters = Object.keys(filters).length > 0;
+    
+    const majors = await majorService.getAllMajors(
+      hasFilters ? filters : undefined
+    );
+    
     res.json({
       success: true,
-      data: majors
+      data: majors,
+      filters: hasFilters ? filters : undefined
     });
   } catch (error) {
     res.status(500).json({
@@ -68,15 +80,7 @@ const getMajorById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/**
- * Search majors by keyword
- */
-const searchMajors = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement major search
-  // 1. Extract search keyword from request query
-  // 2. Search majors in database
-  // 3. Return matching majors
-};
+
 
 /**
  * Get majors by campus
@@ -92,6 +96,5 @@ const getMajorsByCampus = async (req: Request, res: Response): Promise<void> => 
 export const majorController = {
   getAllMajors,
   getMajorById,
-  searchMajors,
   getMajorsByCampus
 };
