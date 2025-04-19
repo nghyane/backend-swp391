@@ -1,15 +1,36 @@
-import { eq } from 'drizzle-orm';
+import { eq, ilike, or, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { campuses } from '../db/schema';
 
 /**
- * Get all campuses
- * @returns Array of all campuses
+ * Interface for campus filter options
  */
-const getAllCampuses = async () => {
-  // Lấy tất cả cơ sở đào tạo
-  const result = await db.select().from(campuses);
-  return result;
+export interface CampusFilterOptions {
+  name?: string;
+  address?: string;
+}
+
+/**
+ * Get all campuses with optional filtering
+ * @param filters - Optional filters for name and address
+ * @returns Array of filtered campuses
+ */
+const getAllCampuses = async (filters?: CampusFilterOptions) => {
+  if (!filters || (!filters.name && !filters.address)) {
+    return await db.select().from(campuses);
+  }
+  
+  const conditions: SQL[] = [];
+  
+  if (filters.name) {
+    conditions.push(ilike(campuses.name, `%${filters.name}%`));
+  }
+  
+  if (filters.address) {
+    conditions.push(ilike(campuses.address, `%${filters.address}%`));
+  }
+  
+  return await db.select().from(campuses).where(or(...conditions));
 };
 
 /**

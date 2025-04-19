@@ -6,17 +6,27 @@ import { campusService } from "../../services/campus.service";
  */
 
 /**
- * Get all campuses
+ * Get all campuses with optional filtering
  */
 const getAllCampuses = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Fetch all campuses from database
-    const campuses = await campusService.getAllCampuses();
+    const { name, address } = req.query;
     
-    // Return campuses array
+    const filters = {
+      ...(name ? { name: String(name) } : {}),
+      ...(address ? { address: String(address) } : {})
+    };
+    
+    const hasFilters = Object.keys(filters).length > 0;
+    
+    const campuses = await campusService.getAllCampuses(
+      hasFilters ? filters : undefined
+    );
+    
     res.json({
       success: true,
-      data: campuses
+      data: campuses,
+      filters: hasFilters ? filters : undefined
     });
   } catch (error) {
     res.status(500).json({
@@ -31,10 +41,8 @@ const getAllCampuses = async (req: Request, res: Response): Promise<void> => {
  */
 const getCampusById = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Extract campus ID from request params
     const id = Number(req.params.id);
     
-    // Validate ID
     if (isNaN(id)) {
       res.status(400).json({
         success: false,
@@ -43,10 +51,8 @@ const getCampusById = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     
-    // Fetch campus from database
     const campus = await campusService.getCampusById(id);
     
-    // Return 404 if campus not found
     if (!campus) {
       res.status(404).json({
         success: false,
@@ -55,7 +61,6 @@ const getCampusById = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     
-    // Return campus data
     res.json({
       success: true,
       data: campus
@@ -68,30 +73,9 @@ const getCampusById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/**
- * Get campus facilities
- */
-const getCampusFacilities = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting campus facilities
-  // 1. Extract campus ID from request params
-  // 2. Fetch facilities for this campus
-  // 3. Return facilities array
-};
-
-/**
- * Get campus location information
- */
-const getCampusLocation = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting campus location
-  // 1. Extract campus ID from request params
-  // 2. Fetch location information
-  // 3. Return location data including coordinates
-};
 
 // Export all controller functions
 export const campusController = {
   getAllCampuses,
   getCampusById,
-  getCampusFacilities,
-  getCampusLocation
 };
