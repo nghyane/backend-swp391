@@ -6,12 +6,19 @@ type AsyncControllerFunction = (req: Request, res: Response, next: NextFunction)
  * Bọc một hàm controller để tự động xử lý lỗi mà không cần try-catch
  * 
  * @example
- * // Sử dụng trong controller
- * export const myController = {
- *   getItems: asyncHandler(async (req, res) => {
- *     const items = await itemService.getItems();
- *     res.json({ success: true, data: items });
- *   })
+ * // Định nghĩa hàm controller
+ * const getItems = async (req: Request, res: Response): Promise<void> => {
+ *   const items = await itemService.getItems();
+ *   res.status(200).json({
+ *     success: true,
+ *     data: items,
+ *     count: items.length
+ *   });
+ * };
+ * 
+ * // Export controller sử dụng asyncHandler
+ * export const itemController = {
+ *   getItems: asyncHandler(getItems)
  * };
  * 
  * @param fn Hàm controller cần bọc
