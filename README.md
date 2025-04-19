@@ -89,15 +89,34 @@ pnpm run dev
 ```
 
 ### API Documentation
-Once the server is running, API documentation is available at:
-- Swagger UI: http://localhost:3000/api-docs
+The project includes a Postman collection file that documents all available API endpoints.
+
+```bash
+# Import the Postman collection
+# File: postman.json (excluded from git repository)
+```
+
+You can also generate a new Postman collection file with:
 
 ### Testing the Chatbot
-You can test the chatbot endpoint using:
+You can test the Zalo webhook endpoint using:
 ```bash
-curl -X POST http://localhost:3000/api/chatbot \
+# Verify webhook
+curl -X GET "http://localhost:3000/api/chatbot/zalo/webhook"
+
+# Send a message
+curl -X POST "http://localhost:3000/api/chatbot/zalo/webhook" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Tell me about Computer Science programs", "sessionId": "new-session"}'
+  -d '{
+    "app_id": "your_app_id",
+    "event_name": "user_send_text",
+    "sender": {
+      "id": "user_id"
+    },
+    "message": {
+      "text": "Tell me about Computer Science programs"
+    }
+  }'
 ```
 
 ## 8. Contribution Guidelines
