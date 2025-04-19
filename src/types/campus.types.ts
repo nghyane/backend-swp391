@@ -1,3 +1,4 @@
+import { campuses } from "../db/schema";
 /**
  * Interface for campus filter options
  */
@@ -9,8 +10,4 @@ export interface CampusFilterOptions {
 /**
  * Interface for campus data
  */
-export interface Campus {
-  id: number;
-  name: string;
-  address: string | null;
-}
+export type Campus = typeof campuses.$inferSelect;
