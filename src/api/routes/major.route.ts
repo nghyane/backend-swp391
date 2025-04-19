@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { majorController } from "../controllers/major.controller";
+import * as majorController from "../controllers/major.controller";
 import { validateId, validateCommonQueries } from "../../middlewares/validators";
 
 const router = Router();

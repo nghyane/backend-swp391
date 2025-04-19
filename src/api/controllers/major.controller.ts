@@ -1,16 +1,10 @@
 import { Request, Response } from "express";
 import { majorService } from "../../services/major.service";
-import { MajorFilterOptions } from "../../types/major.types";
+import { Major, MajorFilterOptions } from "../../types/major.types";
 import { catch$ } from "../../utils/catch";
+import { NotFoundError } from "../../utils/errors";
 
-/**
- * Controller for major-related endpoints.
- */
-
-/**
- * Get all majors with optional filtering
- */
-const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> => {
+export const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name, code, description } = req.query;
   
   const filters: MajorFilterOptions = {
@@ -32,35 +26,9 @@ const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> =
   });
 });
 
-/**
- * Get major by ID
- */
-const getMajorById = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Extract major ID from request params
-  const id = Number(req.params.id);
-  
-  // Validate ID
-  if (isNaN(id)) {
-    res.status(400).json({
-      success: false,
-      error: 'Invalid major ID format'
-    });
-    return;
-  }
-  
-  // Fetch major from database
+export const getMajorById = catch$(async (req: Request, res: Response): Promise<void> => {
+  const id = parseInt(req.params.id);
   const major = await majorService.getMajorById(id);
-  
-  // Return 404 if major not found
-  if (!major) {
-    res.status(404).json({
-      success: false,
-      error: 'Major not found'
-    });
-    return;
-  }
-  
-  // Return major data
   res.json({
     success: true,
     data: major
@@ -69,23 +37,11 @@ const getMajorById = catch$(async (req: Request, res: Response): Promise<void> =
 
 
 
-/**
- * Get majors by campus
- */
-const getMajorsByCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting majors by campus
-  // 1. Extract campus ID from request params
-  // 2. Fetch majors for this campus
-  // 3. Return majors array
+export const getMajorsByCampus = catch$(async (req: Request, res: Response): Promise<void> => {
   res.status(501).json({
     success: false,
-    error: 'Not implemented yet'
+    message: 'Not implemented yet'
   });
 });
 
-// Export all controller functions
-export const majorController = {
-  getAllMajors,
-  getMajorById,
-  getMajorsByCampus
-};
+
