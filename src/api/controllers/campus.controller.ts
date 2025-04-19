@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { campusService } from "../../services/campus.service";
 
 /**
  * Controller for campus-related endpoints.
@@ -8,22 +9,63 @@ import { Request, Response } from "express";
  * Get all campuses
  */
 const getAllCampuses = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting all campuses
-  // 1. Fetch all campuses from database
-  // 2. Format response data
-  // 3. Return campuses array
-
-
+  try {
+    // Fetch all campuses from database
+    const campuses = await campusService.getAllCampuses();
+    
+    // Return campuses array
+    res.json({
+      success: true,
+      data: campuses
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
 };
 
 /**
  * Get campus by ID
  */
 const getCampusById = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting campus by ID
-  // 1. Extract campus ID from request params
-  // 2. Fetch campus from database
-  // 3. Return campus or 404 if not found
+  try {
+    // Extract campus ID from request params
+    const id = Number(req.params.id);
+    
+    // Validate ID
+    if (isNaN(id)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid campus ID format'
+      });
+      return;
+    }
+    
+    // Fetch campus from database
+    const campus = await campusService.getCampusById(id);
+    
+    // Return 404 if campus not found
+    if (!campus) {
+      res.status(404).json({
+        success: false,
+        error: 'Campus not found'
+      });
+      return;
+    }
+    
+    // Return campus data
+    res.json({
+      success: true,
+      data: campus
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
 };
 
 /**
