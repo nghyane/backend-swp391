@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { dormitories, campuses } from "../db/schema";
-import { eq, and, gte, lte, like } from "drizzle-orm";
+import { eq, and, like, sql } from "drizzle-orm";
 import { Dormitory, DormitoryFilterOptions } from "../types/dormitory.types";
 
 /**
@@ -15,34 +15,30 @@ export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = 
     if (filterOptions.name) conditions.push(like(dormitories.name, `%${filterOptions.name}%`));
     if (filterOptions.campusId) conditions.push(eq(dormitories.campus_id, filterOptions.campusId));
     
-    // Truy vấn dữ liệu với campus
+    // Truy vấn dữ liệu
     const results = await db
       .select({
-        id: dormitories.id,
-        campus_id: dormitories.campus_id,
-        name: dormitories.name,
-        description: dormitories.description,
-        capacity: dormitories.capacity,
-        campus_id_ref: campuses.id,
-        campus_name: campuses.name,
-        campus_address: campuses.address
+        dormitory: {
+          id: dormitories.id,
+          campus_id: dormitories.campus_id,
+          name: dormitories.name,
+          description: dormitories.description,
+          capacity: dormitories.capacity,
+        },
+        campus: {
+          id: campuses.id,
+          name: campuses.name,
+          address: campuses.address,
+        },
       })
       .from(dormitories)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
-    
+      
     // Chuyển đổi kết quả
-    return results.map(item => ({
-      id: item.id,
-      campus_id: item.campus_id,
-      name: item.name,
-      description: item.description,
-      capacity: item.capacity,
-      campus: {
-        id: item.campus_id_ref,
-        name: item.campus_name,
-        address: item.campus_address
-      }
+    return results.map(row => ({
+      ...row.dormitory,
+      campus: row.campus
     }));
   } catch (error) {
     console.error("Error getting dormitories:", error);
@@ -59,14 +55,18 @@ export const getDormitoryById = async (id: number): Promise<Dormitory | null> =>
   try {
     const result = await db
       .select({
-        id: dormitories.id,
-        campus_id: dormitories.campus_id,
-        name: dormitories.name,
-        description: dormitories.description,
-        capacity: dormitories.capacity,
-        campus_id_ref: campuses.id,
-        campus_name: campuses.name,
-        campus_address: campuses.address
+        dormitory: {
+          id: dormitories.id,
+          campus_id: dormitories.campus_id,
+          name: dormitories.name,
+          description: dormitories.description,
+          capacity: dormitories.capacity,
+        },
+        campus: {
+          id: campuses.id,
+          name: campuses.name,
+          address: campuses.address,
+        },
       })
       .from(dormitories)
       .where(eq(dormitories.id, id))
@@ -74,18 +74,10 @@ export const getDormitoryById = async (id: number): Promise<Dormitory | null> =>
     
     if (result.length === 0) return null;
     
-    const item = result[0];
+    const row = result[0];
     return {
-      id: item.id,
-      campus_id: item.campus_id,
-      name: item.name,
-      description: item.description,
-      capacity: item.capacity,
-      campus: {
-        id: item.campus_id_ref,
-        name: item.campus_name,
-        address: item.campus_address
-      }
+      ...row.dormitory,
+      campus: row.campus
     };
   } catch (error) {
     console.error("Error getting dormitory by ID:", error);
