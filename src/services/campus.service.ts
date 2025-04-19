@@ -1,21 +1,14 @@
 import { eq, ilike, or, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { campuses } from '../db/schema';
-
-/**
- * Interface for campus filter options
- */
-export interface CampusFilterOptions {
-  name?: string;
-  address?: string;
-}
+import { CampusFilterOptions, Campus } from '../types/campus.types';
 
 /**
  * Get all campuses with optional filtering
  * @param filters - Optional filters for name and address
  * @returns Array of filtered campuses
  */
-const getAllCampuses = async (filters?: CampusFilterOptions) => {
+const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> => {
   if (!filters || (!filters.name && !filters.address)) {
     return await db.select().from(campuses);
   }
@@ -38,12 +31,10 @@ const getAllCampuses = async (filters?: CampusFilterOptions) => {
  * @param id - Campus ID to retrieve
  * @returns Campus object if found, null otherwise
  */
-const getCampusById = async (id: number) => {
-  // Tìm cơ sở đào tạo theo ID
+const getCampusById = async (id: number): Promise<Campus | null> => {
   const result = await db.select().from(campuses)
     .where(eq(campuses.id, id));
     
-  // Trả về cơ sở đào tạo đầu tiên hoặc null nếu không tìm thấy
   return result.length > 0 ? result[0] : null;
 };
 

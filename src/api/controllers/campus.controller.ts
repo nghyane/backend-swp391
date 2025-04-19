@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { campusService } from "../../services/campus.service";
+import { CampusFilterOptions } from "../../types/campus.types";
 
 /**
  * Controller for campus-related endpoints.
@@ -12,7 +13,7 @@ const getAllCampuses = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, address } = req.query;
     
-    const filters = {
+    const filters: CampusFilterOptions = {
       ...(name ? { name: String(name) } : {}),
       ...(address ? { address: String(address) } : {})
     };
