@@ -2,6 +2,7 @@ import { eq, ilike, or, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { campuses } from '../db/schema';
 import { CampusFilterOptions, Campus } from '../types/campus.types';
+import { NotFoundError } from '../utils/errors';
 
 const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> => {
   if (!filters || (!filters.name && !filters.address)) {
@@ -23,12 +24,16 @@ const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> 
   });
 };
 
-const getCampusById = async (id: number): Promise<Campus | null> => {
+const getCampusById = async (id: number): Promise<Campus> => {
   const result = await db.query.campuses.findFirst({
     where: eq(campuses.id, id)
   });
   
-  return result ?? null;
+  if (!result) {
+    throw new NotFoundError('Campus', id);
+  }
+  
+  return result;
 };
 
 export const campusService = {

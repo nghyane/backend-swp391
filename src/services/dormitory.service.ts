@@ -2,6 +2,7 @@ import { db } from "../db";
 import { dormitories, campuses } from "../db/schema";
 import { eq, and, like, sql, SQL } from "drizzle-orm";
 import { Dormitory, DormitoryFilterOptions } from "../types/dormitory.types";
+import { NotFoundError } from "../utils/errors";
 
 export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = {}): Promise<Dormitory[]> => {
   const filters = [];
@@ -31,7 +32,7 @@ export const getDormitoryById = async (id: number): Promise<Dormitory> => {
   });
   
   if (!result) {
-    throw new Error("Dormitory not found");
+    throw new NotFoundError("Dormitory", id);
   }
   
   return result;

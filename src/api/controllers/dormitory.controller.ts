@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as dormitoryService from "../../services/dormitory.service";
 import { DormitoryFilterOptions } from "../../types/dormitory.types";
+import { isNotFoundError } from "../../utils/errors";
 
 const getAllDormitories = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -37,10 +38,10 @@ const getDormitoryById = async (req: Request, res: Response): Promise<void> => {
       data: dormitory
     });
   } catch (error) {
-    if ((error as Error).message === "Dormitory not found") {
+    if (isNotFoundError(error)) {
       res.status(404).json({
         success: false,
-        message: "Dormitory not found"
+        message: error.message
       });
       return;
     }

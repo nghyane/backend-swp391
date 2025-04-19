@@ -2,6 +2,7 @@ import { eq, ilike, or, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { majors } from '../db/schema';
 import { Major, MajorFilterOptions } from '../types/major.types';
+import { NotFoundError } from '../utils/errors';
 
 const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[]> => {
   if (!filters || (!filters.name && !filters.code && !filters.description)) {
@@ -27,12 +28,16 @@ const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[]> => {
   });
 };
 
-const getMajorById = async (id: number): Promise<Major | null> => {
+const getMajorById = async (id: number): Promise<Major> => {
   const result = await db.query.majors.findFirst({
     where: eq(majors.id, id)
   });
   
-  return result ?? null;
+  if (!result) {
+    throw new NotFoundError('Major', id);
+  }
+  
+  return result;
 };
 
 export const majorService = {
