@@ -52,10 +52,47 @@ const getAllDormitories = async (req: Request, res: Response): Promise<void> => 
  * Get dormitory by ID
  */
 const getDormitoryById = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting dormitory by ID
-  // 1. Extract dormitory ID from request params
-  // 2. Fetch dormitory from database
-  // 3. Return dormitory or 404 if not found
+  try {
+    // Lấy dormitory ID từ params
+    const dormitoryId = Number(req.params.id);
+    
+    // Kiểm tra ID có hợp lệ không
+    if (isNaN(dormitoryId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid dormitory ID format"
+      });
+      return;
+    }
+    
+    try {
+      // Lấy thông tin ký túc xá từ service
+      const dormitory = await dormitoryService.getDormitoryById(dormitoryId);
+      
+      // Trả về kết quả
+      res.status(200).json({
+        success: true,
+        data: dormitory
+      });
+    } catch (error) {
+      // Xử lý trường hợp không tìm thấy ký túc xá
+      if ((error as Error).message === "Dormitory not found") {
+        res.status(404).json({
+          success: false,
+          message: "Dormitory not found"
+        });
+      } else {
+        throw error; // Re-throw để xử lý ở catch bên ngoài
+      }
+    }
+  } catch (error) {
+    // Xử lý lỗi chung
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve dormitory",
+      error: (error as Error).message
+    });
+  }
 };
 
 /**
