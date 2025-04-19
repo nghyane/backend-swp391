@@ -23,31 +23,31 @@ export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = 
       conditions.push(eq(dormitories.campus_id, filterOptions.campusId));
     }
     
-    // Truy vấn dữ liệu
+    // Truy vấn dữ liệu - luôn join với campus
     const dormitoryList = await db
-      .select()
+      .select({
+        dormitory: dormitories,
+        campus: campuses
+      })
       .from(dormitories)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .leftJoin(campuses, eq(dormitories.campus_id, campuses.id));
+      .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
     
     // Chuyển đổi kết quả thành mảng Dormitory
     return dormitoryList.map(item => {
       const dormitory: Dormitory = {
-        id: item.dormitories.id,
-        campus_id: item.dormitories.campus_id,
-        name: item.dormitories.name,
-        description: item.dormitories.description,
-        capacity: item.dormitories.capacity
+        id: item.dormitory.id,
+        campus_id: item.dormitory.campus_id,
+        name: item.dormitory.name,
+        description: item.dormitory.description,
+        capacity: item.dormitory.capacity,
+        // Luôn bao gồm thông tin campus
+        campus: {
+          id: item.campus.id,
+          name: item.campus.name,
+          address: item.campus.address
+        }
       };
-      
-      // Thêm thông tin campus nếu có
-      if (item.campuses) {
-        dormitory.campus = {
-          id: item.campuses.id,
-          name: item.campuses.name,
-          address: item.campuses.address
-        };
-      }
       
       return dormitory;
     });
@@ -65,10 +65,13 @@ export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = 
 export const getDormitoryById = async (id: number): Promise<Dormitory | null> => {
   try {
     const result = await db
-      .select()
+      .select({
+        dormitory: dormitories,
+        campus: campuses
+      })
       .from(dormitories)
       .where(eq(dormitories.id, id))
-      .leftJoin(campuses, eq(dormitories.campus_id, campuses.id));
+      .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
     
     if (result.length === 0) {
       return null;
@@ -76,21 +79,18 @@ export const getDormitoryById = async (id: number): Promise<Dormitory | null> =>
     
     const item = result[0];
     const dormitory: Dormitory = {
-      id: item.dormitories.id,
-      campus_id: item.dormitories.campus_id,
-      name: item.dormitories.name,
-      description: item.dormitories.description,
-      capacity: item.dormitories.capacity
+      id: item.dormitory.id,
+      campus_id: item.dormitory.campus_id,
+      name: item.dormitory.name,
+      description: item.dormitory.description,
+      capacity: item.dormitory.capacity,
+      // Luôn bao gồm thông tin campus
+      campus: {
+        id: item.campus.id,
+        name: item.campus.name,
+        address: item.campus.address
+      }
     };
-    
-    // Thêm thông tin campus nếu có
-    if (item.campuses) {
-      dormitory.campus = {
-        id: item.campuses.id,
-        name: item.campuses.name,
-        address: item.campuses.address
-      };
-    }
     
     return dormitory;
   } catch (error) {

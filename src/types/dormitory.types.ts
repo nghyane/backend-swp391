@@ -9,7 +9,7 @@ type Campus = {
 
 // Type cho dữ liệu dormitory
 export type Dormitory = typeof dormitories.$inferSelect & {
-  campus?: Campus;
+  campus: Campus; // Campus là bắt buộc
 };
 
 // Interface cho các tùy chọn lọc
