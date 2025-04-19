@@ -9,7 +9,8 @@ const DEFAULT_QUERY_OPTIONS = {
   with: {
     majorCampusAdmissions: {
       with: {
-        campus: true as const
+        campus: true as const,
+        academicYear: true as const
       }
     },
     careers: true as const,

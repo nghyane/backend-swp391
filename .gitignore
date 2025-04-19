@@ -33,3 +33,6 @@ coverage/
 
 # windsurf rules
 .windsurfrules
+
+# Postman collection
+postman.json
