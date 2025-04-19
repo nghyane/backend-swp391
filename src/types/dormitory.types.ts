@@ -1,20 +1,18 @@
-import { dormitories, campuses } from "../db/schema";
+import { dormitories } from "../db/schema";
+import { Campus } from "./campus.types";
+import { BaseFilterOptions } from "./common.types";
 
-// Type cho dữ liệu campus
-type Campus = {
-  id: number;
-  name: string;
-  address: string | null;
-};
-
-// Type cho dữ liệu dormitory
+/**
+ * Dormitory entity data type with campus information
+ */
 export type Dormitory = typeof dormitories.$inferSelect & {
-  campus: Campus; // Campus là bắt buộc
+  campus: Campus; // Campus is required
 };
 
-// Interface cho các tùy chọn lọc
-export interface DormitoryFilterOptions {
-  name?: string;
+/**
+ * Filter options for dormitory entities
+ */
+export interface DormitoryFilterOptions extends BaseFilterOptions {
   campusId?: number;
   priceMin?: number;
   priceMax?: number;

@@ -1,11 +1,16 @@
 import { Router } from "express";
-import { campusController } from "../controllers/campus.controller";
+import * as campusController from "../controllers/campus.controller";
 import { validateId, validateCommonQueries } from "../../middlewares/validators";
 
 const router = Router();
 
-// Campus routes
 router.get("/", validateCommonQueries(), campusController.getAllCampuses);
 router.get("/:id", validateId(), campusController.getCampusById);
+router.get("/:id/majors", validateId(), campusController.getCampusMajors);
+router.get("/:id/facilities", validateId(), campusController.getCampusFacilities);
+
+router.post("/", campusController.createCampus);
+router.put("/:id", validateId(), campusController.updateCampus);
+router.delete("/:id", validateId(), campusController.deleteCampus);
 
 export default router;

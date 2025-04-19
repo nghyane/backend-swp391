@@ -26,7 +26,50 @@ const getAdmissionMethodById = async (id: number): Promise<AdmissionMethod> => {
   return result;
 };
 
+const createAdmissionMethod = async (data: Omit<AdmissionMethod, 'id'>): Promise<AdmissionMethod> => {
+  const [newAdmissionMethod] = await db.insert(admissionMethods)
+    .values(data)
+    .returning();
+  
+  return newAdmissionMethod;
+};
+
+const updateAdmissionMethod = async (id: number, data: Partial<Omit<AdmissionMethod, 'id'>>): Promise<AdmissionMethod> => {
+  await getAdmissionMethodById(id);
+  
+  const [updatedAdmissionMethod] = await db.update(admissionMethods)
+    .set(data)
+    .where(eq(admissionMethods.id, id))
+    .returning();
+  
+  if (!updatedAdmissionMethod) {
+    throw new NotFoundError('AdmissionMethod', id);
+  }
+  
+  return updatedAdmissionMethod;
+};
+
+const deleteAdmissionMethod = async (id: number): Promise<void> => {
+  await getAdmissionMethodById(id);
+  
+  await db.delete(admissionMethods)
+    .where(eq(admissionMethods.id, id));
+};
+
+const getAdmissionMethodsByMajorId = async (majorId: number): Promise<AdmissionMethod[]> => {
+  throw new Error('Not implemented');
+};
+
+const getAdmissionMethodRequirements = async (admissionMethodId: number): Promise<unknown> => {
+  throw new Error('Not implemented');
+};
+
 export const admissionMethodService = {
   getAllAdmissionMethods,
   getAdmissionMethodById,
+  createAdmissionMethod,
+  updateAdmissionMethod,
+  deleteAdmissionMethod,
+  getAdmissionMethodsByMajorId,
+  getAdmissionMethodRequirements
 };

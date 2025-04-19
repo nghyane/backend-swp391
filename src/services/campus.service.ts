@@ -36,7 +36,50 @@ const getCampusById = async (id: number): Promise<Campus> => {
   return result;
 };
 
+const createCampus = async (data: Omit<Campus, 'id'>): Promise<Campus> => {
+  const [newCampus] = await db.insert(campuses)
+    .values(data)
+    .returning();
+  
+  return newCampus;
+};
+
+const updateCampus = async (id: number, data: Partial<Omit<Campus, 'id'>>): Promise<Campus> => {
+  await getCampusById(id);
+  
+  const [updatedCampus] = await db.update(campuses)
+    .set(data)
+    .where(eq(campuses.id, id))
+    .returning();
+  
+  if (!updatedCampus) {
+    throw new NotFoundError('Campus', id);
+  }
+  
+  return updatedCampus;
+};
+
+const deleteCampus = async (id: number): Promise<void> => {
+  await getCampusById(id);
+  
+  await db.delete(campuses)
+    .where(eq(campuses.id, id));
+};
+
+const getCampusMajors = async (campusId: number): Promise<unknown> => {
+  throw new Error('Not implemented');
+};
+
+const getCampusFacilities = async (campusId: number): Promise<unknown> => {
+  throw new Error('Not implemented');
+};
+
 export const campusService = {
   getAllCampuses,
   getCampusById,
+  createCampus,
+  updateCampus,
+  deleteCampus,
+  getCampusMajors,
+  getCampusFacilities
 };

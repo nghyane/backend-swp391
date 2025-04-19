@@ -5,33 +5,34 @@
  * @module zalo_webhook.controller
  */
 import { Request, Response } from "express";
+import { catch$ } from "../../utils/catch";
 
 /**
- * Xác thực webhook với Zalo (dùng cho đăng ký webhook từ Zalo OA)
+ * Verify Zalo webhook
  * @param req Express Request
  * @param res Express Response
  * @returns void
  */
-const verifyWebhook = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Cập nhật logic xác thực webhook theo tài liệu Zalo OA
-  res.status(200).send("Zalo webhook verified");
-};
+const verifyWebhook = catch$(async (req: Request, res: Response): Promise<void> => {
+	// TODO: Update verification logic according to Zalo OA documentation
+	res.status(200).send("Zalo webhook verified");
+});
 
 /**
- * Nhận và xử lý message từ webhook Zalo
+ * Receive and process message from Zalo webhook
  * @param req Express Request
  * @param res Express Response
- * @returns any
+ * @returns void
  */
-const receiveMessage = async (req: Request, res: Response): Promise<any> => {
-  // TODO: Xử lý message từ Zalo OA webhook
-  res.status(200).send("EVENT_RECEIVED");
-};
+const receiveMessage = catch$(async (req: Request, res: Response): Promise<void> => {
+	// TODO: Update message processing logic according to Zalo OA documentation
+	res.status(200).send("EVENT_RECEIVED");
+});
 
 /**
  * Export các hàm controller cho Zalo webhook
  */
 export const zaloWebhookController = {
-  verifyWebhook,
-  receiveMessage,
+	verifyWebhook,
+	receiveMessage,
 };

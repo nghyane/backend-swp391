@@ -1,13 +1,13 @@
 import { admissionMethods } from "../db/schema";
+import { BaseFilterOptions } from "./common.types";
 
 /**
- * Type for admission method data
+ * Admission method entity data type
  */
 export type AdmissionMethod = typeof admissionMethods.$inferSelect;
 
 /**
- * Interface for admission method filter options
+ * Filter options for admission method entities
  */
-export interface AdmissionMethodFilterOptions {
-  name?: string;
+export interface AdmissionMethodFilterOptions extends BaseFilterOptions {
 }

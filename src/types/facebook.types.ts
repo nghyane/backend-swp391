@@ -2,34 +2,43 @@
  * Types for Facebook Messenger webhook integration
  */
 
+/**
+ * Event received from Facebook webhook
+ */
 export type FacebookWebhookEvent = {
-  sender: {
-    id: string;
+  readonly sender: {
+    readonly id: string;
   };
-  recipient: {
-    id: string;
+  readonly recipient: {
+    readonly id: string;
   };
-  timestamp: number;
-  message?: {
-    mid: string;
-    text: string;
+  readonly timestamp: number;
+  readonly message?: {
+    readonly mid: string;
+    readonly text: string;
   };
-  postback?: {
-    title: string;
-    payload: string;
+  readonly postback?: {
+    readonly title: string;
+    readonly payload: string;
   };
 };
 
+/**
+ * Response from Facebook when sending a message
+ */
 export type FacebookMessageResponse = {
-  recipient_id: string;
-  message_id: string;
+  readonly recipient_id: string;
+  readonly message_id: string;
 };
 
+/**
+ * Request to send a message to Facebook
+ */
 export type FacebookSendMessageRequest = {
-  recipient: {
-    id: string;
+  readonly recipient: {
+    readonly id: string;
   };
-  message: {
-    text: string;
+  readonly message: {
+    readonly text: string;
   };
 };

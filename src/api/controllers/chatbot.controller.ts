@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { FacebookWebhookEvent, FacebookMessageResponse, FacebookSendMessageRequest } from "../../types/facebook.types";
+import { catch$ } from "../../utils/catch";
 
 /**
  * Controller for chatbot-related endpoints.
@@ -9,10 +10,7 @@ import { FacebookWebhookEvent, FacebookMessageResponse, FacebookSendMessageReque
 /**
  * Verify webhook for Facebook Messenger integration
  */
-const verifyWebhook = async (req: Request, res: Response): Promise<void> => {
-  
-
-
+const verifyWebhook = catch$(async (req: Request, res: Response): Promise<void> => {
   // TODO: Implement webhook verification
   // 1. Extract verification token and challenge from query params
   const { "hub.mode": mode, "hub.challenge": challenge, "hub.verify_token": verifyToken } = req.query;
@@ -24,22 +22,24 @@ const verifyWebhook = async (req: Request, res: Response): Promise<void> => {
   } else {
     res.status(403).send("Invalid verification token");
   }
-};
+});
 
 /**
  * Receive and process messages from Facebook Messenger
  */
-const receiveMessage = async (req: Request, res: Response): Promise<any> => {
+const receiveMessage = catch$(async (req: Request, res: Response): Promise<void> => {
   // TODO: Implement message processing
   // 1. Extract Facebook user ID from webhook event
   if (req.body.object !== "page") {
-    return res.status(200).send('EVENT_RECEIVED');
+    res.status(200).send('EVENT_RECEIVED');
+    return;
   }
   // 2. Create or update session with Facebook user ID
   // 3. Process message and generate response
   // 4. Send response back to user
   // 5. Return 200 OK to Facebook
-};
+  res.status(200).send('EVENT_RECEIVED');
+});
 
 
 

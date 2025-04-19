@@ -1,102 +1,82 @@
 import { Request, Response } from "express";
 import { admissionMethodService } from "../../services/admission-method.service";
-import { AdmissionMethodFilterOptions } from "../../types/admission-method.types";
+import { AdmissionMethod, AdmissionMethodFilterOptions } from "../../types/admission-method.types";
+import { catch$ } from "../../utils/catch";
+import { NotFoundError } from "../../utils/errors";
 
-/**
- * Controller for admission method-related endpoints.
- */
 
-/**
- * Get all admission methods
- */
-const getAllAdmissionMethods = async (req: Request, res: Response): Promise<void> => {
-  try {
-    // Get filter parameters from query string
-    const filters: AdmissionMethodFilterOptions = {};
-    
-    if (req.query.name && typeof req.query.name === 'string') {
-      filters.name = req.query.name;
-    }
-    
-    // Get admission methods list from service
-    const admissionMethods = await admissionMethodService.getAllAdmissionMethods(filters);
-    
-    // Return result
-    res.status(200).json({
-      success: true,
-      data: admissionMethods,
-      count: admissionMethods.length
-    });
-  } catch (error) {
-    // Handle error
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve admission methods",
-      error: (error as Error).message
-    });
+export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
+  const filters: AdmissionMethodFilterOptions = {};
+  
+  if (req.query.name && typeof req.query.name === 'string') {
+    filters.name = req.query.name;
   }
-};
+  
+  const admissionMethods = await admissionMethodService.getAllAdmissionMethods(filters);
+  res.status(200).json({
+    success: true,
+    data: admissionMethods,
+    count: admissionMethods.length
+  });
+});
 
-/**
- * Get admission method by ID
- */
-const getAdmissionMethodById = async (req: Request, res: Response): Promise<void> => {
-  try {
-    // ID has been validated and converted by middleware validator
-    const id = parseInt(req.params.id);
-    
-    // Get admission method information from service
-    const admissionMethod = await admissionMethodService.getAdmissionMethodById(id);
-    
-    // Check if not found
-    if (!admissionMethod) {
-      res.status(404).json({
-        success: false,
-        message: `Admission method not found with ID: ${id}`
-      });
-      return;
-    }
-    
-    // Return result
-    res.status(200).json({
-      success: true,
-      data: admissionMethod
-    });
-  } catch (error) {
-    // Handle error
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve admission method information",
-      error: (error as Error).message
-    });
-  }
+export const getAdmissionMethodById = catch$(async (req: Request, res: Response): Promise<void> => {
+  const id = parseInt(req.params.id);
+  const admissionMethod = await admissionMethodService.getAdmissionMethodById(id);
+  res.status(200).json({
+    success: true,
+    data: admissionMethod
+  });
+});
 
-};
+export const getAdmissionMethodRequirements = catch$(async (req: Request, res: Response): Promise<void> => {
 
-/**
- * Get admission method requirements
- */
-const getAdmissionMethodRequirements = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting admission method requirements
-  // 1. Extract admission method ID from request params
-  // 2. Fetch requirements for this admission method
-  // 3. Return requirements data
-};
+  res.status(501).json({
+    success: false,
+    message: "Not implemented yet"
+  });
+});
 
-/**
- * Get admission methods by major
- */
-const getAdmissionMethodsByMajor = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting admission methods by major
-  // 1. Extract major ID from request params
-  // 2. Fetch admission methods for this major
-  // 3. Return admission methods array
-};
+export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
 
-// Export all controller functions
-export const admissionMethodController = {
-  getAllAdmissionMethods,
-  getAdmissionMethodById,
-  getAdmissionMethodRequirements,
-  getAdmissionMethodsByMajor
-};
+  res.status(501).json({
+    success: false,
+    message: "Not implemented yet"
+  });
+});
+
+export const createAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
+  const admissionMethodData: Omit<AdmissionMethod, 'id'> = req.body;
+  
+  const newAdmissionMethod = await admissionMethodService.createAdmissionMethod(admissionMethodData);
+  res.status(201).json({
+    success: true,
+    data: newAdmissionMethod,
+    message: 'Admission method created successfully'
+  });
+});
+
+export const updateAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
+  const id = parseInt(req.params.id);
+  const updateData: Partial<Omit<AdmissionMethod, 'id'>> = req.body;
+  
+  const updatedAdmissionMethod = await admissionMethodService.updateAdmissionMethod(id, updateData);
+  res.status(200).json({
+    success: true,
+    data: updatedAdmissionMethod,
+    message: 'Admission method updated successfully'
+  });
+});
+
+export const deleteAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
+  const id = parseInt(req.params.id);
+  
+  await admissionMethodService.deleteAdmissionMethod(id);
+  res.status(200).json({
+    success: true,
+    message: 'Admission method deleted successfully'
+  });
+});
+
+
+

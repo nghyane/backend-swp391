@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { scholarshipController } from "../controllers/scholarship.controller";
+import * as scholarshipController from "../controllers/scholarship.controller";
 import { validateId, validateCommonQueries } from "../../middlewares/validators";
 
 const router = Router();

@@ -1,13 +1,14 @@
 import { campuses } from "../db/schema";
+import { BaseFilterOptions } from "./common.types";
+
 /**
- * Interface for campus filter options
+ * Filter options for campus entities
  */
-export interface CampusFilterOptions {
-  name?: string;
+export interface CampusFilterOptions extends BaseFilterOptions {
   address?: string;
 }
 
 /**
- * Interface for campus data
+ * Campus entity data type
  */
 export type Campus = typeof campuses.$inferSelect;

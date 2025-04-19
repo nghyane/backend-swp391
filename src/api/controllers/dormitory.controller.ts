@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import * as dormitoryService from "../../services/dormitory.service";
 import { DormitoryFilterOptions } from "../../types/dormitory.types";
-import { asyncHandler } from "../../utils/async-handler";
+import { catch$ } from "../../utils/catch";
 
-const getAllDormitories = async (req: Request, res: Response): Promise<void> => {
+export const getAllDormitories = catch$(async (req: Request, res: Response): Promise<void> => {
   const filters: DormitoryFilterOptions = {};
   
   if (req.query.name) filters.name = req.query.name as string;
-  if (req.query.campusId) filters.campusId = Number(req.query.campusId);
-  if (req.query.priceMin) filters.priceMin = Number(req.query.priceMin);
-  if (req.query.priceMax) filters.priceMax = Number(req.query.priceMax);
+  if (req.query.campusId) filters.campusId = parseInt(req.query.campusId as string);
+  if (req.query.priceMin) filters.priceMin = parseInt(req.query.priceMin as string);
+  if (req.query.priceMax) filters.priceMax = parseInt(req.query.priceMax as string);
   
   const dormitories = await dormitoryService.getAllDormitories(filters);
   
@@ -18,29 +18,29 @@ const getAllDormitories = async (req: Request, res: Response): Promise<void> => 
     data: dormitories,
     count: dormitories.length
   });
-};
+});
 
-const getDormitoryById = async (req: Request, res: Response): Promise<void> => {
-  const dormitoryId = Number(req.params.id);
+export const getDormitoryById = catch$(async (req: Request, res: Response): Promise<void> => {
+  const dormitoryId = parseInt(req.params.id);
   const dormitory = await dormitoryService.getDormitoryById(dormitoryId);
   
   res.status(200).json({
     success: true,
     data: dormitory
   });
-};
+});
 
-const getDormitoryAvailability = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting dormitory availability
-};
+export const getDormitoryAvailability = catch$(async (req: Request, res: Response): Promise<void> => {
+  res.status(501).json({
+    success: false,
+    message: "Not implemented yet"
+  });
+});
 
-const getDormitoryFacilities = async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement getting dormitory facilities
-};
+export const getDormitoryFacilities = catch$(async (req: Request, res: Response): Promise<void> => {
+  res.status(501).json({
+    success: false,
+    message: "Not implemented yet"
+  });
+});
 
-export const dormitoryController = {
-  getAllDormitories: asyncHandler(getAllDormitories),
-  getDormitoryById: asyncHandler(getDormitoryById),
-  getDormitoryAvailability: asyncHandler(getDormitoryAvailability),
-  getDormitoryFacilities: asyncHandler(getDormitoryFacilities)
-};

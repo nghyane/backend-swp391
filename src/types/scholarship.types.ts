@@ -1,15 +1,15 @@
 import { scholarships } from "../db/schema";
+import { BaseFilterOptions } from "./common.types";
 
 /**
- * Type for scholarship data
+ * Scholarship entity data type
  */
 export type Scholarship = typeof scholarships.$inferSelect;
 
 /**
- * Interface for scholarship filter options
+ * Filter options for scholarship entities
  */
-export interface ScholarshipFilterOptions {
-  name?: string;
+export interface ScholarshipFilterOptions extends BaseFilterOptions {
   majorId?: number;
   campusId?: number;
   minAmount?: number;

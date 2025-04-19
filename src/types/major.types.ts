@@ -1,15 +1,15 @@
 import { majors } from "../db/schema";
+import { BaseFilterOptions } from "./common.types";
 
 /**
- * Interface for major filter options
+ * Filter options for major entities
  */
-export interface MajorFilterOptions {
-  name?: string;
+export interface MajorFilterOptions extends BaseFilterOptions {
   code?: string;
   description?: string;
 }
 
 /**
- * Type for major data
+ * Major entity data type
  */
 export type Major = typeof majors.$inferSelect;

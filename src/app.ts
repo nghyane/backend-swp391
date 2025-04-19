@@ -1,9 +1,8 @@
 import express, { Application } from "express";
 import bodyParser from "body-parser";
+import morgan from "morgan";
 import apiRouter from "./api";
 import { errorHandler } from "./middlewares/error.middleware";
-
-import morgan from "morgan";
 
 const app: Application = express();
 
@@ -13,6 +12,8 @@ app.use(morgan(
 ));
 
 app.use("/api", apiRouter);
+
+// Error handler middleware must be registered last
 app.use(errorHandler);
 
 export default app;
