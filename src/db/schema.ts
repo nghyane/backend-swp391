@@ -19,17 +19,6 @@ export const majors = pgTable("majors", {
 });
 
 /**
- * Chương trình đào tạo theo ngành và học kỳ
- */
-export const curriculums = pgTable("curriculums", {
-  id: serial("id").primaryKey(),
-  major_id: integer("major_id").references(() => majors.id).notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  content: text("content"),
-  semester: integer("semester").notNull(),
-});
-
-/**
  * Nghề nghiệp gợi ý theo ngành
  */
 export const careers = pgTable("careers", {
@@ -76,7 +65,7 @@ export const scholarships = pgTable("scholarships", {
 
 
 /**
- * Bảng tài khoản người dùng nội bộ (admin, staff)
+ * Bảng tài khoản người dùng nội bộ (admin, staff) 
  */
 /**
  * Roles for internal users (admin, staff)

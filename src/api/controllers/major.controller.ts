@@ -38,9 +38,14 @@ export const getMajorById = catch$(async (req: Request, res: Response): Promise<
 
 
 export const getMajorsByCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  res.status(501).json({
-    success: false,
-    message: 'Not implemented yet'
+  const campusId = Number(req.params.campusId);
+  
+  const majors = await majorService.getMajorsByCampusId(campusId);
+  
+  res.json({
+    success: true,
+    data: majors,
+    count: majors.length
   });
 });
 

@@ -4,7 +4,7 @@
   "description": "Backend for an admission consulting platform, providing RESTful APIs and chatbot interface for exploring majors, campuses, tuition, scholarships, dormitories, and admission methods.",
   "main": "index.js",
   "scripts": {
-    "dev": "vite-node src/server.ts",
+    "dev": "vite-node --watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },

@@ -3,7 +3,6 @@ import {
   dormitories, 
   campuses, 
   majors, 
-  curriculums, 
   careers, 
   scholarships, 
   majorCampusAdmission, 
@@ -28,18 +27,9 @@ export const campusesRelations = relations(campuses, ({ many }) => ({
 
 // Định nghĩa relations cho majors
 export const majorsRelations = relations(majors, ({ many }) => ({
-  curriculums: many(curriculums),
   careers: many(careers),
   majorCampusAdmissions: many(majorCampusAdmission),
   scholarships: many(scholarships),
-}));
-
-// Định nghĩa relations cho curriculums
-export const curriculumsRelations = relations(curriculums, ({ one }) => ({
-  major: one(majors, {
-    fields: [curriculums.major_id],
-    references: [majors.id],
-  }),
 }));
 
 // Định nghĩa relations cho careers
