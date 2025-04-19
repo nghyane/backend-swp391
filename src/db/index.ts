@@ -1,5 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
+import * as schema from "./schema";
 import env from "../config/env";
 
 const pool = new Pool({
@@ -8,7 +10,8 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
 });
 
-export const db = drizzle(pool);
+// Tạo instance db với schema để hỗ trợ API db.query
+export const db = drizzle(pool, { schema });
 
 export const initDb = async () => {
   try {

@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { dormitories, campuses } from "../db/schema";
-import { eq, and, like, sql } from "drizzle-orm";
+import { eq, and, like, sql, SQL } from "drizzle-orm";
 import { Dormitory, DormitoryFilterOptions } from "../types/dormitory.types";
 
 /**
@@ -11,35 +11,36 @@ import { Dormitory, DormitoryFilterOptions } from "../types/dormitory.types";
 export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = {}): Promise<Dormitory[]> => {
   try {
     // Xây dựng điều kiện lọc
-    const conditions = [];
-    if (filterOptions.name) conditions.push(like(dormitories.name, `%${filterOptions.name}%`));
-    if (filterOptions.campusId) conditions.push(eq(dormitories.campus_id, filterOptions.campusId));
+    const conditions: SQL[] = [];
     
-    // Truy vấn dữ liệu
+    if (filterOptions.name) {
+      conditions.push(like(dormitories.name, `%${filterOptions.name}%`));
+    }
+    
+    if (filterOptions.campusId) {
+      conditions.push(eq(dormitories.campus_id, filterOptions.campusId));
+    }
+    
+    // Sử dụng API db.query
     const results = await db
       .select({
-        dormitory: {
-          id: dormitories.id,
-          campus_id: dormitories.campus_id,
-          name: dormitories.name,
-          description: dormitories.description,
-          capacity: dormitories.capacity,
-        },
+        id: dormitories.id,
+        campus_id: dormitories.campus_id,
+        name: dormitories.name,
+        description: dormitories.description,
+        capacity: dormitories.capacity,
         campus: {
           id: campuses.id,
           name: campuses.name,
-          address: campuses.address,
-        },
+          address: campuses.address
+        }
       })
       .from(dormitories)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
-      
-    // Chuyển đổi kết quả
-    return results.map(row => ({
-      ...row.dormitory,
-      campus: row.campus
-    }));
+    
+    // Chuyển đổi kết quả thành mảng Dormitory
+    return results;
   } catch (error) {
     console.error("Error getting dormitories:", error);
     throw new Error("Failed to retrieve dormitories");
@@ -53,20 +54,19 @@ export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = 
  */
 export const getDormitoryById = async (id: number): Promise<Dormitory | null> => {
   try {
+    // Sử dụng API select
     const result = await db
       .select({
-        dormitory: {
-          id: dormitories.id,
-          campus_id: dormitories.campus_id,
-          name: dormitories.name,
-          description: dormitories.description,
-          capacity: dormitories.capacity,
-        },
+        id: dormitories.id,
+        campus_id: dormitories.campus_id,
+        name: dormitories.name,
+        description: dormitories.description,
+        capacity: dormitories.capacity,
         campus: {
           id: campuses.id,
           name: campuses.name,
-          address: campuses.address,
-        },
+          address: campuses.address
+        }
       })
       .from(dormitories)
       .where(eq(dormitories.id, id))
@@ -74,11 +74,7 @@ export const getDormitoryById = async (id: number): Promise<Dormitory | null> =>
     
     if (result.length === 0) return null;
     
-    const row = result[0];
-    return {
-      ...row.dormitory,
-      campus: row.campus
-    };
+    return result[0];
   } catch (error) {
     console.error("Error getting dormitory by ID:", error);
     throw new Error("Failed to retrieve dormitory");
