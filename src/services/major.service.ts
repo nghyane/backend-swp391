@@ -3,14 +3,9 @@ import { db } from '../db';
 import { majors } from '../db/schema';
 import { Major, MajorFilterOptions } from '../types/major.types';
 
-/**
- * Get all majors with optional filtering
- * @param filters - Optional filters for name, code, and description
- * @returns Array of filtered majors
- */
 const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[]> => {
   if (!filters || (!filters.name && !filters.code && !filters.description)) {
-    return await db.select().from(majors);
+    return await db.query.majors.findMany();
   }
   
   const conditions: SQL[] = [];
@@ -27,19 +22,17 @@ const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[]> => {
     conditions.push(ilike(majors.description, `%${filters.description}%`));
   }
   
-  return await db.select().from(majors).where(or(...conditions));
+  return await db.query.majors.findMany({
+    where: or(...conditions)
+  });
 };
 
-/**
- * Get a major by its ID
- * @param id - Major ID to retrieve
- * @returns Major object if found, null otherwise
- */
 const getMajorById = async (id: number): Promise<Major | null> => {
-  const result = await db.select().from(majors)
-    .where(eq(majors.id, id));
-    
-  return result.length > 0 ? result[0] : null;
+  const result = await db.query.majors.findFirst({
+    where: eq(majors.id, id)
+  });
+  
+  return result ?? null;
 };
 
 export const majorService = {

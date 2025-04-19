@@ -3,9 +3,6 @@ import { db } from '../db';
 import { scholarships } from '../db/schema';
 import { Scholarship, ScholarshipFilterOptions } from '../types/scholarship.types';
 
-/**
- * Lấy tất cả học bổng với tùy chọn lọc
- */
 const getAllScholarships = async (filters?: ScholarshipFilterOptions): Promise<Scholarship[]> => {
   const conditions = [];
   
@@ -25,11 +22,13 @@ const getAllScholarships = async (filters?: ScholarshipFilterOptions): Promise<S
     conditions.push(gte(scholarships.amount, filters.minAmount));
   }
   
-  if (conditions.length > 0) {
-    return await db.select().from(scholarships).where(and(...conditions));
-  }
-  
-  return await db.select().from(scholarships);
+  return await db.query.scholarships.findMany({
+    where: conditions.length > 0 ? and(...conditions) : undefined,
+    with: {
+      major: true,
+      campus: true
+    }
+  });
 };
 
 export const scholarshipService = {

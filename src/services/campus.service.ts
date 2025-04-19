@@ -3,14 +3,9 @@ import { db } from '../db';
 import { campuses } from '../db/schema';
 import { CampusFilterOptions, Campus } from '../types/campus.types';
 
-/**
- * Get all campuses with optional filtering
- * @param filters - Optional filters for name and address
- * @returns Array of filtered campuses
- */
 const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> => {
   if (!filters || (!filters.name && !filters.address)) {
-    return await db.select().from(campuses);
+    return await db.query.campuses.findMany();
   }
   
   const conditions: SQL[] = [];
@@ -23,19 +18,17 @@ const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> 
     conditions.push(ilike(campuses.address, `%${filters.address}%`));
   }
   
-  return await db.select().from(campuses).where(or(...conditions));
+  return await db.query.campuses.findMany({
+    where: or(...conditions)
+  });
 };
 
-/**
- * Get a campus by its ID
- * @param id - Campus ID to retrieve
- * @returns Campus object if found, null otherwise
- */
 const getCampusById = async (id: number): Promise<Campus | null> => {
-  const result = await db.select().from(campuses)
-    .where(eq(campuses.id, id));
-    
-  return result.length > 0 ? result[0] : null;
+  const result = await db.query.campuses.findFirst({
+    where: eq(campuses.id, id)
+  });
+  
+  return result ?? null;
 };
 
 export const campusService = {
