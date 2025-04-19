@@ -1,20 +1,39 @@
-import { eq, ilike } from 'drizzle-orm';
+import { eq, ilike, and, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { admissionMethods } from '../db/schema';
 import { AdmissionMethod, AdmissionMethodFilterOptions } from '../types/admission-method.types';
 import { NotFoundError } from '../utils/errors';
 
-const getAllAdmissionMethods = async (filters?: AdmissionMethodFilterOptions): Promise<AdmissionMethod[]> => {
-  if (!filters || !filters.name) {
-    return await db.query.admissionMethods.findMany();
+export const getAllAdmissionMethods = async (filters?: AdmissionMethodFilterOptions): Promise<AdmissionMethod[]> => {
+  // Nếu không có filter, trả về tất cả
+  if (!filters) {
+    return await db.query.admissionMethods.findMany({
+      orderBy: admissionMethods.name
+    });
   }
   
+  // Xây dựng điều kiện tìm kiếm
+  const conditions: SQL[] = [];
+  
+  if (filters.name) {
+    conditions.push(ilike(admissionMethods.name, `%${filters.name}%`));
+  }
+  
+  // Nếu không có điều kiện nào, trả về tất cả
+  if (conditions.length === 0) {
+    return await db.query.admissionMethods.findMany({
+      orderBy: admissionMethods.name
+    });
+  }
+  
+  // Thực hiện truy vấn với điều kiện
   return await db.query.admissionMethods.findMany({
-    where: ilike(admissionMethods.name, `%${filters.name}%`)
+    where: and(...conditions),
+    orderBy: admissionMethods.name
   });
 };
 
-const getAdmissionMethodById = async (id: number): Promise<AdmissionMethod> => {
+export const getAdmissionMethodById = async (id: number): Promise<AdmissionMethod> => {
   const result = await db.query.admissionMethods.findFirst({
     where: eq(admissionMethods.id, id)
   });
@@ -26,7 +45,7 @@ const getAdmissionMethodById = async (id: number): Promise<AdmissionMethod> => {
   return result;
 };
 
-const createAdmissionMethod = async (data: Omit<AdmissionMethod, 'id'>): Promise<AdmissionMethod> => {
+export const createAdmissionMethod = async (data: Omit<AdmissionMethod, 'id'>): Promise<AdmissionMethod> => {
   const [newAdmissionMethod] = await db.insert(admissionMethods)
     .values(data)
     .returning();
@@ -34,7 +53,8 @@ const createAdmissionMethod = async (data: Omit<AdmissionMethod, 'id'>): Promise
   return newAdmissionMethod;
 };
 
-const updateAdmissionMethod = async (id: number, data: Partial<Omit<AdmissionMethod, 'id'>>): Promise<AdmissionMethod> => {
+export const updateAdmissionMethod = async (id: number, data: Partial<Omit<AdmissionMethod, 'id'>>): Promise<AdmissionMethod> => {
+  // Kiểm tra xem admission method có tồn tại không
   await getAdmissionMethodById(id);
   
   const [updatedAdmissionMethod] = await db.update(admissionMethods)
@@ -49,27 +69,21 @@ const updateAdmissionMethod = async (id: number, data: Partial<Omit<AdmissionMet
   return updatedAdmissionMethod;
 };
 
-const deleteAdmissionMethod = async (id: number): Promise<void> => {
+export const deleteAdmissionMethod = async (id: number): Promise<void> => {
+  // Kiểm tra xem admission method có tồn tại không
   await getAdmissionMethodById(id);
   
   await db.delete(admissionMethods)
     .where(eq(admissionMethods.id, id));
 };
 
-const getAdmissionMethodsByMajorId = async (majorId: number): Promise<AdmissionMethod[]> => {
+export const getAdmissionMethodsByMajorId = async (majorId: number): Promise<AdmissionMethod[]> => {
+  // TODO: Implement this function when the relationship is established
   throw new Error('Not implemented');
 };
 
-const getAdmissionMethodRequirements = async (admissionMethodId: number): Promise<unknown> => {
+export const getAdmissionMethodRequirements = async (admissionMethodId: number): Promise<unknown> => {
+  // TODO: Implement this function when the requirements schema is defined
   throw new Error('Not implemented');
 };
 
-export const admissionMethodService = {
-  getAllAdmissionMethods,
-  getAdmissionMethodById,
-  createAdmissionMethod,
-  updateAdmissionMethod,
-  deleteAdmissionMethod,
-  getAdmissionMethodsByMajorId,
-  getAdmissionMethodRequirements
-};

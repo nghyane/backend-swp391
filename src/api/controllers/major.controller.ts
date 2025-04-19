@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { majorService } from "../../services/major.service";
+import * as majorService from "../../services/major.service";
 import { Major, MajorFilterOptions } from "../../types/major.types";
 import { catch$ } from "../../utils/catch";
 import { NotFoundError } from "../../utils/errors";

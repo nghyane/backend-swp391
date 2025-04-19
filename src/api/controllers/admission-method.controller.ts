@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { admissionMethodService } from "../../services/admission-method.service";
+import * as admissionMethodService from "../../services/admission-method.service";
 import { AdmissionMethod, AdmissionMethodFilterOptions } from "../../types/admission-method.types";
 import { catch$ } from "../../utils/catch";
 import { NotFoundError } from "../../utils/errors";

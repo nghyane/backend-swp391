@@ -4,11 +4,15 @@ import { campuses } from '../db/schema';
 import { CampusFilterOptions, Campus } from '../types/campus.types';
 import { NotFoundError } from '../utils/errors';
 
-const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> => {
-  if (!filters || (!filters.name && !filters.address)) {
-    return await db.query.campuses.findMany();
+export const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> => {
+  // Nếu không có filter, trả về tất cả
+  if (!filters) {
+    return await db.query.campuses.findMany({
+      orderBy: campuses.name
+    });
   }
   
+  // Xây dựng điều kiện tìm kiếm
   const conditions: SQL[] = [];
   
   if (filters.name) {
@@ -19,12 +23,21 @@ const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> 
     conditions.push(ilike(campuses.address, `%${filters.address}%`));
   }
   
+  // Nếu không có điều kiện nào, trả về tất cả
+  if (conditions.length === 0) {
+    return await db.query.campuses.findMany({
+      orderBy: campuses.name
+    });
+  }
+  
+  // Thực hiện truy vấn với điều kiện
   return await db.query.campuses.findMany({
-    where: or(...conditions)
+    where: or(...conditions),
+    orderBy: campuses.name
   });
 };
 
-const getCampusById = async (id: number): Promise<Campus> => {
+export const getCampusById = async (id: number): Promise<Campus> => {
   const result = await db.query.campuses.findFirst({
     where: eq(campuses.id, id)
   });
@@ -36,7 +49,7 @@ const getCampusById = async (id: number): Promise<Campus> => {
   return result;
 };
 
-const createCampus = async (data: Omit<Campus, 'id'>): Promise<Campus> => {
+export const createCampus = async (data: Omit<Campus, 'id'>): Promise<Campus> => {
   const [newCampus] = await db.insert(campuses)
     .values(data)
     .returning();
@@ -44,7 +57,8 @@ const createCampus = async (data: Omit<Campus, 'id'>): Promise<Campus> => {
   return newCampus;
 };
 
-const updateCampus = async (id: number, data: Partial<Omit<Campus, 'id'>>): Promise<Campus> => {
+export const updateCampus = async (id: number, data: Partial<Omit<Campus, 'id'>>): Promise<Campus> => {
+  // Kiểm tra xem campus có tồn tại không
   await getCampusById(id);
   
   const [updatedCampus] = await db.update(campuses)
@@ -59,27 +73,21 @@ const updateCampus = async (id: number, data: Partial<Omit<Campus, 'id'>>): Prom
   return updatedCampus;
 };
 
-const deleteCampus = async (id: number): Promise<void> => {
+export const deleteCampus = async (id: number): Promise<void> => {
+  // Kiểm tra xem campus có tồn tại không
   await getCampusById(id);
   
   await db.delete(campuses)
     .where(eq(campuses.id, id));
 };
 
-const getCampusMajors = async (campusId: number): Promise<unknown> => {
+export const getCampusMajors = async (campusId: number): Promise<unknown> => {
+  // TODO: Implement this function when the relationship is established
   throw new Error('Not implemented');
 };
 
-const getCampusFacilities = async (campusId: number): Promise<unknown> => {
+export const getCampusFacilities = async (campusId: number): Promise<unknown> => {
+  // TODO: Implement this function when the facilities schema is defined
   throw new Error('Not implemented');
 };
 
-export const campusService = {
-  getAllCampuses,
-  getCampusById,
-  createCampus,
-  updateCampus,
-  deleteCampus,
-  getCampusMajors,
-  getCampusFacilities
-};

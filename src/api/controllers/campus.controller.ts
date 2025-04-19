@@ -1,5 +1,13 @@
 import { Request, Response } from "express";
-import { campusService } from "../../services/campus.service";
+import { 
+  getAllCampuses as getAllCampusesService,
+  getCampusById as getCampusByIdService,
+  createCampus as createCampusService,
+  updateCampus as updateCampusService,
+  deleteCampus as deleteCampusService,
+  getCampusMajors as getCampusMajorsService,
+  getCampusFacilities as getCampusFacilitiesService
+} from "../../services/campus.service";
 import { Campus, CampusFilterOptions } from "../../types/campus.types";
 import { catch$ } from "../../utils/catch";
 import { NotFoundError } from "../../utils/errors";
@@ -13,7 +21,7 @@ export const getAllCampuses = catch$(async (req: Request, res: Response): Promis
   if (address) filters.address = String(address);
   
   const hasFilters = Object.keys(filters).length > 0;
-  const campuses = await campusService.getAllCampuses(hasFilters ? filters : undefined);
+  const campuses = await getAllCampusesService(hasFilters ? filters : undefined);
   
   res.json({
     success: true,
@@ -25,7 +33,7 @@ export const getAllCampuses = catch$(async (req: Request, res: Response): Promis
 
 export const getCampusById = catch$(async (req: Request, res: Response): Promise<void> => {
   const id = Number(req.params.id);
-  const campus = await campusService.getCampusById(id);
+  const campus = await getCampusByIdService(id);
   res.json({
     success: true,
     data: campus
@@ -34,7 +42,7 @@ export const getCampusById = catch$(async (req: Request, res: Response): Promise
 
 export const createCampus = catch$(async (req: Request, res: Response): Promise<void> => {
   const campusData: Omit<Campus, 'id'> = req.body;
-  const newCampus = await campusService.createCampus(campusData);
+  const newCampus = await createCampusService(campusData);
   res.status(201).json({
     success: true,
     data: newCampus,
@@ -46,7 +54,7 @@ export const updateCampus = catch$(async (req: Request, res: Response): Promise<
   const id = Number(req.params.id);
   const updateData: Partial<Omit<Campus, 'id'>> = req.body;
   
-  const updatedCampus = await campusService.updateCampus(id, updateData);
+  const updatedCampus = await updateCampusService(id, updateData);
   res.json({
     success: true,
     data: updatedCampus,
@@ -55,10 +63,10 @@ export const updateCampus = catch$(async (req: Request, res: Response): Promise<
 });
 
 export const deleteCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = parseInt(req.params.id);
+  const id = Number(req.params.id);
   
-  await campusService.deleteCampus(id);
-  res.status(200).json({
+  await deleteCampusService(id);
+  res.json({
     success: true,
     message: 'Campus deleted successfully'
   });

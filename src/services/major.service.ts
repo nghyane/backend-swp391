@@ -4,11 +4,15 @@ import { majors } from '../db/schema';
 import { Major, MajorFilterOptions } from '../types/major.types';
 import { NotFoundError } from '../utils/errors';
 
-const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[]> => {
-  if (!filters || (!filters.name && !filters.code && !filters.description)) {
-    return await db.query.majors.findMany();
+export const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[]> => {
+  // Nếu không có filter, trả về tất cả
+  if (!filters) {
+    return await db.query.majors.findMany({
+      orderBy: majors.name
+    });
   }
   
+  // Xây dựng điều kiện tìm kiếm
   const conditions: SQL[] = [];
   
   if (filters.name) {
@@ -23,12 +27,21 @@ const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[]> => {
     conditions.push(ilike(majors.description, `%${filters.description}%`));
   }
   
+  // Nếu không có điều kiện nào, trả về tất cả
+  if (conditions.length === 0) {
+    return await db.query.majors.findMany({
+      orderBy: majors.name
+    });
+  }
+  
+  // Thực hiện truy vấn với điều kiện
   return await db.query.majors.findMany({
-    where: or(...conditions)
+    where: or(...conditions),
+    orderBy: majors.name
   });
 };
 
-const getMajorById = async (id: number): Promise<Major> => {
+export const getMajorById = async (id: number): Promise<Major> => {
   const result = await db.query.majors.findFirst({
     where: eq(majors.id, id)
   });
@@ -40,8 +53,40 @@ const getMajorById = async (id: number): Promise<Major> => {
   return result;
 };
 
-export const majorService = {
-  getAllMajors,
-  getMajorById,
+export const getMajorsByCampusId = async (campusId: number): Promise<Major[]> => {
+  // TODO: Implement this function when the relationship is established
+  throw new Error('Not implemented');
+};
+
+export const createMajor = async (data: Omit<Major, 'id'>): Promise<Major> => {
+  const [newMajor] = await db.insert(majors)
+    .values(data)
+    .returning();
+  
+  return newMajor;
+};
+
+export const updateMajor = async (id: number, data: Partial<Omit<Major, 'id'>>): Promise<Major> => {
+  // Kiểm tra xem major có tồn tại không
+  await getMajorById(id);
+  
+  const [updatedMajor] = await db.update(majors)
+    .set(data)
+    .where(eq(majors.id, id))
+    .returning();
+  
+  if (!updatedMajor) {
+    throw new NotFoundError('Major', id);
+  }
+  
+  return updatedMajor;
+};
+
+export const deleteMajor = async (id: number): Promise<void> => {
+  // Kiểm tra xem major có tồn tại không
+  await getMajorById(id);
+  
+  await db.delete(majors)
+    .where(eq(majors.id, id));
 };
 
