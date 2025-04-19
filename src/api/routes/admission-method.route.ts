@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { admissionMethodController } from "../controllers/admission-method.controller";
-import { validateIdParam } from "../../middlewares/validators";
+import { validateId, validateCommonQueries } from "../../middlewares/validators";
 
 const router = Router();
 
 // Admission method routes
-router.get("/", admissionMethodController.getAllAdmissionMethods);
-router.get("/major/:majorId", validateIdParam("majorId"), admissionMethodController.getAdmissionMethodsByMajor);
-router.get("/:id", validateIdParam(), admissionMethodController.getAdmissionMethodById);
-router.get("/:id/requirements", validateIdParam(), admissionMethodController.getAdmissionMethodRequirements);
+router.get("/", validateCommonQueries(), admissionMethodController.getAllAdmissionMethods);
+router.get("/major/:majorId", validateId("majorId"), admissionMethodController.getAdmissionMethodsByMajor);
+router.get("/:id", validateId(), admissionMethodController.getAdmissionMethodById);
+router.get("/:id/requirements", validateId(), admissionMethodController.getAdmissionMethodRequirements);
 
 export default router;

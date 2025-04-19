@@ -1,2 +1,1 @@
-export * from './id.validator';
-export * from './query.validator';
+export * from './common.validator';
