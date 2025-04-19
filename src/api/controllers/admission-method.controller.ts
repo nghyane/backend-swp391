@@ -6,24 +6,28 @@ import { NotFoundError } from "../../utils/errors";
 
 
 export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
-  const filters: AdmissionMethodFilterOptions = {};
+  const { name } = req.query;
   
-  if (req.query.name && typeof req.query.name === 'string') {
-    filters.name = req.query.name;
-  }
+  const filters: AdmissionMethodFilterOptions = {
+    ...(name ? { name: String(name) } : {})
+  };
   
-  const admissionMethods = await admissionMethodService.getAllAdmissionMethods(filters);
-  res.status(200).json({
+  const hasFilters = Object.keys(filters).length > 0;
+  const admissionMethods = await admissionMethodService.getAllAdmissionMethods(hasFilters ? filters : undefined);
+  
+  res.json({
     success: true,
     data: admissionMethods,
-    count: admissionMethods.length
+    count: admissionMethods.length,
+    filters: hasFilters ? filters : undefined
   });
 });
 
 export const getAdmissionMethodById = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = parseInt(req.params.id);
+  const id = Number(req.params.id);
   const admissionMethod = await admissionMethodService.getAdmissionMethodById(id);
-  res.status(200).json({
+  
+  res.json({
     success: true,
     data: admissionMethod
   });

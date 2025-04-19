@@ -20,7 +20,7 @@ export const getAllCampuses = catch$(async (req: Request, res: Response): Promis
 });
 
 export const getCampusById = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = parseInt(req.params.id);
+  const id = Number(req.params.id);
   const campus = await campusService.getCampusById(id);
   res.json({
     success: true,
@@ -39,11 +39,11 @@ export const createCampus = catch$(async (req: Request, res: Response): Promise<
 });
 
 export const updateCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = parseInt(req.params.id);
+  const id = Number(req.params.id);
   const updateData: Partial<Omit<Campus, 'id'>> = req.body;
   
   const updatedCampus = await campusService.updateCampus(id, updateData);
-  res.status(200).json({
+  res.json({
     success: true,
     data: updatedCampus,
     message: 'Campus updated successfully'

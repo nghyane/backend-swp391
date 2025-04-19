@@ -1,22 +1,26 @@
 import { Request, Response } from "express";
 import * as dormitoryService from "../../services/dormitory.service";
-import { DormitoryFilterOptions } from "../../types/dormitory.types";
+import { Dormitory, DormitoryFilterOptions } from "../../types/dormitory.types";
 import { catch$ } from "../../utils/catch";
 
 export const getAllDormitories = catch$(async (req: Request, res: Response): Promise<void> => {
-  const filters: DormitoryFilterOptions = {};
+  const { name, campusId, priceMin, priceMax } = req.query;
   
-  if (req.query.name) filters.name = req.query.name as string;
-  if (req.query.campusId) filters.campusId = parseInt(req.query.campusId as string);
-  if (req.query.priceMin) filters.priceMin = parseInt(req.query.priceMin as string);
-  if (req.query.priceMax) filters.priceMax = parseInt(req.query.priceMax as string);
+  const filters: DormitoryFilterOptions = {
+    ...(name ? { name: String(name) } : {}),
+    ...(campusId ? { campusId: Number(campusId) } : {}),
+    ...(priceMin ? { priceMin: Number(priceMin) } : {}),
+    ...(priceMax ? { priceMax: Number(priceMax) } : {})
+  };
   
-  const dormitories = await dormitoryService.getAllDormitories(filters);
+  const hasFilters = Object.keys(filters).length > 0;
+  const dormitories = await dormitoryService.getAllDormitories(hasFilters ? filters : undefined);
   
-  res.status(200).json({
+  res.json({
     success: true,
     data: dormitories,
-    count: dormitories.length
+    count: dormitories.length,
+    filters: hasFilters ? filters : undefined
   });
 });
 

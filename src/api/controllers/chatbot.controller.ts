@@ -2,15 +2,9 @@ import { Request, Response } from "express";
 import { FacebookWebhookEvent, FacebookMessageResponse, FacebookSendMessageRequest } from "../../types/facebook.types";
 import { catch$ } from "../../utils/catch";
 
-/**
- * Controller for chatbot-related endpoints.
- * Handles Facebook Messenger webhook integration and message processing.
- */
+// Controller for Facebook Messenger webhook integration
 
-/**
- * Verify webhook for Facebook Messenger integration
- */
-const verifyWebhook = catch$(async (req: Request, res: Response): Promise<void> => {
+export const verifyWebhook = catch$(async (req: Request, res: Response): Promise<void> => {
   // TODO: Implement webhook verification
   // 1. Extract verification token and challenge from query params
   const { "hub.mode": mode, "hub.challenge": challenge, "hub.verify_token": verifyToken } = req.query;
@@ -24,10 +18,7 @@ const verifyWebhook = catch$(async (req: Request, res: Response): Promise<void> 
   }
 });
 
-/**
- * Receive and process messages from Facebook Messenger
- */
-const receiveMessage = catch$(async (req: Request, res: Response): Promise<void> => {
+export const receiveMessage = catch$(async (req: Request, res: Response): Promise<void> => {
   // TODO: Implement message processing
   // 1. Extract Facebook user ID from webhook event
   if (req.body.object !== "page") {
@@ -43,8 +34,4 @@ const receiveMessage = catch$(async (req: Request, res: Response): Promise<void>
 
 
 
-// Export all controller functions
-export const chatbotController = {
-  verifyWebhook,
-  receiveMessage,
-};
+

@@ -27,7 +27,7 @@ export const getAllMajors = catch$(async (req: Request, res: Response): Promise<
 });
 
 export const getMajorById = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = parseInt(req.params.id);
+  const id = Number(req.params.id);
   const major = await majorService.getMajorById(id);
   res.json({
     success: true,

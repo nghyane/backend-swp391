@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { chatbotController } from "../controllers/chatbot.controller";
+import * as chatbotController from "../controllers/chatbot.controller";
 import { zaloWebhookController } from "../controllers/zalo-webhook.controller";
 import { validateCustomQueries, validateBody } from "../../middlewares/validators";
 import { query, body } from "express-validator";
