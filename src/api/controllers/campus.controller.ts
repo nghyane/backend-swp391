@@ -6,15 +6,19 @@ import { NotFoundError } from "../../utils/errors";
 
 export const getAllCampuses = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name, address } = req.query;
-  const filters: CampusFilterOptions = {
-    ...(name ? { name: String(name) } : {}),
-    ...(address ? { address: String(address) } : {})
-  };
+  
+  const filters: CampusFilterOptions = {};
+  
+  if (name) filters.name = String(name);
+  if (address) filters.address = String(address);
+  
   const hasFilters = Object.keys(filters).length > 0;
   const campuses = await campusService.getAllCampuses(hasFilters ? filters : undefined);
+  
   res.json({
     success: true,
     data: campuses,
+    count: campuses.length,
     filters: hasFilters ? filters : undefined
   });
 });

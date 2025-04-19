@@ -7,11 +7,11 @@ import { NotFoundError } from "../../utils/errors";
 export const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name, code, description } = req.query;
   
-  const filters: MajorFilterOptions = {
-    ...(name ? { name: String(name) } : {}),
-    ...(code ? { code: String(code) } : {}),
-    ...(description ? { description: String(description) } : {})
-  };
+  const filters: MajorFilterOptions = {};
+  
+  if (name) filters.name = String(name);
+  if (code) filters.code = String(code);
+  if (description) filters.description = String(description);
   
   const hasFilters = Object.keys(filters).length > 0;
   
@@ -22,6 +22,7 @@ export const getAllMajors = catch$(async (req: Request, res: Response): Promise<
   res.json({
     success: true,
     data: majors,
+    count: majors.length,
     filters: hasFilters ? filters : undefined
   });
 });

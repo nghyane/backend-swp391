@@ -8,9 +8,9 @@ import { NotFoundError } from "../../utils/errors";
 export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name } = req.query;
   
-  const filters: AdmissionMethodFilterOptions = {
-    ...(name ? { name: String(name) } : {})
-  };
+  const filters: AdmissionMethodFilterOptions = {};
+  
+  if (name) filters.name = String(name);
   
   const hasFilters = Object.keys(filters).length > 0;
   const admissionMethods = await admissionMethodService.getAllAdmissionMethods(hasFilters ? filters : undefined);

@@ -6,12 +6,12 @@ import { catch$ } from "../../utils/catch";
 export const getAllDormitories = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name, campusId, priceMin, priceMax } = req.query;
   
-  const filters: DormitoryFilterOptions = {
-    ...(name ? { name: String(name) } : {}),
-    ...(campusId ? { campusId: Number(campusId) } : {}),
-    ...(priceMin ? { priceMin: Number(priceMin) } : {}),
-    ...(priceMax ? { priceMax: Number(priceMax) } : {})
-  };
+  const filters: DormitoryFilterOptions = {};
+  
+  if (name) filters.name = String(name);
+  if (campusId) filters.campusId = Number(campusId);
+  if (priceMin) filters.priceMin = Number(priceMin);
+  if (priceMax) filters.priceMax = Number(priceMax);
   
   const hasFilters = Object.keys(filters).length > 0;
   const dormitories = await dormitoryService.getAllDormitories(hasFilters ? filters : undefined);

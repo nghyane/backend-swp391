@@ -7,12 +7,12 @@ import { catch$ } from "../../utils/catch";
 export const getAllScholarships = catch$(async (req: Request, res: Response): Promise<void> => {
   const { name, majorId, campusId, minAmount } = req.query;
   
-  const filters: ScholarshipFilterOptions = {
-    ...(name ? { name: String(name) } : {}),
-    ...(majorId ? { majorId: Number(majorId) } : {}),
-    ...(campusId ? { campusId: Number(campusId) } : {}),
-    ...(minAmount ? { minAmount: Number(minAmount) } : {})
-  };
+  const filters: ScholarshipFilterOptions = {};
+  
+  if (name) filters.name = String(name);
+  if (majorId) filters.majorId = Number(majorId);
+  if (campusId) filters.campusId = Number(campusId);
+  if (minAmount) filters.minAmount = Number(minAmount);
   
   const hasFilters = Object.keys(filters).length > 0;
   const scholarships = await scholarshipService.getAllScholarships(hasFilters ? filters : undefined);
