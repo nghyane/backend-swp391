@@ -12,45 +12,38 @@ export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = 
   try {
     // Xây dựng điều kiện lọc
     const conditions = [];
+    if (filterOptions.name) conditions.push(like(dormitories.name, `%${filterOptions.name}%`));
+    if (filterOptions.campusId) conditions.push(eq(dormitories.campus_id, filterOptions.campusId));
     
-    // Lọc theo tên
-    if (filterOptions.name) {
-      conditions.push(like(dormitories.name, `%${filterOptions.name}%`));
-    }
-    
-    // Lọc theo campus
-    if (filterOptions.campusId) {
-      conditions.push(eq(dormitories.campus_id, filterOptions.campusId));
-    }
-    
-    // Truy vấn dữ liệu - luôn join với campus
-    const dormitoryList = await db
+    // Truy vấn dữ liệu với campus
+    const results = await db
       .select({
-        dormitory: dormitories,
-        campus: campuses
+        id: dormitories.id,
+        campus_id: dormitories.campus_id,
+        name: dormitories.name,
+        description: dormitories.description,
+        capacity: dormitories.capacity,
+        campus_id_ref: campuses.id,
+        campus_name: campuses.name,
+        campus_address: campuses.address
       })
       .from(dormitories)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
     
-    // Chuyển đổi kết quả thành mảng Dormitory
-    return dormitoryList.map(item => {
-      const dormitory: Dormitory = {
-        id: item.dormitory.id,
-        campus_id: item.dormitory.campus_id,
-        name: item.dormitory.name,
-        description: item.dormitory.description,
-        capacity: item.dormitory.capacity,
-        // Luôn bao gồm thông tin campus
-        campus: {
-          id: item.campus.id,
-          name: item.campus.name,
-          address: item.campus.address
-        }
-      };
-      
-      return dormitory;
-    });
+    // Chuyển đổi kết quả
+    return results.map(item => ({
+      id: item.id,
+      campus_id: item.campus_id,
+      name: item.name,
+      description: item.description,
+      capacity: item.capacity,
+      campus: {
+        id: item.campus_id_ref,
+        name: item.campus_name,
+        address: item.campus_address
+      }
+    }));
   } catch (error) {
     console.error("Error getting dormitories:", error);
     throw new Error("Failed to retrieve dormitories");
@@ -66,33 +59,34 @@ export const getDormitoryById = async (id: number): Promise<Dormitory | null> =>
   try {
     const result = await db
       .select({
-        dormitory: dormitories,
-        campus: campuses
+        id: dormitories.id,
+        campus_id: dormitories.campus_id,
+        name: dormitories.name,
+        description: dormitories.description,
+        capacity: dormitories.capacity,
+        campus_id_ref: campuses.id,
+        campus_name: campuses.name,
+        campus_address: campuses.address
       })
       .from(dormitories)
       .where(eq(dormitories.id, id))
       .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
     
-    if (result.length === 0) {
-      return null;
-    }
+    if (result.length === 0) return null;
     
     const item = result[0];
-    const dormitory: Dormitory = {
-      id: item.dormitory.id,
-      campus_id: item.dormitory.campus_id,
-      name: item.dormitory.name,
-      description: item.dormitory.description,
-      capacity: item.dormitory.capacity,
-      // Luôn bao gồm thông tin campus
+    return {
+      id: item.id,
+      campus_id: item.campus_id,
+      name: item.name,
+      description: item.description,
+      capacity: item.capacity,
       campus: {
-        id: item.campus.id,
-        name: item.campus.name,
-        address: item.campus.address
+        id: item.campus_id_ref,
+        name: item.campus_name,
+        address: item.campus_address
       }
     };
-    
-    return dormitory;
   } catch (error) {
     console.error("Error getting dormitory by ID:", error);
     throw new Error("Failed to retrieve dormitory");
