@@ -11,36 +11,23 @@ import { Dormitory, DormitoryFilterOptions } from "../types/dormitory.types";
 export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = {}): Promise<Dormitory[]> => {
   try {
     // Xây dựng điều kiện lọc
-    const conditions: SQL[] = [];
+    const filters = [];
     
     if (filterOptions.name) {
-      conditions.push(like(dormitories.name, `%${filterOptions.name}%`));
+      filters.push(like(dormitories.name, `%${filterOptions.name}%`));
     }
     
     if (filterOptions.campusId) {
-      conditions.push(eq(dormitories.campus_id, filterOptions.campusId));
+      filters.push(eq(dormitories.campus_id, filterOptions.campusId));
     }
     
-    // Sử dụng API db.query
-    const results = await db
-      .select({
-        id: dormitories.id,
-        campus_id: dormitories.campus_id,
-        name: dormitories.name,
-        description: dormitories.description,
-        capacity: dormitories.capacity,
-        campus: {
-          id: campuses.id,
-          name: campuses.name,
-          address: campuses.address
-        }
-      })
-      .from(dormitories)
-      .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
-    
-    // Chuyển đổi kết quả thành mảng Dormitory
-    return results;
+    // Sử dụng API db.query.find
+    return await db.query.dormitories.findMany({
+      where: filters.length > 0 ? and(...filters) : undefined,
+      with: {
+        campus: true
+      }
+    });
   } catch (error) {
     console.error("Error getting dormitories:", error);
     throw new Error("Failed to retrieve dormitories");
@@ -54,27 +41,16 @@ export const getAllDormitories = async (filterOptions: DormitoryFilterOptions = 
  */
 export const getDormitoryById = async (id: number): Promise<Dormitory | null> => {
   try {
-    // Sử dụng API select
-    const result = await db
-      .select({
-        id: dormitories.id,
-        campus_id: dormitories.campus_id,
-        name: dormitories.name,
-        description: dormitories.description,
-        capacity: dormitories.capacity,
-        campus: {
-          id: campuses.id,
-          name: campuses.name,
-          address: campuses.address
-        }
-      })
-      .from(dormitories)
-      .where(eq(dormitories.id, id))
-      .innerJoin(campuses, eq(dormitories.campus_id, campuses.id));
+    // Sử dụng API db.query.find
+    const result = await db.query.dormitories.findFirst({
+      where: eq(dormitories.id, id),
+      with: {
+        campus: true
+      }
+    });
     
-    if (result.length === 0) return null;
-    
-    return result[0];
+    // Chuyển đổi undefined thành null để phù hợp với kiểu trả về
+    return result || null;
   } catch (error) {
     console.error("Error getting dormitory by ID:", error);
     throw new Error("Failed to retrieve dormitory");
