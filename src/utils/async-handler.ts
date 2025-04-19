@@ -25,7 +25,11 @@ type AsyncControllerFunction = (req: Request, res: Response, next: NextFunction)
  * @returns Hàm wrapper đã xử lý lỗi
  */
 export const asyncHandler = (fn: AsyncControllerFunction) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+      next(error);
+    }
   };
 };
