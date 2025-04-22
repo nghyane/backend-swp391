@@ -1,0 +1,338 @@
+{
+  "info": {
+    "name": "SPW391 Backend API",
+    "description": "API Collection cho dự án SPW391 Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admission Methods",
+      "description": "API liên quan đến phương thức xét tuyển",
+      "item": [
+        {
+          "name": "Get All Admission Methods",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods?name=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "description": "Lọc theo tên phương thức xét tuyển"
+                }
+              ]
+            },
+            "description": "Lấy danh sách tất cả phương thức xét tuyển với tùy chọn lọc theo tên"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Admission Method by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID của phương thức xét tuyển"
+                }
+              ]
+            },
+            "description": "Lấy thông tin chi tiết của một phương thức xét tuyển theo ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Admission Methods by Major Code",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods/major/:majorCode",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods", "major", ":majorCode"],
+              "variable": [
+                {
+                  "key": "majorCode",
+                  "value": "IT",
+                  "description": "Mã ngành học"
+                }
+              ]
+            },
+            "description": "Lấy danh sách phương thức xét tuyển áp dụng cho một ngành học cụ thể"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Majors by Admission Method",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods/:id/majors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods", ":id", "majors"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID của phương thức xét tuyển"
+                }
+              ]
+            },
+            "description": "Lấy danh sách ngành học áp dụng một phương thức xét tuyển cụ thể"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Admission Method",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Xét học bạ THPT\",\n  \"description\": \"Xét tuyển dựa trên kết quả học tập THPT\",\n  \"application_url\": \"https://example.com/hocba\"\n}"
+            },
+            "description": "Tạo một phương thức xét tuyển mới"
+          },
+          "response": []
+        },
+        {
+          "name": "Associate Major with Admission Method",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods/associate-major",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods", "associate-major"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"majorId\": 1,\n  \"admissionMethodId\": 1,\n  \"academicYearId\": 1,\n  \"campusId\": 1,\n  \"minScore\": 24,\n  \"note\": \"Điểm tối thiểu 24/30\"\n}"
+            },
+            "description": "Liên kết một ngành học với một phương thức xét tuyển"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Global Admission Method Application",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods/global-application",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods", "global-application"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admissionMethodId\": 1,\n  \"academicYearId\": 1,\n  \"campusId\": 1,\n  \"note\": \"Áp dụng cho tất cả ngành\"\n}"
+            },
+            "description": "Tạo áp dụng phương thức xét tuyển cho tất cả ngành"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Admission Method",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID của phương thức xét tuyển"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Xét học bạ THPT (Cập nhật)\",\n  \"description\": \"Xét tuyển dựa trên kết quả học tập THPT - Phiên bản cập nhật\"\n}"
+            },
+            "description": "Cập nhật thông tin của một phương thức xét tuyển"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Admission Method",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/admission-methods/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admission-methods", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID của phương thức xét tuyển"
+                }
+              ]
+            },
+            "description": "Xóa một phương thức xét tuyển"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Majors",
+      "description": "API liên quan đến ngành học",
+      "item": [
+        {
+          "name": "Get All Majors",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/majors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "majors"]
+            },
+            "description": "Lấy danh sách tất cả ngành học"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Major by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/majors/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "majors", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID của ngành học"
+                }
+              ]
+            },
+            "description": "Lấy thông tin chi tiết của một ngành học theo ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Campuses",
+      "description": "API liên quan đến cơ sở đào tạo",
+      "item": [
+        {
+          "name": "Get All Campuses",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/campuses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "campuses"]
+            },
+            "description": "Lấy danh sách tất cả cơ sở đào tạo"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Campus by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/campuses/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "campuses", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID của cơ sở đào tạo"
+                }
+              ]
+            },
+            "description": "Lấy thông tin chi tiết của một cơ sở đào tạo theo ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dormitories",
+      "description": "API liên quan đến ký túc xá",
+      "item": [
+        {
+          "name": "Get All Dormitories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/dormitories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dormitories"]
+            },
+            "description": "Lấy danh sách tất cả ký túc xá"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dormitory by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/dormitories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dormitories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID của ký túc xá"
+                }
+              ]
+            },
+            "description": "Lấy thông tin chi tiết của một ký túc xá theo ID"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

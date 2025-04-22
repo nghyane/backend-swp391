@@ -16,7 +16,12 @@ const DEFAULT_QUERY_OPTIONS = {
     careers: true as const,
     scholarships: {
       with: {
-        campus: true as const
+        availabilities: {
+          with: {
+            campus: true as const,
+            academicYear: true as const
+          }
+        }
       }
     }
   }
@@ -47,7 +52,8 @@ export const getAllMajors = async (filters?: MajorFilterOptions): Promise<Major[
 
 export const getMajorById = async (id: number): Promise<Major> => {
   const result = await db.query.majors.findFirst({
-    where: eq(majors.id, id)
+    where: eq(majors.id, id),
+    ...DEFAULT_QUERY_OPTIONS
   });
   if (!result) throw new NotFoundError('Major', id);
   return result;
@@ -80,5 +86,18 @@ export const updateMajor = async (id: number, data: Partial<Omit<Major, 'id'>>):
 export const deleteMajor = async (id: number): Promise<void> => {
   await getMajorById(id);
   await db.delete(majors).where(eq(majors.id, id));
+};
+
+/**
+ * Get major details by code
+ * This function retrieves a major by its unique code rather than ID
+ */
+export const getMajorByCode = async (code: string): Promise<Major> => {
+  const result = await db.query.majors.findFirst({
+    where: eq(majors.code, code),
+    ...DEFAULT_QUERY_OPTIONS
+  });
+  if (!result) throw new NotFoundError('Major with code', code);
+  return result;
 };
 

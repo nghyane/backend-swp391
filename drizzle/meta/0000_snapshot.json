@@ -1,5 +1,5 @@
 {
-  "id": "70707135-6b51-4950-bad6-f513bc346fc7",
+  "id": "b17e972b-37d7-4a5b-8bbc-c556cbeb44cd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -23,6 +23,185 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.admission_method_applications": {
+      "name": "admission_method_applications",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "admission_method_id": {
+          "name": "admission_method_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "academic_year_id": {
+          "name": "academic_year_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "campus_id": {
+          "name": "campus_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "major_id": {
+          "name": "major_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "min_score": {
+          "name": "min_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "uniq_admission_year_campus_major": {
+          "name": "uniq_admission_year_campus_major",
+          "columns": [
+            {
+              "expression": "admission_method_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "academic_year_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "campus_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "major_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_admission_app_method": {
+          "name": "idx_admission_app_method",
+          "columns": [
+            {
+              "expression": "admission_method_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_admission_app_major": {
+          "name": "idx_admission_app_major",
+          "columns": [
+            {
+              "expression": "major_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "admission_method_applications_admission_method_id_admission_methods_id_fk": {
+          "name": "admission_method_applications_admission_method_id_admission_methods_id_fk",
+          "tableFrom": "admission_method_applications",
+          "tableTo": "admission_methods",
+          "columnsFrom": [
+            "admission_method_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "admission_method_applications_academic_year_id_academic_years_id_fk": {
+          "name": "admission_method_applications_academic_year_id_academic_years_id_fk",
+          "tableFrom": "admission_method_applications",
+          "tableTo": "academic_years",
+          "columnsFrom": [
+            "academic_year_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "admission_method_applications_campus_id_campuses_id_fk": {
+          "name": "admission_method_applications_campus_id_campuses_id_fk",
+          "tableFrom": "admission_method_applications",
+          "tableTo": "campuses",
+          "columnsFrom": [
+            "campus_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "admission_method_applications_major_id_majors_id_fk": {
+          "name": "admission_method_applications_major_id_majors_id_fk",
+          "tableFrom": "admission_method_applications",
+          "tableTo": "majors",
+          "columnsFrom": [
+            "major_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -113,75 +292,73 @@
           "primaryKey": false,
           "notNull": true
         },
-        "major_id": {
-          "name": "major_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "careers_major_id_majors_id_fk": {
-          "name": "careers_major_id_majors_id_fk",
-          "tableFrom": "careers",
-          "tableTo": "majors",
-          "columnsFrom": [
-            "major_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.curriculums": {
-      "name": "curriculums",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "major_id": {
-          "name": "major_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "semester": {
-          "name": "semester",
+        "salary_range": {
+          "name": "salary_range",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "info_url": {
+          "name": "info_url",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "major_id": {
+          "name": "major_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_career_major": {
+          "name": "idx_career_major",
+          "columns": [
+            {
+              "expression": "major_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_career_category": {
+          "name": "idx_career_category",
+          "columns": [
+            {
+              "expression": "category",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "curriculums_major_id_majors_id_fk": {
-          "name": "curriculums_major_id_majors_id_fk",
-          "tableFrom": "curriculums",
+        "careers_major_id_majors_id_fk": {
+          "name": "careers_major_id_majors_id_fk",
+          "tableFrom": "careers",
           "tableTo": "majors",
           "columnsFrom": [
             "major_id"
@@ -234,7 +411,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_dormitory_campus": {
+          "name": "idx_dormitory_campus",
+          "columns": [
+            {
+              "expression": "campus_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "dormitories_campus_id_campuses_id_fk": {
           "name": "dormitories_campus_id_campuses_id_fk",
@@ -370,7 +563,35 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "uniq_major_campus_year": {
+          "name": "uniq_major_campus_year",
+          "columns": [
+            {
+              "expression": "major_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "campus_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "academic_year_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "major_campus_admission_major_id_majors_id_fk": {
           "name": "major_campus_admission_major_id_majors_id_fk",
@@ -463,6 +684,111 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.scholarship_availability": {
+      "name": "scholarship_availability",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "scholarship_id": {
+          "name": "scholarship_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "academic_year_id": {
+          "name": "academic_year_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "campus_id": {
+          "name": "campus_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_scholarship_year_campus": {
+          "name": "idx_scholarship_year_campus",
+          "columns": [
+            {
+              "expression": "scholarship_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "academic_year_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "campus_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "scholarship_availability_scholarship_id_scholarships_id_fk": {
+          "name": "scholarship_availability_scholarship_id_scholarships_id_fk",
+          "tableFrom": "scholarship_availability",
+          "tableTo": "scholarships",
+          "columnsFrom": [
+            "scholarship_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "scholarship_availability_academic_year_id_academic_years_id_fk": {
+          "name": "scholarship_availability_academic_year_id_academic_years_id_fk",
+          "tableFrom": "scholarship_availability",
+          "tableTo": "academic_years",
+          "columnsFrom": [
+            "academic_year_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "scholarship_availability_campus_id_campuses_id_fk": {
+          "name": "scholarship_availability_campus_id_campuses_id_fk",
+          "tableFrom": "scholarship_availability",
+          "tableTo": "campuses",
+          "columnsFrom": [
+            "campus_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.scholarships": {
       "name": "scholarships",
       "schema": "",
@@ -516,7 +842,38 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_scholarship_major": {
+          "name": "idx_scholarship_major",
+          "columns": [
+            {
+              "expression": "major_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_scholarship_campus": {
+          "name": "idx_scholarship_campus",
+          "columns": [
+            {
+              "expression": "campus_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "scholarships_major_id_majors_id_fk": {
           "name": "scholarships_major_id_majors_id_fk",
@@ -561,8 +918,20 @@
           "primaryKey": true,
           "notNull": true
         },
-        "fb_user_id": {
-          "name": "fb_user_id",
+        "platform": {
+          "name": "platform",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hubspot_contact_id": {
+          "name": "hubspot_contact_id",
           "type": "varchar(64)",
           "primaryKey": false,
           "notNull": false
@@ -575,7 +944,38 @@
           "default": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_user_id": {
+          "name": "idx_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_hubspot_contact_id": {
+          "name": "idx_hubspot_contact_id",
+          "columns": [
+            {
+              "expression": "hubspot_contact_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

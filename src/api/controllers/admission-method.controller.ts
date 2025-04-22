@@ -33,18 +33,98 @@ export const getAdmissionMethodById = catch$(async (req: Request, res: Response)
 });
 
 export const getAdmissionMethodRequirements = catch$(async (req: Request, res: Response): Promise<void> => {
-
   res.status(501).json({
     success: false,
     message: "Not implemented yet"
   });
 });
 
-export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
+/**
+ * Get majors that use a specific admission method
+ */
+export const getMajorsByAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
+  const admissionMethodId = Number(req.params.id);
+  
+  const majors = await admissionMethodService.getMajorsByAdmissionMethodId(admissionMethodId);
+  
+  res.json({
+    success: true,
+    data: majors,
+    count: Array.isArray(majors) ? majors.length : 0
+  });
+});
 
-  res.status(501).json({
-    success: false,
-    message: "Not implemented yet"
+/**
+ * Associate a major with an admission method
+ */
+export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
+  const { majorId, admissionMethodId, academicYearId, campusId, minScore, note } = req.body;
+  
+  if (!majorId || !admissionMethodId || !academicYearId) {
+    res.status(400).json({
+      success: false,
+      message: "Missing required fields: majorId, admissionMethodId, and academicYearId are required"
+    });
+    return;
+  }
+  
+  const result = await admissionMethodService.associateMajorWithAdmissionMethod(
+    Number(majorId),
+    Number(admissionMethodId),
+    Number(academicYearId),
+    campusId ? Number(campusId) : undefined,
+    minScore ? Number(minScore) : undefined,
+    note
+  );
+  
+  res.status(201).json({
+    success: true,
+    data: result,
+    message: "Major successfully associated with admission method"
+  });
+});
+
+/**
+ * Create a global admission method application (for all majors)
+ */
+export const createGlobalAdmissionMethodApplication = catch$(async (req: Request, res: Response): Promise<void> => {
+  const { admissionMethodId, academicYearId, campusId, note } = req.body;
+  
+  if (!admissionMethodId || !academicYearId) {
+    res.status(400).json({
+      success: false,
+      message: "Missing required fields: admissionMethodId and academicYearId are required"
+    });
+    return;
+  }
+  
+  const result = await admissionMethodService.createGlobalAdmissionMethodApplication(
+    Number(admissionMethodId),
+    Number(academicYearId),
+    campusId ? Number(campusId) : undefined,
+    note
+  );
+  
+  res.status(201).json({
+    success: true,
+    data: result,
+    message: "Global admission method application created successfully"
+  });
+});
+
+/**
+ * Get admission methods by major code
+ * This endpoint retrieves all admission methods for a specific major identified by its code
+ */
+export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
+  const majorCode = req.params.majorCode;
+  
+  const admissionMethods = await admissionMethodService.getAdmissionMethodsByMajorCode(majorCode);
+  
+  res.json({
+    success: true,
+    data: admissionMethods,
+    count: admissionMethods.length
   });
 });
 

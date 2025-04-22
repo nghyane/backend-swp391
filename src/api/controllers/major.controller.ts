@@ -26,9 +26,14 @@ export const getAllMajors = catch$(async (req: Request, res: Response): Promise<
   });
 });
 
-export const getMajorById = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = Number(req.params.id);
-  const major = await majorService.getMajorById(id);
+/**
+ * Get major details by code
+ * This endpoint retrieves a major by its unique code
+ */
+export const getMajorByCode = catch$(async (req: Request, res: Response): Promise<void> => {
+  const code = req.params.code;
+  const major = await majorService.getMajorByCode(code);
+  
   res.json({
     success: true,
     data: major

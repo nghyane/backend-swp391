@@ -44,13 +44,20 @@ export const getScholarshipsByEligibility = catch$(async (req: Request, res: Res
 });
 
 
+/**
+ * Get scholarships by major code
+ * This endpoint retrieves all scholarships for a specific major identified by its code
+ */
 export const getScholarshipsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
-
-  res.status(501).json({
-    success: false,
-    message: "Not implemented yet"
+  const majorCode = req.params.majorCode;
+  
+  const scholarships = await scholarshipService.getScholarshipsByMajorCode(majorCode);
+  
+  res.json({
+    success: true,
+    data: scholarships,
+    count: scholarships.length
   });
 });
-
 
 

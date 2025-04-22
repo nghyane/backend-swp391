@@ -1,6 +1,6 @@
 import { eq, ilike, and, gte, SQL } from 'drizzle-orm';
 import { db } from '../db';
-import { scholarships } from '../db/schema';
+import { scholarships, majors } from '../db/schema';
 import { Scholarship, ScholarshipFilterOptions } from '../types/scholarship.types';
 import { NotFoundError } from '../utils/errors';
 
@@ -48,6 +48,25 @@ export const getScholarshipsByMajorId = async (majorId: number): Promise<Scholar
   return await db.query.scholarships.findMany({
     ...AMOUNT_SORT_OPTIONS,
     where: eq(scholarships.major_id, majorId)
+  });
+};
+
+/**
+ * Get scholarships by major code
+ * This function retrieves all scholarships for a specific major identified by its code
+ */
+export const getScholarshipsByMajorCode = async (majorCode: string): Promise<Scholarship[]> => {
+  // First get the major by code to find its ID
+  const major = await db.query.majors.findFirst({
+    where: eq(majors.code, majorCode)
+  });
+  
+  if (!major) throw new NotFoundError('Major with code', majorCode);
+  
+  // Then get scholarships by the major ID
+  return await db.query.scholarships.findMany({
+    ...AMOUNT_SORT_OPTIONS,
+    where: eq(scholarships.major_id, major.id)
   });
 };
 

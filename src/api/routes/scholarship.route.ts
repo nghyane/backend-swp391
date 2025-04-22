@@ -10,7 +10,7 @@ router.get("/",
   scholarshipController.getAllScholarships
 );
 router.post("/eligibility", scholarshipController.getScholarshipsByEligibility);
-router.get("/major/:majorId", validateId("majorId"), scholarshipController.getScholarshipsByMajor);
+router.get("/major/:majorCode", scholarshipController.getScholarshipsByMajor);
 router.get("/:id", validateId(), scholarshipController.getScholarshipById);
 
 export default router;
