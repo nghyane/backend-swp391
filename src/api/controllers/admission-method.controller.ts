@@ -2,41 +2,58 @@ import { Request, Response } from "express";
 import * as admissionMethodService from "../../services/admission-method.service";
 import { AdmissionMethod, AdmissionMethodFilterOptions } from "../../types/admission-method.types";
 import { catch$ } from "../../utils/catch";
+import { reply, replyPaginated, replyError } from "../../utils/response";
+import { paginate } from "../../utils/pagination";
 
 
 export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
+  // Get validated query parameters
   const { name } = req.query;
+  const page = Number(req.query.page || 1); // Validated by middleware
+  const limit = Number(req.query.limit || 10); // Validated by middleware
+  const sortBy = req.query.sortBy as string | undefined;
+  const order = req.query.order as 'asc' | 'desc' | undefined;
   
+  // Build filters
   const filters: AdmissionMethodFilterOptions = {};
-  
   if (name) filters.name = String(name);
   
   const hasFilters = Object.keys(filters).length > 0;
+  
+  // Get all admission methods matching filters
   const admissionMethods = await admissionMethodService.getAllAdmissionMethods(hasFilters ? filters : undefined);
   
-  res.json({
-    success: true,
-    data: admissionMethods,
-    count: admissionMethods.length,
-    filters: hasFilters ? filters : undefined
-  });
+  // Apply pagination and sorting
+  const paginatedResult = paginate(
+    admissionMethods,
+    page,
+    limit,
+    sortBy && order && admissionMethods.length > 0 ? { 
+      sortBy: sortBy as keyof (typeof admissionMethods)[0], 
+      order 
+    } : undefined
+  );
+  
+  // Send paginated response
+  replyPaginated(
+    res, 
+    paginatedResult.items, 
+    paginatedResult.total, 
+    paginatedResult.page, 
+    paginatedResult.limit, 
+    'Admission methods retrieved successfully'
+  );
 });
 
 export const getAdmissionMethodById = catch$(async (req: Request, res: Response): Promise<void> => {
   const id = Number(req.params.id);
   const admissionMethod = await admissionMethodService.getAdmissionMethodById(id);
   
-  res.json({
-    success: true,
-    data: admissionMethod
-  });
+  reply(res, admissionMethod, 'Admission method retrieved successfully');
 });
 
 export const getAdmissionMethodRequirements = catch$(async (req: Request, res: Response): Promise<void> => {
-  res.status(501).json({
-    success: false,
-    message: "Not implemented yet"
-  });
+  replyError(res, 'Not implemented yet', 501);
 });
 
 /**
@@ -47,11 +64,8 @@ export const getMajorsByAdmissionMethod = catch$(async (req: Request, res: Respo
   
   const majors = await admissionMethodService.getMajorsByAdmissionMethodId(admissionMethodId);
   
-  res.json({
-    success: true,
-    data: majors,
-    count: Array.isArray(majors) ? majors.length : 0
-  });
+  const items = Array.isArray(majors) ? majors : [];
+  reply(res, items, 'Majors by admission method retrieved successfully');
 });
 
 /**
@@ -61,10 +75,7 @@ export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res
   const { majorId, admissionMethodId, academicYearId, campusId, minScore, note } = req.body;
   
   if (!majorId || !admissionMethodId || !academicYearId) {
-    res.status(400).json({
-      success: false,
-      message: "Missing required fields: majorId, admissionMethodId, and academicYearId are required"
-    });
+    replyError(res, 'Missing required fields', 400, 'body', 'majorId, admissionMethodId, and academicYearId are required');
     return;
   }
   
@@ -77,11 +88,7 @@ export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res
     note
   );
   
-  res.status(201).json({
-    success: true,
-    data: result,
-    message: "Major successfully associated with admission method"
-  });
+  reply(res, result, 'Major successfully associated with admission method', 201);
 });
 
 /**
@@ -91,10 +98,7 @@ export const createGlobalAdmissionMethodApplication = catch$(async (req: Request
   const { admissionMethodId, academicYearId, campusId, note } = req.body;
   
   if (!admissionMethodId || !academicYearId) {
-    res.status(400).json({
-      success: false,
-      message: "Missing required fields: admissionMethodId and academicYearId are required"
-    });
+    replyError(res, 'Missing required fields', 400, 'body', 'admissionMethodId and academicYearId are required');
     return;
   }
   
@@ -105,11 +109,7 @@ export const createGlobalAdmissionMethodApplication = catch$(async (req: Request
     note
   );
   
-  res.status(201).json({
-    success: true,
-    data: result,
-    message: "Global admission method application created successfully"
-  });
+  reply(res, result, 'Global admission method application created successfully', 201);
 });
 
 /**
@@ -121,22 +121,14 @@ export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Respo
   
   const admissionMethods = await admissionMethodService.getAdmissionMethodsByMajorCode(majorCode);
   
-  res.json({
-    success: true,
-    data: admissionMethods,
-    count: admissionMethods.length
-  });
+  reply(res, admissionMethods, 'Admission methods by major retrieved successfully');
 });
 
 export const createAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
   const admissionMethodData: Omit<AdmissionMethod, 'id'> = req.body;
   
   const newAdmissionMethod = await admissionMethodService.createAdmissionMethod(admissionMethodData);
-  res.status(201).json({
-    success: true,
-    data: newAdmissionMethod,
-    message: 'Admission method created successfully'
-  });
+  reply(res, newAdmissionMethod, 'Admission method created successfully', 201);
 });
 
 export const updateAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
@@ -144,21 +136,14 @@ export const updateAdmissionMethod = catch$(async (req: Request, res: Response):
   const updateData: Partial<Omit<AdmissionMethod, 'id'>> = req.body;
   
   const updatedAdmissionMethod = await admissionMethodService.updateAdmissionMethod(id, updateData);
-  res.status(200).json({
-    success: true,
-    data: updatedAdmissionMethod,
-    message: 'Admission method updated successfully'
-  });
+  reply(res, updatedAdmissionMethod, 'Admission method updated successfully');
 });
 
 export const deleteAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
   const id = parseInt(req.params.id);
   
   await admissionMethodService.deleteAdmissionMethod(id);
-  res.status(200).json({
-    success: true,
-    message: 'Admission method deleted successfully'
-  });
+  reply(res, null, 'Admission method deleted successfully');
 });
 
 

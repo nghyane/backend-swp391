@@ -44,12 +44,6 @@ export const getScholarshipById = async (id: number): Promise<Scholarship> => {
   return result;
 };
 
-export const getScholarshipsByMajorId = async (majorId: number): Promise<Scholarship[]> => {
-  return await db.query.scholarships.findMany({
-    ...AMOUNT_SORT_OPTIONS,
-    where: eq(scholarships.major_id, majorId)
-  });
-};
 
 /**
  * Get scholarships by major code

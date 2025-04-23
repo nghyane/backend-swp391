@@ -2,28 +2,48 @@ import { Request, Response } from "express";
 import * as majorService from "../../services/major.service";
 import { MajorFilterOptions } from "../../types/major.types";
 import { catch$ } from "../../utils/catch";
+import { reply, replyPaginated } from "../../utils/response";
+import { paginate } from "../../utils/pagination";
 
 export const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> => {
+  // Get validated query parameters
   const { name, code, description } = req.query;
+  const page = Number(req.query.page || 1); // Validated by middleware
+  const limit = Number(req.query.limit || 10); // Validated by middleware
+  const sortBy = req.query.sortBy as string | undefined;
+  const order = req.query.order as 'asc' | 'desc' | undefined;
   
+  // Build filters
   const filters: MajorFilterOptions = {};
-  
   if (name) filters.name = String(name);
   if (code) filters.code = String(code);
   if (description) filters.description = String(description);
   
   const hasFilters = Object.keys(filters).length > 0;
   
-  const majors = await majorService.getAllMajors(
-    hasFilters ? filters : undefined
+  // Get all majors matching filters
+  const majors = await majorService.getAllMajors(hasFilters ? filters : undefined);
+  
+  // Apply pagination and sorting
+  const paginatedResult = paginate(
+    majors,
+    page,
+    limit,
+    sortBy && order && majors.length > 0 ? { 
+      sortBy: sortBy as keyof (typeof majors)[0], 
+      order 
+    } : undefined
   );
   
-  res.json({
-    success: true,
-    data: majors,
-    count: majors.length,
-    filters: hasFilters ? filters : undefined
-  });
+  // Send paginated response
+  replyPaginated(
+    res, 
+    paginatedResult.items, 
+    paginatedResult.total, 
+    paginatedResult.page, 
+    paginatedResult.limit, 
+    'Majors retrieved successfully'
+  );
 });
 
 /**
@@ -34,10 +54,7 @@ export const getMajorByCode = catch$(async (req: Request, res: Response): Promis
   const code = req.params.code;
   const major = await majorService.getMajorByCode(code);
   
-  res.json({
-    success: true,
-    data: major
-  });
+  reply(res, major, 'Major retrieved successfully');
 });
 
 
@@ -47,11 +64,5 @@ export const getMajorsByCampus = catch$(async (req: Request, res: Response): Pro
   
   const majors = await majorService.getMajorsByCampusId(campusId);
   
-  res.json({
-    success: true,
-    data: majors,
-    count: majors.length
-  });
+  reply(res, majors, 'Majors by campus retrieved successfully');
 });
-
-

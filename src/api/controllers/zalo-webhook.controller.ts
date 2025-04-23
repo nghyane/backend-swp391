@@ -6,6 +6,7 @@
  */
 import { Request, Response } from "express";
 import { catch$ } from "../../utils/catch";
+import { reply } from "../../utils/response";
 
 /**
  * Verify Zalo webhook
@@ -15,7 +16,7 @@ import { catch$ } from "../../utils/catch";
  */
 const verifyWebhook = catch$(async (req: Request, res: Response): Promise<void> => {
 	// TODO: Update verification logic according to Zalo OA documentation
-	res.status(200).send("Zalo webhook verified");
+	reply(res, { verified: true }, "Zalo webhook verified");
 });
 
 /**
@@ -26,11 +27,11 @@ const verifyWebhook = catch$(async (req: Request, res: Response): Promise<void> 
  */
 const receiveMessage = catch$(async (req: Request, res: Response): Promise<void> => {
 	// TODO: Update message processing logic according to Zalo OA documentation
-	res.status(200).send("EVENT_RECEIVED");
+	reply(res, { received: true }, "EVENT_RECEIVED");
 });
 
 /**
- * Export các hàm controller cho Zalo webhook
+ * Export controller functions for Zalo webhook
  */
 export const zaloWebhookController = {
 	verifyWebhook,

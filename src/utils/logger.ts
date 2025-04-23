@@ -1,4 +1,4 @@
 export const log = (msg: string) => {
-  // Có thể tích hợp winston/morgan tuỳ nhu cầu
+  // Can integrate winston/morgan based on requirements
   console.log(`[LOG]: ${msg}`);
 };

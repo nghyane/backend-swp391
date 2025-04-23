@@ -146,14 +146,14 @@ export const admissionMethodApplications = pgTable("admission_method_application
   is_active: boolean("is_active").default(true),
   note: text("note"),
 }, (table) => [
-  // Đảm bảo không có bản ghi trùng lặp cho cùng phương thức, năm học, campus và ngành
+  // Ensure no duplicate records for the same admission method, academic year, campus, and major
   uniqueIndex("uniq_admission_year_campus_major").on(
     table.admission_method_id, 
     table.academic_year_id,
     table.campus_id,
     table.major_id
   ),
-  // Index để tối ưu truy vấn
+  // Index to optimize queries
   index("idx_admission_app_method").on(table.admission_method_id),
   index("idx_admission_app_major").on(table.major_id),
 ]);

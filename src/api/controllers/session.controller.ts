@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { catch$ } from "../../utils/catch";
+import { replyError } from "../../utils/response";
 
 /**
  * Controller for session-related endpoints.
@@ -15,10 +16,7 @@ const getSessionByFacebookId = catch$(async (req: Request, res: Response): Promi
   // 1. Extract Facebook user ID from request params
   // 2. Fetch session from database
   // 3. Return session or 404 if not found
-  res.status(501).json({
-    success: false,
-    message: "Not implemented yet"
-  });
+  replyError(res, "Not implemented yet", 501);
 });
 
 /**
@@ -29,10 +27,7 @@ const updateSession = catch$(async (req: Request, res: Response): Promise<void> 
   // 1. Extract Facebook user ID and message from request body
   // 2. Update session in database
   // 3. Return updated session
-  res.status(501).json({
-    success: false,
-    message: "Not implemented yet"
-  });
+  replyError(res, "Not implemented yet", 501);
 });
 
 /**
@@ -43,10 +38,7 @@ const getAllSessions = catch$(async (req: Request, res: Response): Promise<void>
   // 1. Fetch all sessions from database
   // 2. Apply optional filtering
   // 3. Return sessions array
-  res.status(501).json({
-    success: false,
-    message: "Not implemented yet"
-  });
+  replyError(res, "Not implemented yet", 501);
 });
 
 // Export all controller functions

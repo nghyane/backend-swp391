@@ -4,7 +4,11 @@ import { validateId, validateCommonQueries } from "../../middlewares/validators"
 
 const router = Router();
 
-router.get("/", validateCommonQueries(), campusController.getAllCampuses);
+router.get("/", validateCommonQueries({
+  defaultPage: 1,
+  defaultLimit: 10,
+  maxLimit: 50
+}), campusController.getAllCampuses);
 router.get("/:id", validateId(), campusController.getCampusById);
 router.get("/:id/majors", validateId(), campusController.getCampusMajors);
 router.get("/:id/facilities", validateId(), campusController.getCampusFacilities);

@@ -5,7 +5,11 @@ import { validateId, validateCommonQueries, validateDormitoryQueries } from "../
 const router = Router();
 
 // Dormitory routes
-router.get("/", validateCommonQueries(), validateDormitoryQueries(), getAllDormitories);
+router.get("/", validateCommonQueries({
+  defaultPage: 1,
+  defaultLimit: 10,
+  maxLimit: 50
+}), validateDormitoryQueries(), getAllDormitories);
 router.get("/:id", validateId(), getDormitoryById);
 router.get("/:id/availability", validateId(), getDormitoryAvailability);
 router.get("/:id/facilities", validateId(), getDormitoryFacilities);

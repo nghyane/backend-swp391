@@ -64,6 +64,8 @@ export const getMajorsByCampusId = async (campusId: number): Promise<Major[]> =>
     where: eq(majorCampusAdmission.campus_id, campusId),
     with: RELATIONS_WITH_CAMPUS
   });
+
+
   return result.map(item => item.major);
 };
 

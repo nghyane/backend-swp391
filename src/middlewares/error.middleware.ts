@@ -1,18 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { isNotFoundError, isValidationError, isAuthorizationError } from "../utils/errors";
-import { ErrorResponse } from "../types/common.types";
+import { replyError } from "../utils/response";
 
-/**
- * Creates a standardized error response
- */
-function createErrorResponse(message: string, field?: string, error?: string): ErrorResponse {
-  return {
-    success: false,
-    message,
-    ...(field && { field }),
-    ...(error && process.env.NODE_ENV !== "production" && { error })
-  };
-}
+// Removed createErrorResponse function as it's now part of utils/response.ts
 
 /**
  * Centralized error handling middleware for the application
@@ -23,15 +13,17 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   console.error(`[ERROR] ${req.method} ${req.path}:`, err);
   
   if (isNotFoundError(err)) {
-    res.status(404).json(createErrorResponse(err.message));
+    replyError(res, err.message, 404);
     return;
   }
+  
   if (isValidationError(err)) {
-    res.status(400).json(createErrorResponse(err.message, err.field));
+    replyError(res, err.message, 400, err.field);
     return;
   }
+  
   if (isAuthorizationError(err)) {
-    res.status(403).json(createErrorResponse(err.message));
+    replyError(res, err.message, 403);
     return;
   }
 
@@ -39,5 +31,12 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   const anyError = err as any;
   const statusCode = anyError.status || anyError.statusCode || 500;
   const errorMessage = anyError.message || "Internal server error";
-  res.status(statusCode).json(createErrorResponse("Internal server error", undefined, errorMessage));
+  
+  replyError(
+    res, 
+    "Internal server error", 
+    statusCode, 
+    undefined, 
+    errorMessage
+  );
 }

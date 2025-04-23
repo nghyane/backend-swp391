@@ -3,15 +3,25 @@
  */
 
 /**
- * Standard API response structure
+ * Standard API response wrapper
  */
-export type ApiResponse<T> = {
-  readonly success: boolean;
-  readonly message?: string;
-  readonly data?: T;
-  readonly count?: number;
-  readonly error?: string;
-};
+export interface ApiResponse<T> {
+  data: T;
+  message: string;
+  success: boolean;
+  timestamp: string;
+}
+
+/**
+ * Paginated response format
+ */
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 /**
  * Error response structure

@@ -6,11 +6,13 @@ const router = Router();
 
 // Scholarship routes
 router.get("/", 
-  validateCommonQueries(),
+  validateCommonQueries({
+    defaultPage: 1,
+    defaultLimit: 10,
+    maxLimit: 50
+  }),
   scholarshipController.getAllScholarships
 );
-router.post("/eligibility", scholarshipController.getScholarshipsByEligibility);
 router.get("/major/:majorCode", scholarshipController.getScholarshipsByMajor);
-router.get("/:id", validateId(), scholarshipController.getScholarshipById);
 
 export default router;

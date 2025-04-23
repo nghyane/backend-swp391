@@ -7,6 +7,28 @@ import { BaseFilterOptions } from "./common.types";
 export interface MajorFilterOptions extends BaseFilterOptions {
   code?: string;
   description?: string;
+  name?: string;
+}
+
+/**
+ * Pagination and sorting options
+ */
+export interface MajorQueryOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: keyof typeof majors.$inferSelect;
+  order?: 'asc' | 'desc';
+}
+
+/**
+ * Paginated result for majors
+ */
+export interface PaginatedMajorResult {
+  items: typeof majors.$inferSelect[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 /**

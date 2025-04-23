@@ -1,9 +1,9 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
 import * as relations from "./schema-relations";
 import env from "../config/env";
+import { log } from "../utils/logger";
 
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
@@ -11,18 +11,18 @@ const pool = new Pool({
   idleTimeoutMillis: 30000,
 });
 
-// Tạo instance db với schema và relations để hỗ trợ API db.query
+// Create db instance with schema and relations to support db.query API
 export const db = drizzle(pool, { schema: { ...schema, ...relations } });
 
 export const initDb = async () => {
   try {
     await pool.query("SELECT 1");
-    console.log("✅ Database connected");
+    log("✅ Database connected");
   } catch (error) {
-    console.error("❌ Database connection failed:", error);
+    log(`❌ Database connection failed: ${error instanceof Error ? error.message : String(error)}`);
     process.exit(1);
   }
 };
 
 export const closeDb = () =>
-  pool.end().then(() => console.log("✅ Database connection closed"));
+  pool.end().then(() => log("✅ Database connection closed"));
