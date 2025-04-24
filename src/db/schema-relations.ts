@@ -79,6 +79,11 @@ export const scholarshipsRelations = relations(scholarships, ({ one, many }) => 
     fields: [scholarships.major_id],
     references: [majors.id],
   }),
+  // Campus that this scholarship is associated with
+  campus: one(campuses, {
+    fields: [scholarships.campus_id],
+    references: [campuses.id],
+  }),
   // List of campuses and academic years where this scholarship is available
   availabilities: many(scholarshipAvailability),
 }));
