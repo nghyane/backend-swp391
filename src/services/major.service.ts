@@ -39,16 +39,16 @@ export const getAllMajors = async (filters?: MajorQueryParams) => {
   if (!filters) return await db.query.majors.findMany(DEFAULT_QUERY_OPTIONS);
 
   // Filter by campus and academic year
-  if (filters.campusId || filters.academicYear) {
+  if (filters.campus_id || filters.academic_year) {
     let admissionConditions: SQL[] = [];
     
-    if (filters.campusId) {
-      admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campusId));
+    if (filters.campus_id) {
+      admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
     }
     
     // Get academic year ID based on the year
-    if (filters.academicYear) {
-      const yearId = await getAcademicYearId(filters.academicYear);
+    if (filters.academic_year) {
+      const yearId = await getAcademicYearId(filters.academic_year);
       if (!yearId) return []; // If the academic year is not found, return an empty array
       
       admissionConditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
@@ -172,32 +172,13 @@ export const deleteMajor = async (id: number): Promise<void> => {
  * Get major details by code
  * This function retrieves a major by its unique code rather than ID
  */
-export const getMajorByCode = async (code: string, academicYear?: number) => {
+export const getMajorByCode = async (code: string) => {
   const result = await db.query.majors.findFirst({
     where: eq(majors.code, code),
     ...DEFAULT_QUERY_OPTIONS
   });
   
   if (!result) throw new NotFoundError('Major with code', code);
-  
-  if (academicYear) {
-    const yearId = await getAcademicYearId(academicYear);
-    if (!yearId) {
-      throw new NotFoundError('Academic year', academicYear.toString());
-    }
-    
-    const count = await db.select({ count: sql`count(*)` })
-      .from(majorCampusAdmission)
-      .where(and(
-        eq(majorCampusAdmission.major_id, result.id),
-        eq(majorCampusAdmission.academic_year_id, yearId)
-      ))
-      .then(res => Number(res[0].count));
-    
-    if (count === 0) {
-      throw new NotFoundError(`Major with code ${code} not available for academic year`, academicYear.toString());
-    }
-  }
   
   return result;
 };

@@ -24,9 +24,9 @@ export const getAllScholarships = async (filters?: ScholarshipQueryParams): Prom
   
   const conditions: SQL[] = [
     filters.name && ilike(scholarships.name, `%${filters.name}%`),
-    filters.majorId && eq(scholarships.major_id, filters.majorId),
-    filters.campusId && eq(scholarships.campus_id, filters.campusId),
-    filters.minAmount && gte(scholarships.amount, filters.minAmount)
+    filters.major_id && eq(scholarships.major_id, filters.major_id),
+    filters.campus_id && eq(scholarships.campus_id, filters.campus_id),
+    filters.min_amount && gte(scholarships.amount, filters.min_amount)
   ].filter(Boolean) as SQL[];
   
   return await db.query.scholarships.findMany({

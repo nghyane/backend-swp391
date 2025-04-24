@@ -12,8 +12,8 @@ export type MajorLinkParams = z.infer<typeof majorLinkSchema>;
  */
 // Query schema
 export const majorQuerySchema = z.object({
-  academicYear: z.coerce.number().int().min(2000).max(2100).optional(),
-  campusId: z.coerce.number().int().positive().optional(),
+  academic_year: z.coerce.number().int().min(2000).max(2100).optional(),
+  campus_id: z.coerce.number().int().positive().optional(),
   code: z.string().optional()
 }).strict().merge(commonQuerySchema);
 

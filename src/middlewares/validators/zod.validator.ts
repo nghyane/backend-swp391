@@ -77,8 +77,8 @@ export const commonQuerySchema = z.object({
   limit: z.coerce.number().int().positive().optional(),
   
   // Sorting
-  sortBy: z.string().optional(),
-  sortOrder: z.enum(['asc', 'desc']).optional(),
+  sort_by: z.string().optional(),
+  sort_order: z.enum(['asc', 'desc']).optional(),
   
   // Filtering
   name: z.string().optional(),

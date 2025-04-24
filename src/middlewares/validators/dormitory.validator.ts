@@ -6,20 +6,20 @@ import { validateZod, commonQuerySchema } from './zod.validator';
  */
 // Query schema
 export const dormitoryQuerySchema = z.object({
-  campusId: z.coerce.number().int().positive().optional(),
-  priceMin: z.coerce.number().int().min(0).optional(),
-  priceMax: z.coerce.number().int().min(0).optional()
+  campus_id: z.coerce.number().int().positive().optional(),
+  price_min: z.coerce.number().int().min(0).optional(),
+  price_max: z.coerce.number().int().min(0).optional()
 }).strict().merge(commonQuerySchema)
 .refine(
   (data) => {
-    if (data.priceMin !== undefined && data.priceMax !== undefined) {
-      return data.priceMax >= data.priceMin;
+    if (data.price_min !== undefined && data.price_max !== undefined) {
+      return data.price_max >= data.price_min;
     }
     return true;
   },
   {
     message: "Maximum price must be greater than or equal to minimum price",
-    path: ["priceMax"]
+    path: ["price_max"]
   }
 );
 

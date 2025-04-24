@@ -13,9 +13,9 @@ export type AdmissionMethodGlobalAppParams = z.infer<typeof admissionMethodGloba
  */
 // Query schema
 export const admissionMethodQuerySchema = z.object({
-  majorId: z.coerce.number().int().positive().optional(),
-  academicYear: z.coerce.number().int().min(2000).max(2100).optional(),
-  isActive: z.coerce.boolean().optional()
+  major_id: z.coerce.number().int().positive().optional(),
+  academic_year: z.coerce.number().int().min(2000).max(2100).optional(),
+  is_active: z.coerce.boolean().optional()
 }).strict().merge(commonQuerySchema);
 
 // Create schema

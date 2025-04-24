@@ -16,7 +16,7 @@ export const getAllDormitories = async (filterOptions?: DormitoryQueryParams) =>
   
   const filters: SQL[] = [];
   if (filterOptions.name) filters.push(like(dormitories.name, `%${filterOptions.name}%`));
-  if (filterOptions.campusId) filters.push(eq(dormitories.campus_id, filterOptions.campusId));
+  if (filterOptions.campus_id) filters.push(eq(dormitories.campus_id, filterOptions.campus_id));
   
   if (filters.length === 0) return await db.query.dormitories.findMany(DEFAULT_QUERY_OPTIONS);
   

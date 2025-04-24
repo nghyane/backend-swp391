@@ -6,9 +6,9 @@ import { validateZod, commonQuerySchema } from "./zod.validator";
  */
 // Query schema
 export const scholarshipQuerySchema = z.object({
-  majorId: z.coerce.number().int().positive().optional(),
-  campusId: z.coerce.number().int().positive().optional(),
-  minAmount: z.coerce.number().int().min(0).optional()
+  major_id: z.coerce.number().int().positive().optional(),
+  campus_id: z.coerce.number().int().positive().optional(),
+  min_amount: z.coerce.number().int().min(0).optional()
 }).strict().merge(commonQuerySchema);
 
 // Create schema

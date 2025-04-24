@@ -9,10 +9,10 @@ export const getAllMajors = catch$(async (req: Request, res: Response): Promise<
   const filters = req.validatedQuery as MajorQueryParams || {};
   
   // Set default academic year to current year if not specified
-  if (!filters.academicYear) {
+  if (!filters.academic_year) {
     const currentYear = new Date().getFullYear();
     // Lấy năm học hiện tại (năm học 2024-2025 có id là 2024)
-    filters.academicYear = currentYear;
+    filters.academic_year = currentYear;
   }
   
   const hasFilters = Object.keys(filters).length > 0;
@@ -34,14 +34,15 @@ export const getAllMajors = catch$(async (req: Request, res: Response): Promise<
  */
 export const getMajorByCode = catch$(async (req: Request, res: Response): Promise<void> => {
   // Sử dụng dữ liệu đã validate từ Zod với type inference
-  const code = req.validatedParams?.code as string;
-  const { academicYear } = req.validatedQuery as MajorQueryParams;
+  const code = req.params.code;
   
-  // Set default academic year to current year if not specified
-  const currentAcademicYear = academicYear || new Date().getFullYear();
+  const { academic_year } = req.validatedQuery as MajorQueryParams;
+  
+  // // Set default academic year to current year if not specified
+  // const currentAcademicYear = academic_year
   
   // Get major by code with optional academic year filter
-  const major = await majorService.getMajorByCode(code, currentAcademicYear);
+  const major = await majorService.getMajorByCode(code);
   
   reply(res, major, 'Major retrieved successfully');
 });
@@ -51,10 +52,10 @@ export const getMajorByCode = catch$(async (req: Request, res: Response): Promis
 export const getMajorsByCampus = catch$(async (req: Request, res: Response): Promise<void> => {
   // Sử dụng dữ liệu đã validate từ Zod với type inference
   const campusId = req.validatedParams?.campusId as number;
-  const { academicYear } = req.validatedQuery as MajorQueryParams;
+  const { academic_year } = req.validatedQuery as MajorQueryParams;
   
   // Set default academic year to current year if not specified
-  const currentAcademicYear = academicYear || new Date().getFullYear();
+  const currentAcademicYear = academic_year || new Date().getFullYear();
   
   // Get majors by campus with academic year filter
   const majors = await majorService.getMajorsByCampusId(campusId, currentAcademicYear);
