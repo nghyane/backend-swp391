@@ -1,52 +1,36 @@
 import { Request, Response } from "express";
 import * as admissionMethodService from "../../services/admission-method.service";
-import { AdmissionMethod, AdmissionMethodFilterOptions } from "../../types/admission-method.types";
 import { catch$ } from "../../utils/catch";
-import { reply, replyPaginated, replyError } from "../../utils/response";
-import { paginate } from "../../utils/pagination";
+import { reply, replyError } from "../../utils/response";
+import { 
+  AdmissionMethodQueryParams,
+  AdmissionMethodCreateParams,
+  AdmissionMethodUpdateParams,
+  AdmissionMethodAssociateParams,
+  AdmissionMethodGlobalAppParams
+} from "../../middlewares/validators/admission-method.validator";
 
 
 export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Get validated query parameters
-  const { name } = req.query;
-  const page = Number(req.query.page || 1); // Validated by middleware
-  const limit = Number(req.query.limit || 10); // Validated by middleware
-  const sortBy = req.query.sortBy as string | undefined;
-  const order = req.query.order as 'asc' | 'desc' | undefined;
-  
-  // Build filters
-  const filters: AdmissionMethodFilterOptions = {};
-  if (name) filters.name = String(name);
+  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  const filters = req.validatedQuery as AdmissionMethodQueryParams || {};
   
   const hasFilters = Object.keys(filters).length > 0;
   
   // Get all admission methods matching filters
   const admissionMethods = await admissionMethodService.getAllAdmissionMethods(hasFilters ? filters : undefined);
   
-  // Apply pagination and sorting
-  const paginatedResult = paginate(
-    admissionMethods,
-    page,
-    limit,
-    sortBy && order && admissionMethods.length > 0 ? { 
-      sortBy: sortBy as keyof (typeof admissionMethods)[0], 
-      order 
-    } : undefined
-  );
-  
-  // Send paginated response
-  replyPaginated(
+  // Số lượng phương thức xét tuyển thường ít nên không cần phân trang
+  reply(
     res, 
-    paginatedResult.items, 
-    paginatedResult.total, 
-    paginatedResult.page, 
-    paginatedResult.limit, 
-    'Admission methods retrieved successfully'
+    admissionMethods, 
+    hasFilters ? 'Filtered admission methods retrieved successfully' : 'All admission methods retrieved successfully'
   );
 });
 
 export const getAdmissionMethodById = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = Number(req.params.id);
+  // Sử dụng dữ liệu đã validate từ Zod
+  const id = req.validatedParams?.id as number;
   const admissionMethod = await admissionMethodService.getAdmissionMethodById(id);
   
   reply(res, admissionMethod, 'Admission method retrieved successfully');
@@ -60,7 +44,8 @@ export const getAdmissionMethodRequirements = catch$(async (req: Request, res: R
  * Get majors that use a specific admission method
  */
 export const getMajorsByAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  const admissionMethodId = Number(req.params.id);
+  // Sử dụng dữ liệu đã validate từ Zod
+  const admissionMethodId = req.validatedParams?.id as number;
   
   const majors = await admissionMethodService.getMajorsByAdmissionMethodId(admissionMethodId);
   
@@ -72,20 +57,16 @@ export const getMajorsByAdmissionMethod = catch$(async (req: Request, res: Respo
  * Associate a major with an admission method
  */
 export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  const { majorId, admissionMethodId, academicYearId, campusId, minScore, note } = req.body;
-  
-  if (!majorId || !admissionMethodId || !academicYearId) {
-    replyError(res, 'Missing required fields', 400, 'body', 'majorId, admissionMethodId, and academicYearId are required');
-    return;
-  }
+  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  const data = req.body as AdmissionMethodAssociateParams;
   
   const result = await admissionMethodService.associateMajorWithAdmissionMethod(
-    Number(majorId),
-    Number(admissionMethodId),
-    Number(academicYearId),
-    campusId ? Number(campusId) : undefined,
-    minScore ? Number(minScore) : undefined,
-    note
+    data.admissionMethodId,
+    data.majorId,
+    data.academicYearId,
+    data.campusId,
+    data.minScore,
+    data.isActive
   );
   
   reply(res, result, 'Major successfully associated with admission method', 201);
@@ -95,18 +76,14 @@ export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res
  * Create a global admission method application (for all majors)
  */
 export const createGlobalAdmissionMethodApplication = catch$(async (req: Request, res: Response): Promise<void> => {
-  const { admissionMethodId, academicYearId, campusId, note } = req.body;
-  
-  if (!admissionMethodId || !academicYearId) {
-    replyError(res, 'Missing required fields', 400, 'body', 'admissionMethodId and academicYearId are required');
-    return;
-  }
+  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  const data = req.body as AdmissionMethodGlobalAppParams;
   
   const result = await admissionMethodService.createGlobalAdmissionMethodApplication(
-    Number(admissionMethodId),
-    Number(academicYearId),
-    campusId ? Number(campusId) : undefined,
-    note
+    data.admissionMethodId,
+    data.academicYearId,
+    data.campusId,
+    data.note
   );
   
   reply(res, result, 'Global admission method application created successfully', 201);
@@ -117,7 +94,8 @@ export const createGlobalAdmissionMethodApplication = catch$(async (req: Request
  * This endpoint retrieves all admission methods for a specific major identified by its code
  */
 export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
-  const majorCode = req.params.majorCode;
+  // Sử dụng dữ liệu đã validate từ Zod
+  const majorCode = req.validatedParams?.majorCode as string;
   
   const admissionMethods = await admissionMethodService.getAdmissionMethodsByMajorCode(majorCode);
   
@@ -125,22 +103,39 @@ export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Respo
 });
 
 export const createAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  const admissionMethodData: Omit<AdmissionMethod, 'id'> = req.body;
+  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  const admissionMethodData = req.body as AdmissionMethodCreateParams;
   
-  const newAdmissionMethod = await admissionMethodService.createAdmissionMethod(admissionMethodData);
+  // Chuyển đổi từ camelCase (từ Zod schema) sang snake_case (cho database)
+  const mappedData = {
+    name: admissionMethodData.name,
+    description: admissionMethodData.description,
+    application_url: admissionMethodData.applicationUrl
+  };
+  
+  const newAdmissionMethod = await admissionMethodService.createAdmissionMethod(mappedData);
   reply(res, newAdmissionMethod, 'Admission method created successfully', 201);
 });
 
 export const updateAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = parseInt(req.params.id);
-  const updateData: Partial<Omit<AdmissionMethod, 'id'>> = req.body;
+  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  const id = req.validatedParams?.id as number;
+  const updateData = req.body as AdmissionMethodUpdateParams;
   
-  const updatedAdmissionMethod = await admissionMethodService.updateAdmissionMethod(id, updateData);
+  // Chuyển đổi từ camelCase (từ Zod schema) sang snake_case (cho database)
+  const mappedData = {
+    name: updateData.name,
+    description: updateData.description,
+    application_url: updateData.applicationUrl
+  };
+  
+  const updatedAdmissionMethod = await admissionMethodService.updateAdmissionMethod(id, mappedData);
   reply(res, updatedAdmissionMethod, 'Admission method updated successfully');
 });
 
 export const deleteAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = parseInt(req.params.id);
+  // Sử dụng dữ liệu đã validate từ Zod
+  const id = req.validatedParams?.id as number;
   
   await admissionMethodService.deleteAdmissionMethod(id);
   reply(res, null, 'Admission method deleted successfully');

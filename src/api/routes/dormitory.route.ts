@@ -1,17 +1,19 @@
 import { Router } from "express";
-import { getAllDormitories, getDormitoryById, getDormitoryAvailability, getDormitoryFacilities } from "../controllers/dormitory.controller";
-import { validateId, validateCommonQueries, validateDormitoryQueries } from "../../middlewares/validators";
+import * as dormitoryController from "../controllers/dormitory.controller";
+import { dormitoryValidators } from "../../middlewares/validators/dormitory.validator";
+import { validateId } from "../../middlewares/validators/zod.validator";
 
 const router = Router();
 
-// Dormitory routes
-router.get("/", validateCommonQueries({
-  defaultPage: 1,
-  defaultLimit: 10,
-  maxLimit: 50
-}), validateDormitoryQueries(), getAllDormitories);
-router.get("/:id", validateId(), getDormitoryById);
-router.get("/:id/availability", validateId(), getDormitoryAvailability);
-router.get("/:id/facilities", validateId(), getDormitoryFacilities);
+// Dormitory routes - GET
+router.get("/", dormitoryValidators.query, dormitoryController.getAllDormitories);
+router.get("/:id", validateId, dormitoryController.getDormitoryById);
+router.get("/:id/availability", validateId, dormitoryController.getDormitoryAvailability);
+router.get("/:id/facilities", validateId, dormitoryController.getDormitoryFacilities);
+
+// Dormitory routes - CRUD operations
+router.post("/", dormitoryValidators.create, dormitoryController.createDormitory);
+router.put("/:id", validateId, dormitoryValidators.update, dormitoryController.updateDormitory);
+router.delete("/:id", validateId, dormitoryController.deleteDormitory);
 
 export default router;

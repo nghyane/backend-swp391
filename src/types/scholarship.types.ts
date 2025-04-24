@@ -1,16 +1,20 @@
 import { scholarships } from "../db/schema";
-import { BaseFilterOptions } from "./common.types";
+import { z } from 'zod';
+import {
+  scholarshipQuerySchema,
+  scholarshipCreateSchema,
+  scholarshipUpdateSchema
+} from "../middlewares/validators/scholarship.validator";
 
 /**
  * Scholarship entity data type
+ * Sử dụng type inference từ Drizzle ORM schema
  */
 export type Scholarship = typeof scholarships.$inferSelect;
 
 /**
- * Filter options for scholarship entities
+ * Export types inferred from Zod schemas
  */
-export interface ScholarshipFilterOptions extends BaseFilterOptions {
-  majorId?: number;
-  campusId?: number;
-  minAmount?: number;
-}
+export type ScholarshipQueryParams = z.infer<typeof scholarshipQuerySchema>;
+export type ScholarshipCreateParams = z.infer<typeof scholarshipCreateSchema>;
+export type ScholarshipUpdateParams = z.infer<typeof scholarshipUpdateSchema>;

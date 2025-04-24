@@ -1,6 +1,11 @@
 import { dormitories } from "../db/schema";
 import { Campus } from "./campus.types";
-import { BaseFilterOptions } from "./common.types";
+import { z } from 'zod';
+import {
+  dormitoryQuerySchema,
+  dormitoryCreateSchema,
+  dormitoryUpdateSchema
+} from "../middlewares/validators/dormitory.validator";
 
 /**
  * Dormitory entity data type with campus information
@@ -10,10 +15,8 @@ export type Dormitory = typeof dormitories.$inferSelect & {
 };
 
 /**
- * Filter options for dormitory entities
+ * Export types inferred from Zod schemas
  */
-export interface DormitoryFilterOptions extends BaseFilterOptions {
-  campusId?: number;
-  priceMin?: number;
-  priceMax?: number;
-}
+export type DormitoryQueryParams = z.infer<typeof dormitoryQuerySchema>;
+export type DormitoryCreateParams = z.infer<typeof dormitoryCreateSchema>;
+export type DormitoryUpdateParams = z.infer<typeof dormitoryUpdateSchema>;

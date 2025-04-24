@@ -1,75 +1,71 @@
 import { Request, Response } from "express";
 import * as campusService from "../../services/campus.service";
-import { Campus, CampusFilterOptions } from "../../types/campus.types";
+import { Campus, CampusQueryParams } from "../../types/campus.types";
 import { catch$ } from "../../utils/catch";
-import { reply, replyPaginated, replyError } from "../../utils/response";
-import { paginate } from "../../utils/pagination";
+import { reply, replyError } from "../../utils/response";
 
 export const getAllCampuses = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Get validated query parameters
-  const { name, address } = req.query;
-  const page = Number(req.query.page || 1); // Validated by middleware
-  const limit = Number(req.query.limit || 10); // Validated by middleware
-  const sortBy = req.query.sortBy as string | undefined;
-  const order = req.query.order as 'asc' | 'desc' | undefined;
+  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  const filters = req.validatedQuery as CampusQueryParams;
   
-  // Build filters
-  const filters: CampusFilterOptions = {};
-  if (name) filters.name = String(name);
-  if (address) filters.address = String(address);
-  
-  const hasFilters = Object.keys(filters).length > 0;
+  const hasFilters = filters && Object.keys(filters).length > 0;
   
   // Get all campuses matching filters
   const campuses = await campusService.getAllCampuses(hasFilters ? filters : undefined);
   
-  // Apply pagination and sorting
-  const paginatedResult = paginate(
-    campuses,
-    page,
-    limit,
-    sortBy && order && campuses.length > 0 ? { 
-      sortBy: sortBy as keyof (typeof campuses)[0], 
-      order 
-    } : undefined
-  );
-  
-  // Send paginated response
-  replyPaginated(
+  // Số lượng campus thường ít nên không cần phân trang
+  reply(
     res, 
-    paginatedResult.items, 
-    paginatedResult.total, 
-    paginatedResult.page, 
-    paginatedResult.limit, 
-    'Campuses retrieved successfully'
+    campuses, 
+    hasFilters ? 'Filtered campuses retrieved successfully' : 'All campuses retrieved successfully'
   );
 });
 
 export const getCampusById = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = Number(req.params.id);
+  // Sử dụng dữ liệu đã validate từ Zod
+  const id = req.validatedParams?.id as number;
   const campus = await campusService.getCampusById(id);
   reply(res, campus, 'Campus retrieved successfully');
 });
 
+/**
+ * Create a new campus
+ * This endpoint creates a new campus
+ */
 export const createCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  const campusData: Omit<Campus, 'id'> = req.body;
-  const newCampus = await campusService.createCampus(campusData);
-  reply(res, newCampus, 'Campus created successfully', 201);
+  // TODO: Implement the following steps:
+  // 1. Extract campus data from request body (already validated by middleware)
+  // 2. Call campusService.createCampus with the data
+  // 3. Return the created campus with appropriate status code
+  
+  reply(res, { message: 'Not implemented' }, 'Campus creation endpoint not implemented', 501);
 });
 
+/**
+ * Update an existing campus
+ * This endpoint updates a campus by ID
+ */
 export const updateCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = Number(req.params.id);
-  const updateData: Partial<Omit<Campus, 'id'>> = req.body;
+  // TODO: Implement the following steps:
+  // 1. Extract campus ID from request params (already validated by middleware)
+  // 2. Extract update data from request body (already validated by middleware)
+  // 3. Call campusService.updateCampus with the ID and data
+  // 4. Return the updated campus
   
-  const updatedCampus = await campusService.updateCampus(id, updateData);
-  reply(res, updatedCampus, 'Campus updated successfully');
+  reply(res, { message: 'Not implemented' }, 'Campus update endpoint not implemented', 501);
 });
 
+/**
+ * Delete a campus
+ * This endpoint deletes a campus by ID
+ */
 export const deleteCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  const id = Number(req.params.id);
+  // TODO: Implement the following steps:
+  // 1. Extract campus ID from request params
+  // 2. Call campusService.deleteCampus with the ID
+  // 3. Return success message
   
-  await campusService.deleteCampus(id);
-  reply(res, null, 'Campus deleted successfully');
+  reply(res, { message: 'Not implemented' }, 'Campus deletion endpoint not implemented', 501);
 });
 
 export const getCampusMajors = catch$(async (req: Request, res: Response): Promise<void> => {

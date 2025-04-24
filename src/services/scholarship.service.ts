@@ -1,7 +1,7 @@
 import { eq, ilike, and, gte, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { scholarships, majors } from '../db/schema';
-import { Scholarship, ScholarshipFilterOptions } from '../types/scholarship.types';
+import { Scholarship, ScholarshipQueryParams } from '../types/scholarship.types';
 import { NotFoundError } from '../utils/errors';
 
 const RELATIONS = {
@@ -19,7 +19,7 @@ const AMOUNT_SORT_OPTIONS = {
   orderBy: scholarships.amount
 };
 
-export const getAllScholarships = async (filters?: ScholarshipFilterOptions): Promise<Scholarship[]> => {
+export const getAllScholarships = async (filters?: ScholarshipQueryParams): Promise<Scholarship[]> => {
   if (!filters) return await db.query.scholarships.findMany(DEFAULT_QUERY_OPTIONS);
   
   const conditions: SQL[] = [
@@ -73,6 +73,36 @@ export const getScholarshipsByCampusId = async (campusId: number): Promise<Schol
 
 export const getScholarshipsByEligibility = async (criteria: Record<string, any>): Promise<Scholarship[]> => {
   // TODO: Implement this function when eligibility criteria are defined
+  throw new Error('Not implemented');
+};
+
+/**
+ * Create a new scholarship
+ * @param data Scholarship data without id
+ * @returns Created scholarship
+ */
+export const createScholarship = async (data: Omit<Scholarship, 'id' | 'major' | 'campus'>): Promise<Scholarship> => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
+};
+
+/**
+ * Update an existing scholarship
+ * @param id Scholarship ID
+ * @param data Updated scholarship data
+ * @returns Updated scholarship
+ */
+export const updateScholarship = async (id: number, data: Partial<Omit<Scholarship, 'id' | 'major' | 'campus'>>): Promise<Scholarship> => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
+};
+
+/**
+ * Delete a scholarship
+ * @param id Scholarship ID
+ */
+export const deleteScholarship = async (id: number): Promise<void> => {
+  // TODO: Implement this function
   throw new Error('Not implemented');
 };
 

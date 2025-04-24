@@ -1,6 +1,7 @@
-import { admissionMethods, admissionMethodApplications } from "../db/schema";
-import { BaseFilterOptions } from "./common.types";
-import { Major } from "./major.types";
+import { admissionMethods, admissionMethodApplications, majors } from "../db/schema";
+
+// Sử dụng type inference từ Drizzle ORM schema
+type Major = typeof majors.$inferSelect;
 
 /**
  * Admission method entity data type
@@ -27,8 +28,4 @@ export type AdmissionMethodApplicationWithRelations = AdmissionMethodApplication
   major?: Major;
 };
 
-/**
- * Filter options for admission method entities
- */
-export interface AdmissionMethodFilterOptions extends BaseFilterOptions {
-}
+// Lưu ý: AdmissionMethodFilterOptions đã được thay thế bằng AdmissionMethodQueryParams từ Zod schema

@@ -1,15 +1,19 @@
 import { eq, ilike, and, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { admissionMethods, majors, admissionMethodApplications } from '../db/schema';
-import { AdmissionMethod, AdmissionMethodFilterOptions, AdmissionMethodApplication } from '../types/admission-method.types';
-import { Major } from '../types/major.types';
+import { AdmissionMethodQueryParams } from '../middlewares/validators/admission-method.validator';
 import { NotFoundError } from '../utils/errors';
+
+// Sử dụng type inference từ Drizzle ORM schema
+type AdmissionMethod = typeof admissionMethods.$inferSelect;
+type AdmissionMethodApplication = typeof admissionMethodApplications.$inferSelect;
+type Major = typeof majors.$inferSelect;
 
 const DEFAULT_QUERY_OPTIONS = {
   orderBy: admissionMethods.name
 };
 
-export const getAllAdmissionMethods = async (filters?: AdmissionMethodFilterOptions): Promise<AdmissionMethod[]> => {
+export const getAllAdmissionMethods = async (filters?: AdmissionMethodQueryParams) => {
   if (!filters || Object.keys(filters).length === 0) {
     return await db.query.admissionMethods.findMany(DEFAULT_QUERY_OPTIONS);
   }
@@ -28,7 +32,7 @@ export const getAllAdmissionMethods = async (filters?: AdmissionMethodFilterOpti
   });
 };
 
-export const getAdmissionMethodById = async (id: number): Promise<AdmissionMethod> => {
+export const getAdmissionMethodById = async (id: number) => {
   const result = await db.query.admissionMethods.findFirst({
     where: eq(admissionMethods.id, id)
   });
@@ -36,29 +40,37 @@ export const getAdmissionMethodById = async (id: number): Promise<AdmissionMetho
   return result;
 };
 
-export const createAdmissionMethod = async (data: Omit<AdmissionMethod, 'id'>): Promise<AdmissionMethod> => {
-  const [newAdmissionMethod] = await db.insert(admissionMethods).values(data).returning();
-  return newAdmissionMethod;
+/**
+ * Create a new admission method
+ * @param data Admission method data without id
+ * @returns Created admission method
+ */
+export const createAdmissionMethod = async (data: { name: string; description?: string; application_url?: string }) => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
-export const updateAdmissionMethod = async (id: number, data: Partial<Omit<AdmissionMethod, 'id'>>): Promise<AdmissionMethod> => {
-  await getAdmissionMethodById(id);
-  
-  const [updatedAdmissionMethod] = await db.update(admissionMethods)
-    .set(data)
-    .where(eq(admissionMethods.id, id))
-    .returning();
-  if (!updatedAdmissionMethod) throw new NotFoundError('AdmissionMethod', id);
-  
-  return updatedAdmissionMethod;
+/**
+ * Update an existing admission method
+ * @param id Admission method ID
+ * @param data Updated admission method data
+ * @returns Updated admission method
+ */
+export const updateAdmissionMethod = async (id: number, data: { name?: string; description?: string; application_url?: string }) => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
+/**
+ * Delete an admission method
+ * @param id Admission method ID
+ */
 export const deleteAdmissionMethod = async (id: number): Promise<void> => {
-  await getAdmissionMethodById(id);
-  await db.delete(admissionMethods).where(eq(admissionMethods.id, id));
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
-export const getAdmissionMethodsByMajorId = async (majorId: number): Promise<AdmissionMethod[]> => {
+export const getAdmissionMethodsByMajorId = async (majorId: number) => {
   // Check if major exists
   const major = await db.query.majors.findFirst({
     where: eq(majors.id, majorId)
@@ -82,7 +94,7 @@ export const getAdmissionMethodsByMajorId = async (majorId: number): Promise<Adm
  * Get admission methods by major code
  * This function retrieves all admission methods for a specific major identified by its code
  */
-export const getAdmissionMethodsByMajorCode = async (majorCode: string): Promise<AdmissionMethod[]> => {
+export const getAdmissionMethodsByMajorCode = async (majorCode: string) => {
   const major = await db.query.majors.findFirst({
     where: eq(majors.code, majorCode)
   });
@@ -105,7 +117,7 @@ export const getAdmissionMethodsByMajorCode = async (majorCode: string): Promise
 /**
  * Get majors that use a specific admission method
  */
-export const getMajorsByAdmissionMethodId = async (admissionMethodId: number): Promise<Major[]> => {
+export const getMajorsByAdmissionMethodId = async (admissionMethodId: number) => {
   // Ensure the admission method exists
   await getAdmissionMethodById(admissionMethodId);
 
@@ -126,56 +138,40 @@ export const getMajorsByAdmissionMethodId = async (admissionMethodId: number): P
 
 /**
  * Associate a major with an admission method 
+ * @param admissionMethodId Admission method ID
+ * @param majorId Major ID
+ * @param academicYearId Academic year ID
+ * @param campusId Optional campus ID
+ * @param minScore Optional minimum score
+ * @param isActive Optional active status
+ * @returns Created admission method application
  */
 export const associateMajorWithAdmissionMethod = async (
-  majorId: number, 
   admissionMethodId: number,
+  majorId: number, 
   academicYearId: number,
   campusId?: number,
   minScore?: number,
-  note?: string
-): Promise<AdmissionMethodApplication> => {
-  // Check if major and admission method exist
-  await db.query.majors.findFirst({
-    where: eq(majors.id, majorId)
-  });
-  
-  await getAdmissionMethodById(admissionMethodId);
-  
-  // Create the association
-  const [result] = await db.insert(admissionMethodApplications).values({
-    major_id: majorId,
-    admission_method_id: admissionMethodId,
-    academic_year_id: academicYearId,
-    campus_id: campusId,
-    min_score: minScore,
-    note: note,
-    is_active: true
-  }).returning();
-  
-  return result;
+  isActive?: boolean
+) => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
 /**
  * Create a global admission method application (for all majors)
+ * @param admissionMethodId Admission method ID
+ * @param academicYearId Academic year ID
+ * @param campusId Optional campus ID
+ * @param note Optional note
+ * @returns Created global admission method application
  */
 export const createGlobalAdmissionMethodApplication = async (
   admissionMethodId: number,
   academicYearId: number,
   campusId?: number,
   note?: string
-): Promise<AdmissionMethodApplication> => {
-  // Check if admission method exists
-  await getAdmissionMethodById(admissionMethodId);
-  
-  // Create the global application (major_id is null)
-  const [result] = await db.insert(admissionMethodApplications).values({
-    admission_method_id: admissionMethodId,
-    academic_year_id: academicYearId,
-    campus_id: campusId,
-    note: note,
-    is_active: true
-  }).returning();
-  
-  return result;
+) => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };

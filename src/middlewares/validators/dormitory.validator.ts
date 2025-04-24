@@ -1,36 +1,56 @@
-import { query } from "express-validator";
-import { validateCustomQueries } from "./common.validator";
+import { z } from 'zod';
+import { validateZod, commonQuerySchema } from './zod.validator';
 
-export const validateDormitoryQueries = () => {
-  const customValidators = [
-    query("campusId")
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage("Campus ID must be a positive integer")
-      .toInt(),
-    
-    query("priceMin")
-      .optional()
-      .isInt({ min: 0 })
-      .withMessage("Minimum price must be a non-negative integer")
-      .toInt(),
-    
-    query("priceMax")
-      .optional()
-      .isInt({ min: 0 })
-      .withMessage("Maximum price must be a non-negative integer")
-      .toInt(),
-    
-    query("priceMax")
-      .optional()
-      .custom((value, { req }) => {
-        const priceMin = req.query?.priceMin;
-        if (priceMin !== undefined && Number(value) < Number(priceMin)) {
-          throw new Error("Maximum price must be greater than or equal to minimum price");
-        }
-        return true;
-      })
-  ];
+/**
+ * Schema for Dormitory
+ */
+// Query schema
+export const dormitoryQuerySchema = z.object({
+  campusId: z.coerce.number().int().positive().optional(),
+  priceMin: z.coerce.number().int().min(0).optional(),
+  priceMax: z.coerce.number().int().min(0).optional()
+}).strict().merge(commonQuerySchema)
+.refine(
+  (data) => {
+    if (data.priceMin !== undefined && data.priceMax !== undefined) {
+      return data.priceMax >= data.priceMin;
+    }
+    return true;
+  },
+  {
+    message: "Maximum price must be greater than or equal to minimum price",
+    path: ["priceMax"]
+  }
+);
 
-  return validateCustomQueries(customValidators);
+// Create schema
+export const dormitoryCreateSchema = z.object({
+  name: z.string().min(1).max(255),
+  campusId: z.number().int().positive(),
+  description: z.string().optional(),
+  capacity: z.number().int().positive().optional(),
+  pricePerMonth: z.number().int().min(0).optional()
+}).strict();
+
+// Update schema
+export const dormitoryUpdateSchema = z.object({
+  name: z.string().max(255).optional(),
+  campusId: z.number().int().positive().optional(),
+  description: z.string().optional(),
+  capacity: z.number().int().positive().optional(),
+  pricePerMonth: z.number().int().min(0).optional()
+}).strict();
+
+/**
+ * Validators for Dormitory
+ */
+export const dormitoryValidators = {
+  // Query validator
+  query: validateZod(dormitoryQuerySchema, 'query'),
+  
+  // Create validator
+  create: validateZod(dormitoryCreateSchema, 'body'),
+  
+  // Update validator
+  update: validateZod(dormitoryUpdateSchema, 'body')
 };

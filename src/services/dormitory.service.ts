@@ -1,7 +1,7 @@
 import { eq, and, like, SQL } from "drizzle-orm";
 import { db } from "../db";
 import { dormitories, campuses } from "../db/schema";
-import { Dormitory, DormitoryFilterOptions } from "../types/dormitory.types";
+import { Dormitory, DormitoryQueryParams } from "../types/dormitory.types";
 import { NotFoundError } from "../utils/errors";
 
 const RELATIONS = { campus: true } as const;
@@ -11,7 +11,7 @@ const DEFAULT_QUERY_OPTIONS = {
   orderBy: dormitories.name
 };
 
-export const getAllDormitories = async (filterOptions?: DormitoryFilterOptions): Promise<Dormitory[]> => {
+export const getAllDormitories = async (filterOptions?: DormitoryQueryParams) => {
   if (!filterOptions) return await db.query.dormitories.findMany(DEFAULT_QUERY_OPTIONS);
   
   const filters: SQL[] = [];
@@ -26,7 +26,7 @@ export const getAllDormitories = async (filterOptions?: DormitoryFilterOptions):
   });
 };
 
-export const getDormitoryById = async (id: number): Promise<Dormitory> => {
+export const getDormitoryById = async (id: number) => {
   const result = await db.query.dormitories.findFirst({
     where: eq(dormitories.id, id),
     with: RELATIONS
@@ -35,41 +35,37 @@ export const getDormitoryById = async (id: number): Promise<Dormitory> => {
   return result;
 };
 
-export const createDormitory = async (data: Omit<Dormitory, 'id' | 'campus'>): Promise<Dormitory> => {
-  const campusExists = await db.query.campuses.findFirst({
-    where: eq(campuses.id, data.campus_id)
-  });
-  if (!campusExists) throw new NotFoundError("Campus", data.campus_id);
-  
-  const [newDormitory] = await db.insert(dormitories).values(data).returning();
-  return getDormitoryById(newDormitory.id);
+/**
+ * Create a new dormitory
+ * @param data Dormitory data without id and campus
+ * @returns Created dormitory
+ */
+export const createDormitory = async (data: Omit<Dormitory, 'id' | 'campus'>) => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
-export const updateDormitory = async (id: number, data: Partial<Omit<Dormitory, 'id' | 'campus'>>): Promise<Dormitory> => {
-  await getDormitoryById(id);
-  
-  if (data.campus_id) {
-    const campusExists = await db.query.campuses.findFirst({
-      where: eq(campuses.id, data.campus_id)
-    });
-    if (!campusExists) throw new NotFoundError("Campus", data.campus_id);
-  }
-  
-  const [updatedDormitory] = await db.update(dormitories)
-    .set(data)
-    .where(eq(dormitories.id, id))
-    .returning();
-  if (!updatedDormitory) throw new NotFoundError("Dormitory", id);
-  
-  return getDormitoryById(updatedDormitory.id);
+/**
+ * Update an existing dormitory
+ * @param id Dormitory ID
+ * @param data Updated dormitory data
+ * @returns Updated dormitory
+ */
+export const updateDormitory = async (id: number, data: Partial<Omit<Dormitory, 'id' | 'campus'>>) => {
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
+/**
+ * Delete a dormitory
+ * @param id Dormitory ID
+ */
 export const deleteDormitory = async (id: number): Promise<void> => {
-  await getDormitoryById(id);
-  await db.delete(dormitories).where(eq(dormitories.id, id));
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
-export const getDormitoriesByCampusId = async (campusId: number): Promise<Dormitory[]> => {
+export const getDormitoriesByCampusId = async (campusId: number) => {
   const campusExists = await db.query.campuses.findFirst({
     where: eq(campuses.id, campusId)
   });

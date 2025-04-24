@@ -1,14 +1,14 @@
 import { eq, ilike, or, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { campuses } from '../db/schema';
-import { CampusFilterOptions, Campus } from '../types/campus.types';
+import { Campus, CampusQueryParams } from '../types/campus.types';
 import { NotFoundError } from '../utils/errors';
 
 const DEFAULT_QUERY_OPTIONS = {
   orderBy: campuses.name
 };
 
-export const getAllCampuses = async (filters?: CampusFilterOptions): Promise<Campus[]> => {
+export const getAllCampuses = async (filters?: CampusQueryParams): Promise<Campus[]> => {
   if (!filters || Object.keys(filters).length === 0) {
     return await db.query.campuses.findMany(DEFAULT_QUERY_OPTIONS);
   }
@@ -36,26 +36,34 @@ export const getCampusById = async (id: number): Promise<Campus> => {
   return result;
 };
 
+/**
+ * Create a new campus
+ * @param data Campus data without id
+ * @returns Created campus
+ */
 export const createCampus = async (data: Omit<Campus, 'id'>): Promise<Campus> => {
-  const [newCampus] = await db.insert(campuses).values(data).returning();
-  return newCampus;
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
+/**
+ * Update an existing campus
+ * @param id Campus ID
+ * @param data Updated campus data
+ * @returns Updated campus
+ */
 export const updateCampus = async (id: number, data: Partial<Omit<Campus, 'id'>>): Promise<Campus> => {
-  await getCampusById(id);
-  
-  const [updatedCampus] = await db.update(campuses)
-    .set(data)
-    .where(eq(campuses.id, id))
-    .returning();
-  if (!updatedCampus) throw new NotFoundError('Campus', id);
-  
-  return updatedCampus;
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
+/**
+ * Delete a campus
+ * @param id Campus ID
+ */
 export const deleteCampus = async (id: number): Promise<void> => {
-  await getCampusById(id);
-  await db.delete(campuses).where(eq(campuses.id, id));
+  // TODO: Implement this function
+  throw new Error('Not implemented');
 };
 
 export const getCampusMajors = async (campusId: number): Promise<unknown> => {

@@ -1,14 +1,9 @@
 import { majors } from "../db/schema";
-import { BaseFilterOptions } from "./common.types";
 
 /**
- * Filter options for major entities
+ * Major entity data type - sử dụng type inference từ Drizzle ORM schema
  */
-export interface MajorFilterOptions extends BaseFilterOptions {
-  code?: string;
-  description?: string;
-  name?: string;
-}
+export type Major = typeof majors.$inferSelect;
 
 /**
  * Pagination and sorting options
@@ -24,14 +19,11 @@ export interface MajorQueryOptions {
  * Paginated result for majors
  */
 export interface PaginatedMajorResult {
-  items: typeof majors.$inferSelect[];
+  items: Major[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
 
-/**
- * Major entity data type
- */
-export type Major = typeof majors.$inferSelect;
+// Lưu ý: MajorFilterOptions đã được thay thế bằng MajorQueryParams từ Zod schema
