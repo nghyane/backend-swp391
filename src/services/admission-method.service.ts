@@ -1,35 +1,157 @@
-import { eq, ilike, and, SQL } from 'drizzle-orm';
+import { eq, ilike, and, or, SQL, inArray } from 'drizzle-orm';
 import { db } from '../db';
-import { admissionMethods, majors, admissionMethodApplications } from '../db/schema';
+import { admissionMethods, admissionMethodApplications, majors, campuses, academicYears } from '../db/schema';
 import { AdmissionMethodQueryParams } from '../middlewares/validators/admission-method.validator';
 import { NotFoundError } from '../utils/errors';
 
-// Sử dụng type inference từ Drizzle ORM schema
-type AdmissionMethod = typeof admissionMethods.$inferSelect;
-type AdmissionMethodApplication = typeof admissionMethodApplications.$inferSelect;
-type Major = typeof majors.$inferSelect;
-
 const DEFAULT_QUERY_OPTIONS = {
-  orderBy: admissionMethods.name
+  orderBy: admissionMethods.name,
+  with: {
+    applications: {
+      columns: {
+        min_score: true,
+        note: true,
+      },
+      with: {
+        major: {
+          columns: {
+            code: true
+          }
+        },
+        campus: {
+          columns: {
+            code: true
+          }
+        },
+        academicYear: {
+          columns: {
+            year: true
+          }
+        }
+      }
+    }
+  }
 };
 
 export const getAllAdmissionMethods = async (filters?: AdmissionMethodQueryParams) => {
+  // If no filters, return all admission methods
   if (!filters || Object.keys(filters).length === 0) {
     return await db.query.admissionMethods.findMany(DEFAULT_QUERY_OPTIONS);
   }
+
+  // Handle basic name filter
+  const nameFilter = filters.name ? 
+    ilike(admissionMethods.name, `%${filters.name}%`) : undefined;
   
-  const conditions: SQL[] = [
-    filters.name && ilike(admissionMethods.name, `%${filters.name}%`)
-  ].filter(Boolean) as SQL[];
-  
-  if (conditions.length === 0) {
-    return await db.query.admissionMethods.findMany(DEFAULT_QUERY_OPTIONS);
+  // If we don't have relational filters, just filter by name
+  if (!hasRelationalFilters(filters)) {
+    return await db.query.admissionMethods.findMany({
+      ...DEFAULT_QUERY_OPTIONS,
+      where: nameFilter
+    });
   }
   
+  // Process relational filters
+  try {
+    // Step 1: Resolve codes to IDs if needed
+    let majorId = filters.major_id;
+    let campusId = filters.campus_id;
+    let academicYearId: number | undefined;
+    
+    // Find major by code if provided
+    if (filters.major_code && !majorId) {
+      const major = await db.query.majors.findFirst({
+        where: eq(majors.code, filters.major_code)
+      });
+      if (!major) return []; // No matching major found
+      majorId = major.id;
+    }
+    
+    // Find campus by code if provided
+    if (filters.campus_code && !campusId) {
+      const campus = await db.query.campuses.findFirst({
+        where: eq(campuses.code, filters.campus_code)
+      });
+      if (!campus) return []; // No matching campus found
+      campusId = campus.id;
+    }
+    
+    // Find academic year ID if year provided
+    if (filters.academic_year) {
+      const academicYear = await db.query.academicYears.findFirst({
+        where: eq(academicYears.year, filters.academic_year)
+      });
+      if (!academicYear) return []; // No matching academic year found
+      academicYearId = academicYear.id;
+    }
+    
+    // Step 2: Query admission method applications with resolved IDs
+    const applicationConditions: SQL[] = [];
+    
+    if (majorId) {
+      applicationConditions.push(eq(admissionMethodApplications.major_id, majorId));
+    }
+    
+    if (campusId) {
+      applicationConditions.push(eq(admissionMethodApplications.campus_id, campusId));
+    }
+    
+    if (academicYearId) {
+      applicationConditions.push(eq(admissionMethodApplications.academic_year_id, academicYearId));
+    }
+    
+    if (filters.is_active !== undefined) {
+      applicationConditions.push(eq(admissionMethodApplications.is_active, filters.is_active));
+    }
+    
+    // If we have application conditions, find matching admission method IDs
+    if (applicationConditions.length > 0) {
+      // Get distinct admission method IDs that match our criteria
+      const matchingApplications = await db
+        .select({ id: admissionMethodApplications.admission_method_id })
+        .from(admissionMethodApplications)
+        .where(and(...applicationConditions));
+      
+      // If no matches found, return empty array
+      if (matchingApplications.length === 0) {
+        return [];
+      }
+      
+      // Extract admission method IDs
+      const admissionMethodIds = matchingApplications.map(app => app.id);
+      
+      // Final conditions combining ID filter and name filter
+      const finalConditions: SQL[] = [
+        inArray(admissionMethods.id, admissionMethodIds)
+      ];
+      
+      if (nameFilter) {
+        finalConditions.push(nameFilter);
+      }
+      
+      // Return filtered admission methods
+      return await db.query.admissionMethods.findMany({
+        ...DEFAULT_QUERY_OPTIONS,
+        where: and(...finalConditions)
+      });
+    }
+  } catch (error) {
+    console.error('Error in getAllAdmissionMethods:', error);
+    return [];
+  }
+  
+  // Fallback to just name filter if no relational conditions applied
   return await db.query.admissionMethods.findMany({
     ...DEFAULT_QUERY_OPTIONS,
-    where: and(...conditions)
+    where: nameFilter
   });
+};
+
+// Helper function to check if we have any relational filters
+const hasRelationalFilters = (filters: AdmissionMethodQueryParams): boolean => {
+  return !!(filters.major_code || filters.major_id || 
+           filters.campus_code || filters.campus_id || 
+           filters.academic_year || filters.is_active !== undefined);
 };
 
 export const getAdmissionMethodById = async (id: number) => {
@@ -37,6 +159,7 @@ export const getAdmissionMethodById = async (id: number) => {
     where: eq(admissionMethods.id, id)
   });
   if (!result) throw new NotFoundError('AdmissionMethod', id);
+  
   return result;
 };
 
@@ -75,9 +198,9 @@ export const getAdmissionMethodsByMajorId = async (majorId: number) => {
   const major = await db.query.majors.findFirst({
     where: eq(majors.id, majorId)
   });
-  
+
   if (!major) throw new NotFoundError('Major', majorId);
-  
+
   // Get all admission methods for this major through the applications table
   const result = await db.query.admissionMethodApplications.findMany({
     where: eq(admissionMethodApplications.major_id, majorId),
@@ -85,7 +208,7 @@ export const getAdmissionMethodsByMajorId = async (majorId: number) => {
       admissionMethod: true
     }
   });
-  
+
   // Extract and return just the admission methods
   return result.map((item) => item.admissionMethod);
 };
@@ -98,9 +221,9 @@ export const getAdmissionMethodsByMajorCode = async (majorCode: string) => {
   const major = await db.query.majors.findFirst({
     where: eq(majors.code, majorCode)
   });
-  
+
   if (!major) throw new NotFoundError('Major with code', majorCode);
-  
+
   // Get all admission methods for this major through the applications table
   const result = await db.query.admissionMethodApplications.findMany({
     where: eq(admissionMethodApplications.major_id, major.id),
@@ -108,7 +231,7 @@ export const getAdmissionMethodsByMajorCode = async (majorCode: string) => {
       admissionMethod: true
     }
   });
-  
+
   // Extract and return just the admission methods
   return result.map((item) => item.admissionMethod);
 };
@@ -148,7 +271,7 @@ export const getMajorsByAdmissionMethodId = async (admissionMethodId: number) =>
  */
 export const associateMajorWithAdmissionMethod = async (
   admissionMethodId: number,
-  majorId: number, 
+  majorId: number,
   academicYearId: number,
   campusId?: number,
   minScore?: number,
