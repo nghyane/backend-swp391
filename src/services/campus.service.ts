@@ -15,6 +15,7 @@ export const getAllCampuses = async (filters?: CampusQueryParams): Promise<Campu
   
   const conditions: SQL[] = [
     filters.name && ilike(campuses.name, `%${filters.name}%`),
+    filters.code && eq(campuses.code, filters.code),
     filters.address && ilike(campuses.address, `%${filters.address}%`)
   ].filter(Boolean) as SQL[];
   

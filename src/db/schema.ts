@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer, text, boolean, timestamp, pgEnum, uniqueIndex, index } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, integer, text, boolean, timestamp, pgEnum, uniqueIndex, index, jsonb } from "drizzle-orm/pg-core";
 
 /**
  * Enum cho vai trò người dùng nội bộ
@@ -46,8 +46,10 @@ export const careers = pgTable("careers", {
  */
 export const campuses = pgTable("campuses", {
   id: serial("id").primaryKey(),
+  code: varchar("code", { length: 10 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   address: text("address"),
+  contact: jsonb("contact").notNull().default('{"phone":"","email":""}'),
 });
 
 /**

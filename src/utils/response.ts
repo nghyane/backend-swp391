@@ -66,13 +66,19 @@ export const replyPaginated = <T>(
   limit: number,
   message = 'ok'
 ): Response => {
-  const paginatedData: PaginatedResponse<T> = {
-    items,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit)
+  // Create response with snake_case keys directly
+  const response = {
+    data: {
+      items,
+      total,
+      page,
+      limit,
+      total_pages: Math.ceil(total / limit)
+    },
+    message,
+    success: true,
+    timestamp: new Date().toISOString()
   };
   
-  return reply(res, paginatedData, message);
+  return res.status(200).json(response);
 };

@@ -1,6 +1,6 @@
 import { eq, ilike, or, and, SQL, inArray, sql } from 'drizzle-orm';
 import { db } from '../db';
-import { majors, majorCampusAdmission, academicYears } from '../db/schema';
+import { majors, majorCampusAdmission, academicYears, campuses } from '../db/schema';
 import { MajorQueryParams } from '../middlewares/validators/major.validator';
 import { NotFoundError } from '../utils/errors';
 
@@ -9,7 +9,8 @@ type Major = typeof majors.$inferSelect;
 
 const DEFAULT_QUERY_OPTIONS = {
   with: {
-    careers: true as const
+    careers: true as const,
+    campus: true as const
   }
 };
 
@@ -39,11 +40,24 @@ export const getAllMajors = async (filters?: MajorQueryParams) => {
   if (!filters) return await db.query.majors.findMany(DEFAULT_QUERY_OPTIONS);
 
   // Filter by campus and academic year
-  if (filters.campus_id || filters.academic_year) {
+  if (filters.campus_id || filters.campus_code || filters.academic_year) {
     let admissionConditions: SQL[] = [];
     
+    // Xử lý lọc theo campus_id hoặc campus_code
     if (filters.campus_id) {
       admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
+    } else if (filters.campus_code) {
+      // Tìm campus id từ campus code
+      const campus = await db.query.campuses.findFirst({
+        where: eq(campuses.code, filters.campus_code),
+        columns: {
+          id: true
+        }
+      });
+      
+      if (!campus) return []; // Nếu không tìm thấy campus, trả về mảng rỗng
+      
+      admissionConditions.push(eq(majorCampusAdmission.campus_id, campus.id));
     }
     
     // Get academic year ID based on the year
