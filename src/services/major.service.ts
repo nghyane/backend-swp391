@@ -1,16 +1,35 @@
-import { eq, ilike, or, and, SQL, inArray, sql } from 'drizzle-orm';
+import { eq, ilike, or, and, SQL, inArray } from 'drizzle-orm';
 import { db } from '../db';
 import { majors, majorCampusAdmission, academicYears, campuses } from '../db/schema';
 import { MajorQueryParams } from '../middlewares/validators/major.validator';
 import { NotFoundError } from '../utils/errors';
-
-// Sử dụng type inference từ Drizzle ORM schema
-type Major = typeof majors.$inferSelect;
+import { Major } from '../types/major.types';
 
 const DEFAULT_QUERY_OPTIONS = {
+  columns: {
+    id: true as const,
+    name: true as const,
+    code: true as const
+  },
   with: {
-    careers: true as const,
-    campus: true as const
+    majorCampusAdmissions: {
+      with: {
+        campus: {
+          columns: {
+            code: true as const
+          }
+        },
+        academicYear: {
+          columns: {
+            year: true as const
+          }
+        }
+      },
+      columns: {
+        tuition_fee: true as const,
+        quota: true as const
+      }
+    }
   }
 };
 
@@ -40,24 +59,11 @@ export const getAllMajors = async (filters?: MajorQueryParams) => {
   if (!filters) return await db.query.majors.findMany(DEFAULT_QUERY_OPTIONS);
 
   // Filter by campus and academic year
-  if (filters.campus_id || filters.campus_code || filters.academic_year) {
+  if (filters.campus_id || filters.academic_year) {
     let admissionConditions: SQL[] = [];
     
-    // Xử lý lọc theo campus_id hoặc campus_code
     if (filters.campus_id) {
       admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
-    } else if (filters.campus_code) {
-      // Tìm campus id từ campus code
-      const campus = await db.query.campuses.findFirst({
-        where: eq(campuses.code, filters.campus_code),
-        columns: {
-          id: true
-        }
-      });
-      
-      if (!campus) return []; // Nếu không tìm thấy campus, trả về mảng rỗng
-      
-      admissionConditions.push(eq(majorCampusAdmission.campus_id, campus.id));
     }
     
     // Get academic year ID based on the year
@@ -128,7 +134,17 @@ export const getAllMajors = async (filters?: MajorQueryParams) => {
 export const getMajorById = async (id: number) => {
   const result = await db.query.majors.findFirst({
     where: eq(majors.id, id),
-    ...DEFAULT_QUERY_OPTIONS
+    with: {
+      careers: true as const,
+      majorCampusAdmissions: {
+        with: {
+          campus: true as const,
+          academicYear: true as const
+        }
+      },
+      admissionMethodApplications: true as const,
+      scholarships: true as const
+    }
   });
   if (!result) throw new NotFoundError('Major', id);
   return result;
@@ -149,6 +165,41 @@ export const getMajorsByCampusId = async (campusId: number, academicYear?: numbe
     with: RELATIONS_WITH_CAMPUS
   });
 
+  return result;
+};
+
+/**
+ * Lấy tất cả các ngành học theo mã campus
+ * @param campusCode Mã campus (ví dụ: "HN", "HCM")
+ * @param academicYear Năm học (ví dụ: 2024 cho năm học 2024-2025)
+ * @returns Danh sách các ngành học và thông tin tuyển sinh
+ */
+export const getMajorsByCampusCode = async (campusCode: string, academicYear?: number) => {
+  // Tìm campus theo code
+  const campus = await db.query.campuses.findFirst({
+    where: eq(campuses.code, campusCode),
+    columns: {
+      id: true
+    }
+  });
+  
+  if (!campus) throw new NotFoundError('Campus with code', campusCode);
+  
+  // Lấy các ngành học của campus với điều kiện tương tự getMajorsByCampusId
+  let conditions: SQL[] = [eq(majorCampusAdmission.campus_id, campus.id)];
+  
+  if (academicYear) {
+    const yearId = await getAcademicYearId(academicYear);
+    if (!yearId) return [];
+    
+    conditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
+  }
+  
+  const result = await db.query.majorCampusAdmission.findMany({
+    where: and(...conditions),
+    with: RELATIONS_WITH_CAMPUS
+  });
+  
   return result;
 };
 
@@ -189,7 +240,17 @@ export const deleteMajor = async (id: number): Promise<void> => {
 export const getMajorByCode = async (code: string) => {
   const result = await db.query.majors.findFirst({
     where: eq(majors.code, code),
-    ...DEFAULT_QUERY_OPTIONS
+    with: {
+      careers: true as const,
+      majorCampusAdmissions: {
+        with: {
+          campus: true as const,
+          academicYear: true as const
+        }
+      },
+      admissionMethodApplications: true as const,
+      scholarships: true as const
+    }
   });
   
   if (!result) throw new NotFoundError('Major with code', code);
