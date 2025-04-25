@@ -6,6 +6,7 @@ import scholarshipRoutes from "./routes/scholarship.route";
 import dormitoryRoutes from "./routes/dormitory.route";
 import admissionMethodRoutes from "./routes/admission-method.route";
 import internalUserRoutes from './routes/internal-user.routes';
+import dashboardRoutes from './routes/dashboard.route';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/scholarships", scholarshipRoutes);
 router.use("/dormitories", dormitoryRoutes);
 router.use("/admission-methods", admissionMethodRoutes);
 router.use('/internal-users', internalUserRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router;
