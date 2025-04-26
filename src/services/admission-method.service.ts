@@ -52,38 +52,44 @@ export const getAllAdmissionMethods = async (filters?: AdmissionMethodQueryParam
   }
   
   // Process relational filters
-  // Step 1: Resolve codes to IDs if needed
-  let majorId = filters.major_id;
-  let campusId = filters.campus_id;
-  let academicYearId: number | undefined;
-  
-  // Find major by code if provided
-  if (filters.major_code && !majorId) {
-    const major = await db.query.majors.findFirst({
-      where: eq(majors.code, filters.major_code)
-    });
-    if (!major) return []; // No matching major found
-    majorId = major.id;
-  }
-  
-  // Find campus by code if provided
-  if (filters.campus_code && !campusId) {
-    const campus = await db.query.campuses.findFirst({
-      where: eq(campuses.code, filters.campus_code)
-    });
-    if (!campus) return []; // No matching campus found
-    campusId = campus.id;
-  }
-  
-  // Find academic year ID if year provided
-  if (filters.academic_year) {
-    const academicYear = await db.query.academicYears.findFirst({
-      where: eq(academicYears.year, filters.academic_year)
-    });
+  // Step 1: Resolve codes to IDs in parallel
+  // Prepare queries for parallel execution
+  const queries = {
+    major: filters.major_code && !filters.major_id 
+      ? db.query.majors.findFirst({
+          where: eq(majors.code, filters.major_code)
+        })
+      : Promise.resolve(null),
     
-    if (!academicYear) return []; // No matching academic year found
-    academicYearId = academicYear.id;
-  }
+    campus: filters.campus_code && !filters.campus_id
+      ? db.query.campuses.findFirst({
+          where: eq(campuses.code, filters.campus_code)
+        })
+      : Promise.resolve(null),
+    
+    academicYear: filters.academic_year
+      ? db.query.academicYears.findFirst({
+          where: eq(academicYears.year, filters.academic_year)
+        })
+      : Promise.resolve(null)
+  };
+  
+  // Execute all queries in parallel
+  const [majorResult, campusResult, academicYearResult] = await Promise.all([
+    queries.major,
+    queries.campus,
+    queries.academicYear
+  ]);
+  
+  // Handle results
+  if (filters.major_code && !filters.major_id && !majorResult) return []; // No matching major found
+  if (filters.campus_code && !filters.campus_id && !campusResult) return []; // No matching campus found
+  if (filters.academic_year && !academicYearResult) return []; // No matching academic year found
+  
+  // Set IDs from results
+  const majorId = filters.major_id || (majorResult?.id);
+  const campusId = filters.campus_id || (campusResult?.id);
+  const academicYearId = academicYearResult?.id;
   
   // Step 2: We'll run two separate queries and combine the results
   // First query: Find methods specific to the major (if majorId is provided)
