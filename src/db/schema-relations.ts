@@ -50,8 +50,8 @@ export const majorsRelations = relations(majors, ({ many }) => ({
   careers: many(careers),
   // List of campuses and academic years offering this major
   majorCampusAdmissions: many(majorCampusAdmission),
-  // Danh sách học bổng của ngành
-  scholarships: many(scholarships),
+  // Danh sách học bổng áp dụng cho ngành
+  scholarshipAvailabilities: many(scholarshipAvailability),
   // Danh sách phương thức xét tuyển của ngành
   admissionMethodApplications: many(admissionMethodApplications),
 }));
@@ -73,18 +73,8 @@ export const careersRelations = relations(careers, ({ one }) => ({
  * - Mỗi học bổng có thể thuộc về một ngành cụ thể
  * - Mỗi học bổng có thể áp dụng cho nhiều campus và nhiều năm học thông qua bảng scholarshipAvailability
  */
-export const scholarshipsRelations = relations(scholarships, ({ one, many }) => ({
-  // Major that this scholarship applies to (can be null if applicable to all majors)
-  major: one(majors, {
-    fields: [scholarships.major_id],
-    references: [majors.id],
-  }),
-  // Campus that this scholarship is associated with
-  campus: one(campuses, {
-    fields: [scholarships.campus_id],
-    references: [campuses.id],
-  }),
-  // List of campuses and academic years where this scholarship is available
+export const scholarshipsRelations = relations(scholarships, ({ many }) => ({
+  // List of campuses, majors and academic years where this scholarship is available
   availabilities: many(scholarshipAvailability),
 }));
 
@@ -184,6 +174,11 @@ export const scholarshipAvailabilityRelations = relations(scholarshipAvailabilit
   academicYear: one(academicYears, {
     fields: [scholarshipAvailability.academic_year_id],
     references: [academicYears.id],
+  }),
+  // Ngành học (tùy chọn)
+  major: one(majors, {
+    fields: [scholarshipAvailability.major_id],
+    references: [majors.id],
   }),
 }));
 

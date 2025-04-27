@@ -75,13 +75,8 @@ export const scholarships = pgTable("scholarships", {
   description: text("description"),
   condition: text("condition"),
   amount: integer("amount"),
-  major_id: integer("major_id").references(() => majors.id),
-  campus_id: integer("campus_id").references(() => campuses.id),
   application_url: varchar("application_url", { length: 255 }),
-}, (table) => [
-  index("idx_scholarship_major").on(table.major_id),
-  index("idx_scholarship_campus").on(table.campus_id),
-]);
+});
 
 /**
  * Bảng tài khoản người dùng nội bộ (admin, staff)
@@ -168,8 +163,9 @@ export const scholarshipAvailability = pgTable("scholarship_availability", {
   scholarship_id: integer("scholarship_id").references(() => scholarships.id).notNull(),
   academic_year_id: integer("academic_year_id").references(() => academicYears.id).notNull(),
   campus_id: integer("campus_id").references(() => campuses.id),
+  major_id: integer("major_id").references(() => majors.id),
 }, (table) => [
-  index("idx_scholarship_year_campus").on(table.scholarship_id, table.academic_year_id, table.campus_id),
+  index("idx_scholarship_year_campus_major").on(table.scholarship_id, table.academic_year_id, table.campus_id, table.major_id),
 ]);
 
 
