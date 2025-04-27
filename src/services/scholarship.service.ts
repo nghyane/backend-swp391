@@ -1,88 +1,254 @@
-import { eq, ilike, and, gte, SQL } from 'drizzle-orm';
-import { db } from '../db';
-import { scholarships, majors } from '../db/schema';
+/**
+ * Scholarship Service
+ * Provides functions to interact with scholarship data
+ */
+
+import { eq, and, ilike, sql, exists } from "drizzle-orm";
+import { db } from "../db";
+import { 
+  scholarships, 
+  majors, 
+  campuses, 
+  scholarshipAvailability, 
+  academicYears 
+} from "../db/schema";
 import { Scholarship, ScholarshipQueryParams } from '../types/scholarship.types';
 import { NotFoundError } from '../utils/errors';
 
-const RELATIONS = {
-  major: true as const,
-  campus: true as const
+// ===== QUERY STRUCTURE CONSTANTS =====
+
+/**
+ * Common column selections for different entities
+ */
+const COLUMN_SELECTIONS = {
+  major: { columns: { code: true, name: true } },
+  campus: { columns: { code: true, name: true } },
+  academicYear: { columns: { year: true } },
+  scholarship: {
+    id: true,
+    name: true,
+    description: true,
+    amount: true
+  }
 };
 
-const DEFAULT_QUERY_OPTIONS = {
-  with: RELATIONS,
-  orderBy: scholarships.name
+/**
+ * Relation configurations for different query types
+ */
+const RELATION_CONFIGS = {
+  // Default query options with name ordering
+  defaultQuery: {
+    orderBy: scholarships.name,
+    with: {
+      availabilities: {
+        with: {
+          major: COLUMN_SELECTIONS.major,
+          campus: COLUMN_SELECTIONS.campus,
+          academicYear: COLUMN_SELECTIONS.academicYear
+        }
+      }
+    }
+  },
+  
+  // Query options with amount ordering
+  amountSortQuery: {
+    orderBy: scholarships.amount,
+    with: {
+      availabilities: {
+        with: {
+          major: COLUMN_SELECTIONS.major,
+          campus: COLUMN_SELECTIONS.campus,
+          academicYear: COLUMN_SELECTIONS.academicYear
+        }
+      }
+    }
+  },
+  
+  // Full detail relations for scholarship
+  fullDetailRelations: {
+    availabilities: {
+      with: {
+        major: true as const,
+        campus: true as const,
+        academicYear: true as const
+      }
+    }
+  }
 };
 
-const AMOUNT_SORT_OPTIONS = {
-  with: RELATIONS,
-  orderBy: scholarships.amount
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * Resolve major code to major ID
+ * @param majorCode Major code to resolve
+ * @returns Major ID or undefined if not found
+ */
+const resolveMajorCode = async (majorCode?: string): Promise<number | undefined> => {
+  if (!majorCode) return undefined;
+  
+  const major = await db.query.majors.findFirst({
+    where: eq(majors.code, majorCode),
+    columns: { id: true }
+  });
+  
+  return major?.id;
 };
 
+/**
+ * Resolve campus code to campus ID
+ * @param campusCode Campus code to resolve
+ * @returns Campus ID or undefined if not found
+ */
+const resolveCampusCode = async (campusCode?: string): Promise<number | undefined> => {
+  if (!campusCode) return undefined;
+  
+  const campus = await db.query.campuses.findFirst({
+    where: eq(campuses.code, campusCode),
+    columns: { id: true }
+  });
+  
+  return campus?.id;
+};
+
+/**
+ * Build availability filter conditions
+ * @param majorId Major ID to filter by
+ * @param campusId Campus ID to filter by
+ * @returns SQL exists condition or undefined
+ */
+const buildAvailabilityFilter = (majorId?: number, campusId?: number) => {
+  if (!majorId && !campusId) return undefined;
+  
+  const availabilityConditions = [];
+  
+  if (majorId) {
+    availabilityConditions.push(eq(scholarshipAvailability.major_id, majorId));
+  }
+  
+  if (campusId) {
+    availabilityConditions.push(eq(scholarshipAvailability.campus_id, campusId));
+  }
+  
+  return exists(
+    db.select({ dummy: sql`1` })
+      .from(scholarshipAvailability)
+      .where(and(
+        eq(scholarshipAvailability.scholarship_id, scholarships.id),
+        ...availabilityConditions
+      ))
+  );
+};
+
+// ===== EXPORTED SERVICE FUNCTIONS =====
+
+/**
+ * Get all scholarships with optional filtering
+ * @param filters Optional filters for scholarships
+ * @returns Array of scholarships matching the filters
+ */
 export const getAllScholarships = async (filters?: ScholarshipQueryParams): Promise<Scholarship[]> => {
-  if (!filters) return await db.query.scholarships.findMany(DEFAULT_QUERY_OPTIONS);
-  
-  const conditions: SQL[] = [
-    filters.name && ilike(scholarships.name, `%${filters.name}%`),
-    filters.major_id && eq(scholarships.major_id, filters.major_id),
-    filters.campus_id && eq(scholarships.campus_id, filters.campus_id),
-    filters.min_amount && gte(scholarships.amount, filters.min_amount)
-  ].filter(Boolean) as SQL[];
-  
+  // Return all scholarships if no filters provided
+  if (!filters || Object.keys(filters).length === 0) {
+    return await db.query.scholarships.findMany(RELATION_CONFIGS.defaultQuery);
+  }
+
+  // Build scholarship name filter
+  const scholarshipConditions = [];
+  if (filters.name) {
+    scholarshipConditions.push(ilike(scholarships.name, `%${filters.name}%`));
+  }
+
+  // Resolve IDs from codes if needed
+  const majorId = filters.major_id || await resolveMajorCode(filters.major_code);
+  const campusId = filters.campus_id || await resolveCampusCode(filters.campus_code);
+
+  // Build availability filter if major or campus is specified
+  const availabilityFilter = buildAvailabilityFilter(majorId, campusId);
+  if (availabilityFilter) {
+    scholarshipConditions.push(availabilityFilter);
+  }
+
+  // Execute query with all conditions
   return await db.query.scholarships.findMany({
-    ...DEFAULT_QUERY_OPTIONS,
-    where: conditions.length > 0 ? and(...conditions) : undefined
+    ...RELATION_CONFIGS.defaultQuery,
+    where: scholarshipConditions.length > 0 ? and(...scholarshipConditions) : undefined
   });
 };
 
+/**
+ * Get scholarship by ID with all relations
+ * @param id Scholarship ID
+ * @returns Scholarship with all relations
+ * @throws NotFoundError if scholarship not found
+ */
 export const getScholarshipById = async (id: number): Promise<Scholarship> => {
   const result = await db.query.scholarships.findFirst({
     where: eq(scholarships.id, id),
-    with: RELATIONS
+    with: RELATION_CONFIGS.fullDetailRelations
   });
-  if (!result) throw new NotFoundError('Scholarship', id);
+  
+  if (!result) throw new NotFoundError('Scholarship with ID', id.toString());
+  
   return result;
 };
 
-
 /**
  * Get scholarships by major code
- * This function retrieves all scholarships for a specific major identified by its code
+ * @param majorCode Major code to filter by
+ * @returns Array of scholarships available for the specified major
+ * @throws NotFoundError if major not found
  */
 export const getScholarshipsByMajorCode = async (majorCode: string): Promise<Scholarship[]> => {
-  // First get the major by code to find its ID
-  const major = await db.query.majors.findFirst({
-    where: eq(majors.code, majorCode)
-  });
-  
-  if (!major) throw new NotFoundError('Major with code', majorCode);
-  
-  // Then get scholarships by the major ID
+  // Get major ID from code
+  const majorId = await resolveMajorCode(majorCode);
+  if (!majorId) throw new NotFoundError('Major with code', majorCode);
+
+  // Find scholarships with availabilities for this major
   return await db.query.scholarships.findMany({
-    ...AMOUNT_SORT_OPTIONS,
-    where: eq(scholarships.major_id, major.id)
+    ...RELATION_CONFIGS.amountSortQuery,
+    where: buildAvailabilityFilter(majorId)
   });
 };
 
+/**
+ * Get scholarships by campus ID
+ * @param campusId Campus ID to filter by
+ * @returns Array of scholarships available at the specified campus
+ */
 export const getScholarshipsByCampusId = async (campusId: number): Promise<Scholarship[]> => {
   return await db.query.scholarships.findMany({
-    ...AMOUNT_SORT_OPTIONS,
-    where: eq(scholarships.campus_id, campusId)
+    ...RELATION_CONFIGS.amountSortQuery,
+    where: buildAvailabilityFilter(undefined, campusId)
   });
 };
 
+/**
+ * Get scholarships by eligibility criteria
+ * @param criteria Eligibility criteria to filter by
+ * @returns Array of scholarships matching the eligibility criteria
+ */
 export const getScholarshipsByEligibility = async (criteria: Record<string, any>): Promise<Scholarship[]> => {
   // TODO: Implement this function when eligibility criteria are defined
   throw new Error('Not implemented');
 };
 
+// ===== CRUD OPERATIONS (TO BE IMPLEMENTED) =====
+
 /**
  * Create a new scholarship
  * @param data Scholarship data without id
+ * @param availabilities Array of campus, major, and academic year IDs where this scholarship is available
  * @returns Created scholarship
  */
-export const createScholarship = async (data: Omit<Scholarship, 'id' | 'major' | 'campus'>): Promise<Scholarship> => {
-  // TODO: Implement this function
+export const createScholarship = async (
+  data: Omit<typeof scholarships.$inferInsert, 'id'>,
+  availabilities: Array<{
+    campus_id: number;
+    major_id?: number;
+    academic_year_id: number;
+  }>
+): Promise<Scholarship> => {
+  // TODO: Implement this function when needed
   throw new Error('Not implemented');
 };
 
@@ -90,10 +256,19 @@ export const createScholarship = async (data: Omit<Scholarship, 'id' | 'major' |
  * Update an existing scholarship
  * @param id Scholarship ID
  * @param data Updated scholarship data
+ * @param availabilities Optional array of campus, major, and academic year IDs to replace existing availabilities
  * @returns Updated scholarship
  */
-export const updateScholarship = async (id: number, data: Partial<Omit<Scholarship, 'id' | 'major' | 'campus'>>): Promise<Scholarship> => {
-  // TODO: Implement this function
+export const updateScholarship = async (
+  id: number,
+  data: Partial<Omit<typeof scholarships.$inferInsert, 'id'>>,
+  availabilities?: Array<{
+    campus_id: number;
+    major_id?: number;
+    academic_year_id: number;
+  }>
+): Promise<Scholarship> => {
+  // TODO: Implement this function when needed
   throw new Error('Not implemented');
 };
 
@@ -102,7 +277,6 @@ export const updateScholarship = async (id: number, data: Partial<Omit<Scholarsh
  * @param id Scholarship ID
  */
 export const deleteScholarship = async (id: number): Promise<void> => {
-  // TODO: Implement this function
+  // TODO: Implement this function when needed
   throw new Error('Not implemented');
 };
-
