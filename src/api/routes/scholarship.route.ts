@@ -7,11 +7,6 @@ const router = Router();
 
 // Scholarship routes - GET
 router.get("/", scholarshipValidators.query, scholarshipController.getAllScholarships);
-
-// Không cần validate majorCode vì đây là string
-router.get("/major/:majorCode", scholarshipController.getScholarshipsByMajor);
-
-// Validate ID param
 router.get("/:id", validateId, scholarshipController.getScholarshipById);
 
 // Scholarship routes - CRUD operations

@@ -33,16 +33,19 @@ export const getAllMajors = catch$(async (req: Request, res: Response): Promise<
  * This endpoint retrieves a major by its unique code
  */
 export const getMajorByCode = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod với type inference
-  const code = req.params.code;
+  // Kiểm tra và lấy mã ngành từ params đã được validate
+  if (!req.validatedParams?.majorCode) {
+    throw new Error('Major code is required');
+  }
   
-  const { academic_year } = req.validatedQuery as MajorQueryParams;
+  const code = req.validatedParams.majorCode as string;
+  const queryParams = req.validatedQuery as MajorQueryParams || {};
   
-  // // Set default academic year to current year if not specified
-  // const currentAcademicYear = academic_year
+  // Sử dụng năm hiện tại nếu không có năm học được chỉ định
+  const academicYear = queryParams.academic_year || new Date().getFullYear();
   
-  // Get major by code with optional academic year filter
-  const major = await majorService.getMajorByCode(code);
+  // Lấy thông tin ngành học với bộ lọc năm học
+  const major = await majorService.getMajorByCode(code, academicYear);
   
   reply(res, major, 'Major retrieved successfully');
 });
