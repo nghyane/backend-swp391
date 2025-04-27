@@ -109,7 +109,7 @@ export const validateMajorId = validateZod(createParamSchema('majorId'), 'params
 export const validateScholarshipId = validateZod(createParamSchema('scholarshipId'), 'params');
 export const validateDormitoryId = validateZod(createParamSchema('dormitoryId'), 'params');
 export const validateAdmissionMethodId = validateZod(createParamSchema('admissionMethodId'), 'params');
-
+export const validateMajorCode = validateZod(createParamSchema('majorCode'), 'params');
 /**
  * Custom param validator
  */

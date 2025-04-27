@@ -7,21 +7,8 @@ import { validateZod, commonQuerySchema } from './zod.validator';
 // Query schema
 export const dormitoryQuerySchema = z.object({
   campus_id: z.coerce.number().int().positive().optional(),
-  price_min: z.coerce.number().int().min(0).optional(),
-  price_max: z.coerce.number().int().min(0).optional()
-}).strict().merge(commonQuerySchema)
-.refine(
-  (data) => {
-    if (data.price_min !== undefined && data.price_max !== undefined) {
-      return data.price_max >= data.price_min;
-    }
-    return true;
-  },
-  {
-    message: "Maximum price must be greater than or equal to minimum price",
-    path: ["price_max"]
-  }
-);
+  campus_code: z.string().optional(),
+}).strict().merge(commonQuerySchema);
 
 // Create schema
 export const dormitoryCreateSchema = z.object({
@@ -29,7 +16,6 @@ export const dormitoryCreateSchema = z.object({
   campusId: z.number().int().positive(),
   description: z.string().optional(),
   capacity: z.number().int().positive().optional(),
-  pricePerMonth: z.number().int().min(0).optional()
 }).strict();
 
 // Update schema
@@ -38,7 +24,6 @@ export const dormitoryUpdateSchema = z.object({
   campusId: z.number().int().positive().optional(),
   description: z.string().optional(),
   capacity: z.number().int().positive().optional(),
-  pricePerMonth: z.number().int().min(0).optional()
 }).strict();
 
 /**
