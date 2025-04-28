@@ -6,17 +6,17 @@ import { ScholarshipQueryParams } from "../../types/scholarship.types";
 
 
 export const getAllScholarships = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  // Using validated data from Zod with type inference
   const filters = req.validatedQuery as ScholarshipQueryParams;
-  
+
   const hasFilters = filters && Object.keys(filters).length > 0;
-  
+
   // Get all scholarships matching filters
   const scholarships = await scholarshipService.getAllScholarships(hasFilters ? filters : undefined);
-  
+
   reply(
-    res, 
-    scholarships, 
+    res,
+    scholarships,
     hasFilters ? 'Filtered scholarships retrieved successfully' : 'All scholarships retrieved successfully'
   );
 });
@@ -27,11 +27,11 @@ export const getAllScholarships = catch$(async (req: Request, res: Response): Pr
  * This endpoint retrieves all scholarships for a specific major identified by its code
  */
 export const getScholarshipsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod
+  // Using validated data from Zod
   const majorCode = req.validatedParams?.majorCode as string;
-  
+
   const scholarships = await scholarshipService.getScholarshipsByMajorCode(majorCode);
-  
+
   reply(res, scholarships, 'Scholarships by major retrieved successfully');
 });
 
@@ -40,10 +40,10 @@ export const getScholarshipsByMajor = catch$(async (req: Request, res: Response)
  * This endpoint retrieves a specific scholarship by its ID
  */
 export const getScholarshipById = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod
+  // Using validated data from Zod
   const id = req.validatedParams?.id as number;
   const scholarship = await scholarshipService.getScholarshipById(id);
-  
+
   reply(res, scholarship, 'Scholarship retrieved successfully');
 });
 
@@ -57,7 +57,7 @@ export const createScholarship = catch$(async (req: Request, res: Response): Pro
   // 2. Validate data (can be done with middleware)
   // 3. Call scholarshipService.createScholarship with the data
   // 4. Return the created scholarship with appropriate status code
-  
+
   reply(res, { message: 'Not implemented' }, 'Scholarship creation endpoint not implemented', 501);
 });
 
@@ -72,7 +72,7 @@ export const updateScholarship = catch$(async (req: Request, res: Response): Pro
   // 3. Validate data (can be done with middleware)
   // 4. Call scholarshipService.updateScholarship with the ID and data
   // 5. Return the updated scholarship
-  
+
   reply(res, { message: 'Not implemented' }, 'Scholarship update endpoint not implemented', 501);
 });
 
@@ -85,6 +85,6 @@ export const deleteScholarship = catch$(async (req: Request, res: Response): Pro
   // 1. Extract scholarship ID from request params
   // 2. Call scholarshipService.deleteScholarship with the ID
   // 3. Return success message
-  
+
   reply(res, { message: 'Not implemented' }, 'Scholarship deletion endpoint not implemented', 501);
 });

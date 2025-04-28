@@ -12,7 +12,7 @@ import {
 
 
 export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  // Using validated data from Zod with type inference
   const filters = req.validatedQuery as AdmissionMethodQueryParams || {};
 
   const hasFilters = Object.keys(filters).length > 0;
@@ -20,7 +20,7 @@ export const getAllAdmissionMethods = catch$(async (req: Request, res: Response)
   // Get all admission methods matching filters
   const admissionMethods = await admissionMethodService.getAllAdmissionMethods(hasFilters ? filters : undefined);
 
-  // Số lượng phương thức xét tuyển thường ít nên không cần phân trang
+  // The number of admission methods is usually small, so pagination is not needed
   reply(
     res,
     admissionMethods,
@@ -29,7 +29,7 @@ export const getAllAdmissionMethods = catch$(async (req: Request, res: Response)
 });
 
 export const getAdmissionMethodById = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod
+  // Using validated data from Zod
   const id = req.validatedParams?.id as number;
   const admissionMethod = await admissionMethodService.getAdmissionMethodById(id);
 
@@ -44,7 +44,7 @@ export const getAdmissionMethodRequirements = catch$(async (req: Request, res: R
  * Get majors that use a specific admission method
  */
 export const getMajorsByAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod
+  // Using validated data from Zod
   const admissionMethodId = req.validatedParams?.id as number;
 
   const majors = await admissionMethodService.getMajorsByAdmissionMethodId(admissionMethodId);
@@ -57,7 +57,7 @@ export const getMajorsByAdmissionMethod = catch$(async (req: Request, res: Respo
  * Associate a major with an admission method
  */
 export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  // Using validated data from Zod with type inference
   const data = req.body as AdmissionMethodAssociateParams;
 
   const result = await admissionMethodService.associateMajorWithAdmissionMethod(
@@ -76,7 +76,7 @@ export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res
  * Create a global admission method application (for all majors)
  */
 export const createGlobalAdmissionMethodApplication = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  // Using validated data from Zod with type inference
   const data = req.body as AdmissionMethodGlobalAppParams;
 
   const result = await admissionMethodService.createGlobalAdmissionMethodApplication(
@@ -94,7 +94,7 @@ export const createGlobalAdmissionMethodApplication = catch$(async (req: Request
  * This endpoint retrieves all admission methods for a specific major identified by its code
  */
 export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod
+  // Using validated data from Zod
   const majorCode = req.validatedParams?.majorCode as string;
 
   const admissionMethods = await admissionMethodService.getAdmissionMethodsByMajorCode(majorCode);
@@ -103,28 +103,28 @@ export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Respo
 });
 
 export const createAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  // Using validated data from Zod with type inference
   const admissionMethodData = req.body as AdmissionMethodCreateParams;
 
-  // Sử dụng trực tiếp dữ liệu từ request body đã được validate
+  // Using data directly from the validated request body
   const newAdmissionMethod = await admissionMethodService.createAdmissionMethod(admissionMethodData);
 
   reply(res, newAdmissionMethod, 'Admission method created successfully', 201);
 });
 
 export const updateAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod với type inference
+  // Using validated data from Zod with type inference
   const id = req.validatedParams?.id as number;
   const updateData = req.body as AdmissionMethodUpdateParams;
 
-  // Sử dụng trực tiếp dữ liệu từ request body đã được validate
+  // Using data directly from the validated request body
   const updatedAdmissionMethod = await admissionMethodService.updateAdmissionMethod(id, updateData);
 
   reply(res, updatedAdmissionMethod, 'Admission method updated successfully');
 });
 
 export const deleteAdmissionMethod = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Sử dụng dữ liệu đã validate từ Zod
+  // Using validated data from Zod
   const id = req.validatedParams?.id as number;
 
   await admissionMethodService.deleteAdmissionMethod(id);

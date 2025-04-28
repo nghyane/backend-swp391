@@ -1,14 +1,14 @@
 import { pgTable, serial, varchar, integer, text, boolean, timestamp, pgEnum, uniqueIndex, index, jsonb } from "drizzle-orm/pg-core";
 
 /**
- * Enum cho vai trò người dùng nội bộ
+ * Enum for internal user roles
  */
 export const INTERNAL_USER_ROLES = ["admin", "staff"] as const;
 export const internalUserRoleEnum = pgEnum("internal_user_role", INTERNAL_USER_ROLES);
 export type InternalUserRole = typeof INTERNAL_USER_ROLES[number];
 
 /**
- * Danh sách các năm tuyển sinh
+ * List of academic years for admission
  */
 export const academicYears = pgTable("academic_years", {
   id: serial("id").primaryKey(),
@@ -16,7 +16,7 @@ export const academicYears = pgTable("academic_years", {
 });
 
 /**
- * Thông tin các ngành học
+ * Information about academic majors
  */
 export const majors = pgTable("majors", {
   id: serial("id").primaryKey(),
@@ -26,7 +26,7 @@ export const majors = pgTable("majors", {
 });
 
 /**
- * Nghề nghiệp gợi ý theo ngành
+ * Career suggestions by major
  */
 export const careers = pgTable("careers", {
   id: serial("id").primaryKey(),
@@ -42,7 +42,7 @@ export const careers = pgTable("careers", {
 ]);
 
 /**
- * Các cơ sở đào tạo (campus)
+ * Educational campuses
  */
 export const campuses = pgTable("campuses", {
   id: serial("id").primaryKey(),
@@ -53,7 +53,7 @@ export const campuses = pgTable("campuses", {
 });
 
 /**
- * Tuyển sinh từng ngành tại từng campus và năm
+ * Admission for each major at each campus by year
  */
 export const majorCampusAdmission = pgTable("major_campus_admission", {
   id: serial("id").primaryKey(),
@@ -67,7 +67,7 @@ export const majorCampusAdmission = pgTable("major_campus_admission", {
 ]);
 
 /**
- * Học bổng theo ngành và cơ sở
+ * Scholarships by major and campus
  */
 export const scholarships = pgTable("scholarships", {
   id: serial("id").primaryKey(),
@@ -79,7 +79,7 @@ export const scholarships = pgTable("scholarships", {
 });
 
 /**
- * Bảng tài khoản người dùng nội bộ (admin, staff)
+ * Internal user accounts (admin, staff)
  */
 export const internalUsers = pgTable("internal_users", {
   id: serial("id").primaryKey(),
@@ -92,7 +92,7 @@ export const internalUsers = pgTable("internal_users", {
 });
 
 /**
- * Lưu thông tin session người dùng
+ * User session information
  */
 export const sessions = pgTable("sessions", {
   session_id: varchar("session_id", { length: 64 }).primaryKey(),
@@ -106,7 +106,7 @@ export const sessions = pgTable("sessions", {
 ]);
 
 /**
- * Các hình thức xét tuyển (học bạ, thi THPT, phỏng vấn...)
+ * Admission methods (academic records, national exams, interviews...)
  */
 export const admissionMethods = pgTable("admission_methods", {
   id: serial("id").primaryKey(),
@@ -116,7 +116,7 @@ export const admissionMethods = pgTable("admission_methods", {
 });
 
 /**
- * Ký túc xá tại từng cơ sở
+ * Dormitories at each campus
  */
 export const dormitories = pgTable("dormitories", {
   id: serial("id").primaryKey(),
@@ -129,9 +129,9 @@ export const dormitories = pgTable("dormitories", {
 ]);
 
 /**
- * Bảng áp dụng phương thức xét tuyển cho năm học, campus và ngành học
- * Khi major_id là null, phương thức xét tuyển áp dụng cho tất cả các ngành
- * Khi major_id có giá trị, phương thức xét tuyển chỉ áp dụng cho ngành cụ thể
+ * Table for applying admission methods to academic years, campuses, and majors
+ * When major_id is null, the admission method applies to all majors
+ * When major_id has a value, the admission method only applies to the specific major
  */
 export const admissionMethodApplications = pgTable("admission_method_applications", {
   id: serial("id").primaryKey(),
@@ -145,7 +145,7 @@ export const admissionMethodApplications = pgTable("admission_method_application
 }, (table) => [
   // Ensure no duplicate records for the same admission method, academic year, campus, and major
   uniqueIndex("uniq_admission_year_campus_major").on(
-    table.admission_method_id, 
+    table.admission_method_id,
     table.academic_year_id,
     table.campus_id,
     table.major_id
@@ -156,7 +156,7 @@ export const admissionMethodApplications = pgTable("admission_method_application
 ]);
 
 /**
- * Bảng liên kết giữa học bổng và năm học
+ * Junction table between scholarships and academic years
  */
 export const scholarshipAvailability = pgTable("scholarship_availability", {
   id: serial("id").primaryKey(),

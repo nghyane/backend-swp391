@@ -1,7 +1,7 @@
 import { majors } from "../db/schema";
 
 /**
- * Major entity data type - sử dụng type inference từ Drizzle ORM schema
+ * Major entity data type - using type inference from Drizzle ORM schema
  */
 export type Major = typeof majors.$inferSelect;
 
@@ -26,4 +26,4 @@ export interface PaginatedMajorResult {
   totalPages: number;
 }
 
-// Lưu ý: MajorFilterOptions đã được thay thế bằng MajorQueryParams từ Zod schema
+// Note: MajorFilterOptions has been replaced by MajorQueryParams from Zod schema

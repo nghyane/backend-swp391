@@ -1,11 +1,11 @@
 import { relations } from "drizzle-orm";
-import { 
-  dormitories, 
-  campuses, 
-  majors, 
-  careers, 
-  scholarships, 
-  majorCampusAdmission, 
+import {
+  dormitories,
+  campuses,
+  majors,
+  careers,
+  scholarships,
+  majorCampusAdmission,
   academicYears,
   admissionMethods,
   scholarshipAvailability,
@@ -13,8 +13,8 @@ import {
 } from "./schema";
 
 /**
- * Quan hệ của ký túc xá với các bảng khác
- * - Mỗi ký túc xá thuộc về một campus
+ * Relations of dormitories with other tables
+ * - Each dormitory belongs to one campus
  */
 export const dormitoriesRelations = relations(dormitories, ({ one }) => ({
   // Managing campus of the dormitory
@@ -25,13 +25,13 @@ export const dormitoriesRelations = relations(dormitories, ({ one }) => ({
 }));
 
 /**
- * Quan hệ của campus với các bảng khác
- * - Mỗi campus có nhiều ký túc xá
- * - Mỗi campus có nhiều ngành đào tạo theo từng năm
- * - Mỗi campus có nhiều học bổng áp dụng
+ * Relations of campus with other tables
+ * - Each campus has many dormitories
+ * - Each campus offers many majors by year
+ * - Each campus has many applicable scholarships
  */
 export const campusesRelations = relations(campuses, ({ many }) => ({
-  // Danh sách ký túc xá thuộc campus
+  // List of dormitories belonging to this campus
   dormitories: many(dormitories),
   // List of majors offered by year at this campus
   majorCampusAdmissions: many(majorCampusAdmission),
@@ -40,28 +40,28 @@ export const campusesRelations = relations(campuses, ({ many }) => ({
 }));
 
 /**
- * Quan hệ của ngành học với các bảng khác
- * - Mỗi ngành có nhiều cơ hội nghề nghiệp
- * - Mỗi ngành được đào tạo ở nhiều campus theo từng năm
- * - Mỗi ngành có nhiều học bổng
+ * Relations of majors with other tables
+ * - Each major has many career opportunities
+ * - Each major is offered at many campuses by year
+ * - Each major has many scholarships
  */
 export const majorsRelations = relations(majors, ({ many }) => ({
-  // Danh sách cơ hội nghề nghiệp của ngành
+  // List of career opportunities for this major
   careers: many(careers),
   // List of campuses and academic years offering this major
   majorCampusAdmissions: many(majorCampusAdmission),
-  // Danh sách học bổng áp dụng cho ngành
+  // List of scholarships applicable to this major
   scholarshipAvailabilities: many(scholarshipAvailability),
-  // Danh sách phương thức xét tuyển của ngành
+  // List of admission methods for this major
   admissionMethodApplications: many(admissionMethodApplications),
 }));
 
 /**
- * Quan hệ của cơ hội nghề nghiệp với các bảng khác
- * - Mỗi cơ hội nghề nghiệp thuộc về một ngành học
+ * Relations of career opportunities with other tables
+ * - Each career opportunity belongs to one major
  */
 export const careersRelations = relations(careers, ({ one }) => ({
-  // Ngành học liên quan đến cơ hội nghề nghiệp
+  // Major related to this career opportunity
   major: one(majors, {
     fields: [careers.major_id],
     references: [majors.id],
@@ -69,9 +69,9 @@ export const careersRelations = relations(careers, ({ one }) => ({
 }));
 
 /**
- * Quan hệ của học bổng với các bảng khác
- * - Mỗi học bổng có thể thuộc về một ngành cụ thể
- * - Mỗi học bổng có thể áp dụng cho nhiều campus và nhiều năm học thông qua bảng scholarshipAvailability
+ * Relations of scholarships with other tables
+ * - Each scholarship may belong to a specific major
+ * - Each scholarship may apply to multiple campuses and academic years through the scholarshipAvailability table
  */
 export const scholarshipsRelations = relations(scholarships, ({ many }) => ({
   // List of campuses, majors and academic years where this scholarship is available
@@ -79,9 +79,9 @@ export const scholarshipsRelations = relations(scholarships, ({ many }) => ({
 }));
 
 /**
- * Quan hệ của bảng liên kết giữa ngành, campus và năm học
- * - Kết nối ngành học với campus trong từng năm học
- * - Lưu trữ thông tin chỉ tiêu và học phí
+ * Relations of the junction table between major, campus and academic year
+ * - Connects majors with campuses in each academic year
+ * - Stores information about quotas and tuition fees
  */
 export const majorCampusAdmissionRelations = relations(majorCampusAdmission, ({ one }) => ({
   // Major being offered
@@ -102,10 +102,10 @@ export const majorCampusAdmissionRelations = relations(majorCampusAdmission, ({ 
 }));
 
 /**
- * Quan hệ của năm học với các bảng khác
- * - Mỗi năm học có nhiều ngành được đào tạo tại các campus
- * - Mỗi năm học có nhiều phương thức xét tuyển được áp dụng
- * - Mỗi năm học có nhiều học bổng được cung cấp
+ * Relations of academic years with other tables
+ * - Each academic year has many majors offered at various campuses
+ * - Each academic year has many admission methods applied
+ * - Each academic year has many scholarships provided
  */
 export const academicYearsRelations = relations(academicYears, ({ many }) => ({
   // List of majors offered at campuses in this academic year
@@ -117,21 +117,21 @@ export const academicYearsRelations = relations(academicYears, ({ many }) => ({
 }));
 
 /**
- * Quan hệ của phương thức xét tuyển với các bảng khác
- * - Mỗi phương thức xét tuyển có thể được áp dụng trong nhiều năm học khác nhau
+ * Relations of admission methods with other tables
+ * - Each admission method can be applied in different academic years
  */
 export const admissionMethodsRelations = relations(admissionMethods, ({ many }) => ({
-  // Danh sách các áp dụng của phương thức xét tuyển này
+  // List of applications for this admission method
   applications: many(admissionMethodApplications),
 }));
 
 /**
- * Quan hệ của bảng áp dụng phương thức xét tuyển
- * - Kết nối phương thức xét tuyển với năm học, campus và ngành học (tùy chọn)
- * - Cho phép theo dõi phương thức xét tuyển nào được áp dụng trong năm học nào, ở campus nào và cho ngành nào
+ * Relations of the admission method application table
+ * - Connects admission methods with academic years, campuses, and majors (optional)
+ * - Allows tracking which admission method is applied in which academic year, at which campus, and for which major
  */
 export const admissionMethodApplicationsRelations = relations(admissionMethodApplications, ({ one }) => ({
-  // Phương thức xét tuyển được áp dụng
+  // Applied admission method
   admissionMethod: one(admissionMethods, {
     fields: [admissionMethodApplications.admission_method_id],
     references: [admissionMethods.id],
@@ -141,12 +141,12 @@ export const admissionMethodApplicationsRelations = relations(admissionMethodApp
     fields: [admissionMethodApplications.academic_year_id],
     references: [academicYears.id],
   }),
-  // Campus áp dụng (tùy chọn)
+  // Applied campus (optional)
   campus: one(campuses, {
     fields: [admissionMethodApplications.campus_id],
     references: [campuses.id],
   }),
-  // Ngành học áp dụng (tùy chọn)
+  // Applied major (optional)
   major: one(majors, {
     fields: [admissionMethodApplications.major_id],
     references: [majors.id],
@@ -154,13 +154,13 @@ export const admissionMethodApplicationsRelations = relations(admissionMethodApp
 }));
 
 /**
- * Quan hệ của bảng liên kết học bổng với các bảng khác
- * - Mỗi bản ghi liên kết thuộc về một học bổng
- * - Mỗi bản ghi liên kết thuộc về một campus
- * - Mỗi bản ghi liên kết thuộc về một năm học
+ * Relations of the scholarship availability junction table with other tables
+ * - Each record belongs to one scholarship
+ * - Each record belongs to one campus
+ * - Each record belongs to one academic year
  */
 export const scholarshipAvailabilityRelations = relations(scholarshipAvailability, ({ one }) => ({
-  // Học bổng
+  // Scholarship
   scholarship: one(scholarships, {
     fields: [scholarshipAvailability.scholarship_id],
     references: [scholarships.id],
@@ -170,12 +170,12 @@ export const scholarshipAvailabilityRelations = relations(scholarshipAvailabilit
     fields: [scholarshipAvailability.campus_id],
     references: [campuses.id],
   }),
-  // Năm học
+  // Academic year
   academicYear: one(academicYears, {
     fields: [scholarshipAvailability.academic_year_id],
     references: [academicYears.id],
   }),
-  // Ngành học (tùy chọn)
+  // Major (optional)
   major: one(majors, {
     fields: [scholarshipAvailability.major_id],
     references: [majors.id],

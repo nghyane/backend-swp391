@@ -9,7 +9,7 @@ const router = Router();
 // GET routes
 router.get("/", admissionMethodValidators.query, admissionMethodController.getAllAdmissionMethods);
 
-// Không cần validate majorCode vì đây là string
+// No need to validate majorCode as it's a string
 router.get("/major/:majorCode", admissionMethodController.getAdmissionMethodsByMajor);
 
 // Validate ID param

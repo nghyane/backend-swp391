@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 
 /**
- * Bọc tất cả các hàm controller với xử lý lỗi tự động
- * Sử dụng như một wrapper function đơn giản
- * 
+ * Wrap all controller functions with automatic error handling
+ * Use as a simple wrapper function
+ *
  * @example
- * // Sử dụng như một function wrapper
+ * // Use as a function wrapper
  * export const getUsers = catch$(async (req, res) => {
  *   const users = await userService.getAll();
  *   res.json(users);

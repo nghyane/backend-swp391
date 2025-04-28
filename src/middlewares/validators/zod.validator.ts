@@ -3,25 +3,25 @@ import { Request, Response, NextFunction } from 'express';
 import { replyError } from '../../utils/response';
 
 /**
- * Xử lý lỗi validation từ Zod
+ * Handle validation errors from Zod
  */
 export const handleZodError = (
   error: z.ZodError,
   res: Response
 ): void => {
-  // Lấy lỗi đầu tiên để hiển thị message chính
+  // Get the first error to display as the main message
   const firstError = error.errors[0];
   const field = firstError.path.join('.');
   const message = `Validation error: ${firstError.message}`;
-  
-  // Bao gồm tất cả các lỗi validation trong error details
+
+  // Include all validation errors in error details
   const errorDetails = JSON.stringify(error.errors);
-  
+
   replyError(res, message, 400, field, errorDetails);
 };
 
 /**
- * Middleware validate request với Zod schema
+ * Middleware to validate request with Zod schema
  */
 /**
  * Extend Express Request interface to include our validated data properties
@@ -47,7 +47,7 @@ export const validateZod = <T extends z.ZodTypeAny>(
     try {
       // Parse and validate the data
       const validatedData = schema.parse(req[source]) as z.infer<T>;
-      
+
       // Store validated data in a safe way without overwriting read-only properties
       if (source === 'query') {
         // For query params, attach the validated data to req object without overwriting
@@ -59,7 +59,7 @@ export const validateZod = <T extends z.ZodTypeAny>(
         // For body, we can safely overwrite as it's not read-only
         req.body = validatedData;
       }
-      
+
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -70,27 +70,27 @@ export const validateZod = <T extends z.ZodTypeAny>(
   };
 };
 
-// Schema cho các tham số query phổ biến
+// Schema for common query parameters
 export const commonQuerySchema = z.object({
   // Pagination
   page: z.coerce.number().int().positive().optional(),
   limit: z.coerce.number().int().positive().optional(),
-  
+
   // Sorting
   sort_by: z.string().optional(),
   sort_order: z.enum(['asc', 'desc']).optional(),
-  
+
   // Filtering
   name: z.string().optional(),
 }).strict().partial();
 
-// Schema cho ID trong params
+// Schema for ID in params
 export const idParamSchema = z.object({
   id: z.coerce.number().int().positive()
 }).strict();
 
 /**
- * Tạo schema cho param với tên tùy chỉnh
+ * Create schema for param with custom name
  */
 export const createParamSchema = (paramName: string) => {
   return z.object({
@@ -119,6 +119,6 @@ export const validateParam = (paramName: string) => {
 };
 
 /**
- * Middleware validate common queries
+ * Middleware to validate common queries
  */
 export const validateCommonQuery = validateZod(commonQuerySchema, 'query');
