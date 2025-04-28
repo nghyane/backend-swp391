@@ -9,82 +9,67 @@ const PORT = Number(env.PORT) || 3000;
 const SHUTDOWN_TIMEOUT = 10000; // 10 seconds
 
 /**
- * Initialize the database connection
+ * Initialize the database connection with proper logging
  */
 async function initializeDatabase() {
-  try {
-    logger.info("📊 Connecting to database...");
-    await initDb();
-    logger.info("✅ Database connected successfully");
-    return true;
-  } catch (error) {
-    logger.error("❌ Failed to connect to database:", error);
-    return false;
-  }
+  logger.info("📊 Connecting to database...");
+  await initDb();
+  // Success is logged in initDb()
 }
 
 /**
  * Start the HTTP server
+ * @returns The HTTP server instance
  */
 function startHttpServer() {
-  return new Promise<{ server: any, success: boolean }>((resolve) => {
-    try {
-      const server = app.listen(PORT, () => {
-        logger.info(`🚀 Server running on http://localhost:${PORT}`);
-        resolve({ server, success: true });
-      });
-
-      server.on('error', (error: Error) => {
-        logger.error(`❌ Failed to start server: ${error.message}`);
-        resolve({ server: null, success: false });
-      });
-    } catch (error) {
-      logger.error("❌ Failed to initialize server:", error);
-      resolve({ server: null, success: false });
-    }
+  const server = app.listen(PORT, () => {
+    logger.info(`🚀 Server running on http://localhost:${PORT}`);
   });
+
+  server.on('error', (error: Error) => {
+    logger.error(`❌ Failed to start server: ${error.message}`);
+    throw error; // Let the caller handle the error
+  });
+
+  return server;
 }
 
 /**
  * Gracefully shutdown the server
  */
 async function gracefulShutdown(server: any, signal: string) {
-  let shutdownTimeout: NodeJS.Timeout;
+  logger.warn(`⚡ Received ${signal} signal. Shutting down server...`);
 
-  return Promise.race([
-    new Promise<void>(async (resolve) => {
-      logger.warn(`⚡ Received ${signal} signal. Shutting down server...`);
+  // Set a timeout to force exit if shutdown takes too long
+  const forceExitTimeout = setTimeout(() => {
+    logger.warn("⚠️ Shutdown timeout reached, forcing exit");
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT);
 
-      try {
-        // Drain the queue (wait for pending tasks to complete)
-        logger.info("⏳ Draining message queues...");
-        await zaloQueue.drain();
-        logger.info("✅ Message queues drained");
+  try {
+    // Drain the queue (wait for pending tasks to complete)
+    logger.info("⏳ Draining message queues...");
+    await zaloQueue.drain();
+    logger.info("✅ Message queues drained");
 
-        // Close database connection
-        logger.info("📊 Closing database connection...");
-        await closeDb();
-        logger.info("✅ Database connection closed");
+    // Close database connection
+    logger.info("📊 Closing database connection...");
+    await closeDb();
+    logger.info("✅ Database connection closed");
 
-        // Close HTTP server
-        server.close(() => {
-          logger.info("🔒 HTTP server closed");
-          clearTimeout(shutdownTimeout);
-          resolve();
-        });
-      } catch (error) {
-        logger.error("❌ Error during shutdown:", error);
-        clearTimeout(shutdownTimeout);
+    // Close HTTP server
+    await new Promise<void>((resolve) => {
+      server.close(() => {
+        logger.info("🔒 HTTP server closed");
         resolve();
-      }
-    }),
-    new Promise<void>((resolve) => {
-      shutdownTimeout = setTimeout(() => {
-        logger.warn("⚠️ Shutdown timeout reached, forcing exit");
-        resolve();
-      }, SHUTDOWN_TIMEOUT);
-    })
-  ]);
+      });
+    });
+
+  } catch (error) {
+    logger.error("❌ Error during shutdown:", error);
+  } finally {
+    clearTimeout(forceExitTimeout);
+  }
 }
 
 /**
@@ -93,19 +78,10 @@ async function gracefulShutdown(server: any, signal: string) {
 async function startServer() {
   try {
     // Initialize database
-    const dbInitialized = await initializeDatabase();
-    if (!dbInitialized) {
-      logger.error("🛑 Server startup aborted due to database connection failure");
-      process.exit(1);
-    }
+    await initializeDatabase();
 
     // Start HTTP server
-    const { server, success } = await startHttpServer();
-    if (!success) {
-      logger.error("🛑 Server startup aborted due to HTTP server initialization failure");
-      await closeDb();
-      process.exit(1);
-    }
+    const server = startHttpServer();
 
     // Setup signal handlers for graceful shutdown
     const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
@@ -126,7 +102,6 @@ async function startServer() {
       logger.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
       // Don't exit here, just log the error
     });
-
   } catch (error) {
     logger.error("❌ Fatal error during server startup:", error);
     process.exit(1);

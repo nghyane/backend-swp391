@@ -14,15 +14,19 @@ const pool = new Pool({
 // Create db instance with schema and relations to support db.query API
 export const db = drizzle(pool, { schema: { ...schema, ...relations } });
 
+/**
+ * Initialize database connection
+ * @returns Promise that resolves when connection is successful or rejects on failure
+ */
 export const initDb = async () => {
-  try {
-    await pool.query("SELECT 1");
-    logger.info("✅ Database connected");
-  } catch (error) {
-    logger.error(`❌ Database connection failed: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
-  }
+  // Simple connection test - will throw an error if connection fails
+  await pool.query("SELECT 1");
+  logger.info("✅ Database connected");
 };
 
-export const closeDb = () =>
-  pool.end().then(() => logger.info("✅ Database connection closed"));
+/**
+ * Close database connection
+ */
+export const closeDb = async () => {
+  await pool.end();
+};
