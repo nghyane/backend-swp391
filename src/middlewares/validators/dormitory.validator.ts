@@ -13,7 +13,7 @@ export const dormitoryQuerySchema = z.object({
 // Create schema
 export const dormitoryCreateSchema = z.object({
   name: z.string().min(1).max(255),
-  campusId: z.number().int().positive(),
+  campus_id: z.number().int().positive(),
   description: z.string().optional(),
   capacity: z.number().int().positive().optional(),
 }).strict();
@@ -21,7 +21,7 @@ export const dormitoryCreateSchema = z.object({
 // Update schema
 export const dormitoryUpdateSchema = z.object({
   name: z.string().max(255).optional(),
-  campusId: z.number().int().positive().optional(),
+  campus_id: z.number().int().positive().optional(),
   description: z.string().optional(),
   capacity: z.number().int().positive().optional(),
 }).strict();
@@ -32,10 +32,10 @@ export const dormitoryUpdateSchema = z.object({
 export const dormitoryValidators = {
   // Query validator
   query: validateZod(dormitoryQuerySchema, 'query'),
-  
+
   // Create validator
   create: validateZod(dormitoryCreateSchema, 'body'),
-  
+
   // Update validator
   update: validateZod(dormitoryUpdateSchema, 'body')
 };

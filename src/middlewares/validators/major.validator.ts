@@ -33,11 +33,11 @@ export const majorUpdateSchema = z.object({
 
 // Schema for major-campus link
 export const majorLinkSchema = z.object({
-  majorId: z.number().int().positive(),
-  campusId: z.number().int().positive(),
-  academicYear: z.number().int().min(2000).max(2100),
+  major_id: z.number().int().positive(),
+  campus_id: z.number().int().positive(),
+  academic_year: z.number().int().min(2000).max(2100),
   quota: z.number().int().positive().optional(),
-  tuitionFee: z.number().int().min(0).optional()
+  tuition_fee: z.number().int().min(0).optional()
 }).strict();
 
 /**
@@ -46,13 +46,13 @@ export const majorLinkSchema = z.object({
 export const majorValidators = {
   // Query validator
   query: validateZod(majorQuerySchema, 'query'),
-  
+
   // Create validator
   create: validateZod(majorCreateSchema, 'body'),
-  
+
   // Update validator
   update: validateZod(majorUpdateSchema, 'body'),
-  
+
   // Link validator
   link: validateZod(majorLinkSchema, 'body')
 };

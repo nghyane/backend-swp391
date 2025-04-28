@@ -25,14 +25,14 @@ export const admissionMethodQuerySchema = z.object({
 export const admissionMethodCreateSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().optional(),
-  applicationUrl: z.string().url().max(255).optional()
+  application_url: z.string().url().max(255).optional()
 }).strict();
 
 // Update schema
 export const admissionMethodUpdateSchema = z.object({
   name: z.string().max(255).optional(),
   description: z.string().optional(),
-  applicationUrl: z.string().url().max(255).optional()
+  application_url: z.string().url().max(255).optional()
 }).strict();
 
 // Schema for Major association
@@ -60,16 +60,16 @@ export const admissionMethodGlobalAppSchema = z.object({
 export const admissionMethodValidators = {
   // Query validator
   query: validateZod(admissionMethodQuerySchema, 'query'),
-  
+
   // Create validator
   create: validateZod(admissionMethodCreateSchema, 'body'),
-  
+
   // Update validator
   update: validateZod(admissionMethodUpdateSchema, 'body'),
-  
+
   // Major association validator
   associateMajor: validateZod(admissionMethodAssociateSchema, 'body'),
-  
+
   // Global Application validator
   globalApplication: validateZod(admissionMethodGlobalAppSchema, 'body')
 };

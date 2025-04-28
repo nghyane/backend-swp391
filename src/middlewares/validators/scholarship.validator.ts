@@ -18,9 +18,9 @@ export const scholarshipCreateSchema = z.object({
   description: z.string().optional(),
   condition: z.string().optional(),
   amount: z.coerce.number().int().min(0),
-  majorId: z.number().int().positive(),
-  campusId: z.number().int().positive(),
-  applicationUrl: z.string().url().max(255).optional()
+  major_id: z.number().int().positive(),
+  campus_id: z.number().int().positive(),
+  application_url: z.string().url().max(255).optional()
 }).strict();
 
 // Update schema
@@ -29,9 +29,9 @@ export const scholarshipUpdateSchema = z.object({
   description: z.string().optional(),
   condition: z.string().optional(),
   amount: z.coerce.number().int().min(0).optional(),
-  majorId: z.number().int().positive().optional(),
-  campusId: z.number().int().positive().optional(),
-  applicationUrl: z.string().url().max(255).optional()
+  major_id: z.number().int().positive().optional(),
+  campus_id: z.number().int().positive().optional(),
+  application_url: z.string().url().max(255).optional()
 }).strict();
 
 /**
@@ -40,10 +40,10 @@ export const scholarshipUpdateSchema = z.object({
 export const scholarshipValidators = {
   // Query validator
   query: validateZod(scholarshipQuerySchema, 'query'),
-  
+
   // Create validator
   create: validateZod(scholarshipCreateSchema, 'body'),
-  
+
   // Update validator
   update: validateZod(scholarshipUpdateSchema, 'body')
 };
