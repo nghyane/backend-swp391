@@ -5,12 +5,12 @@
 
 import { eq, and, ilike, sql, exists } from "drizzle-orm";
 import { db } from "../db";
-import { 
-  scholarships, 
-  majors, 
-  campuses, 
-  scholarshipAvailability, 
-  academicYears 
+import {
+  scholarships,
+  majors,
+  campuses,
+  scholarshipAvailability,
+  academicYears
 } from "../db/schema";
 import { Scholarship, ScholarshipQueryParams } from '../types/scholarship.types';
 import { NotFoundError } from '../utils/errors';
@@ -49,7 +49,7 @@ const RELATION_CONFIGS = {
       }
     }
   },
-  
+
   // Query options with amount ordering
   amountSortQuery: {
     orderBy: scholarships.amount,
@@ -63,7 +63,7 @@ const RELATION_CONFIGS = {
       }
     }
   },
-  
+
   // Full detail relations for scholarship
   fullDetailRelations: {
     availabilities: {
@@ -85,12 +85,12 @@ const RELATION_CONFIGS = {
  */
 const resolveMajorCode = async (majorCode?: string): Promise<number | undefined> => {
   if (!majorCode) return undefined;
-  
+
   const major = await db.query.majors.findFirst({
     where: eq(majors.code, majorCode),
     columns: { id: true }
   });
-  
+
   return major?.id;
 };
 
@@ -101,12 +101,12 @@ const resolveMajorCode = async (majorCode?: string): Promise<number | undefined>
  */
 const resolveCampusCode = async (campusCode?: string): Promise<number | undefined> => {
   if (!campusCode) return undefined;
-  
+
   const campus = await db.query.campuses.findFirst({
     where: eq(campuses.code, campusCode),
     columns: { id: true }
   });
-  
+
   return campus?.id;
 };
 
@@ -118,26 +118,26 @@ const resolveCampusCode = async (campusCode?: string): Promise<number | undefine
  */
 const buildAvailabilityFilter = (majorId?: number, campusId?: number) => {
   if (!majorId && !campusId) return undefined;
-  
-  // Xây dựng điều kiện cho truy vấn
+
+  // Build conditions for the query
   let majorCondition;
   let campusCondition;
-  
+
   if (majorId) {
-    // Học bổng áp dụng cho ngành cụ thể HOẶC áp dụng cho tất cả ngành (major_id IS NULL)
+    // Scholarship applies to specific major OR applies to all majors (major_id IS NULL)
     majorCondition = sql`(${scholarshipAvailability.major_id} = ${majorId} OR ${scholarshipAvailability.major_id} IS NULL)`;
   }
-  
+
   if (campusId) {
-    // Học bổng áp dụng cho cơ sở cụ thể HOẶC áp dụng cho tất cả cơ sở (campus_id IS NULL)
+    // Scholarship applies to specific campus OR applies to all campuses (campus_id IS NULL)
     campusCondition = sql`(${scholarshipAvailability.campus_id} = ${campusId} OR ${scholarshipAvailability.campus_id} IS NULL)`;
   }
-  
-  // Xây dựng điều kiện cuối cùng
+
+  // Build final condition
   const conditions = [eq(scholarshipAvailability.scholarship_id, scholarships.id)];
   if (majorCondition) conditions.push(majorCondition);
   if (campusCondition) conditions.push(campusCondition);
-  
+
   return exists(
     db.select({ dummy: sql`1` })
       .from(scholarshipAvailability)
@@ -192,9 +192,9 @@ export const getScholarshipById = async (id: number): Promise<Scholarship> => {
     where: eq(scholarships.id, id),
     with: RELATION_CONFIGS.fullDetailRelations
   });
-  
+
   if (!result) throw new NotFoundError('Scholarship with ID', id.toString());
-  
+
   return result;
 };
 

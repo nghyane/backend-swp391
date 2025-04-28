@@ -29,13 +29,13 @@ const verifyWebhook = async (req: Request, res: Response): Promise<void> => {
  * @returns void
  */
 const receiveMessage = async (req: Request, res: Response): Promise<void> => {
-    // Xử lý dữ liệu từ Zalo
+    // Process data from Zalo
     const eventData = req.body;
 
-    // Thêm vào queue thay vì xử lý trực tiếp
+    // Add to queue instead of processing directly
     queueZaloMessage(eventData);
 
-    // Trả về phản hồi cho Zalo ngay lập tức - luôn trả về 200 để Zalo không gửi lại webhook
+    // Return response to Zalo immediately - always return 200 to prevent Zalo from resending the webhook
     reply(res, { received: true }, "EVENT_RECEIVED");
 };
 

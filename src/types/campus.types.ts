@@ -8,7 +8,7 @@ import {
 
 /**
  * Campus entity data type
- * Sử dụng type inference từ Drizzle ORM schema
+ * Using type inference from Drizzle ORM schema
  */
 export type Campus = typeof campuses.$inferSelect;
 

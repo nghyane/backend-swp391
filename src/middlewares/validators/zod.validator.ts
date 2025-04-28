@@ -36,8 +36,8 @@ declare global {
 }
 
 /**
- * Middleware validate request với Zod schema
- * @template T Type được suy ra từ schema
+ * Middleware to validate request with Zod schema
+ * @template T Type inferred from schema
  */
 export const validateZod = <T extends z.ZodTypeAny>(
   schema: T,
