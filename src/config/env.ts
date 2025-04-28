@@ -17,6 +17,9 @@ type EnvironmentVariables = {
   PORT: string;
   DATABASE_URL: string;
   FACEBOOK_VERIFY_TOKEN: string;
+  ZALO_APP_ACCESS_TOKEN: string;
+  AI_AGENT_BASE_URL: string;
+  AI_AGENT_APP_NAME: string;
 };
 
 /**
@@ -25,7 +28,9 @@ type EnvironmentVariables = {
 const requiredEnvVars: Array<keyof EnvironmentVariables> = [
   "DATABASE_URL",
   "PORT",
-  "FACEBOOK_VERIFY_TOKEN"
+  "ZALO_APP_ACCESS_TOKEN",
+  "AI_AGENT_BASE_URL",
+  "AI_AGENT_APP_NAME"
 ];
 
 // Check for missing required environment variables
@@ -44,9 +49,13 @@ if (missingEnvVars.length > 0) {
  */
 const env: EnvironmentVariables = {
   NODE_ENV: process.env.NODE_ENV || "development",
-  PORT: process.env.PORT as string,
-  DATABASE_URL: process.env.DATABASE_URL as string,
-  FACEBOOK_VERIFY_TOKEN: process.env.FACEBOOK_VERIFY_TOKEN as string
+  PORT: process.env.PORT!,
+  DATABASE_URL: process.env.DATABASE_URL!,
+  FACEBOOK_VERIFY_TOKEN: process.env.FACEBOOK_VERIFY_TOKEN!,
+
+  ZALO_APP_ACCESS_TOKEN: process.env.ZALO_APP_ACCESS_TOKEN!,
+  AI_AGENT_BASE_URL: process.env.AI_AGENT_BASE_URL!,
+  AI_AGENT_APP_NAME: process.env.AI_AGENT_APP_NAME!
 };
 
 export default env;

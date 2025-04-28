@@ -119,23 +119,29 @@ const resolveCampusCode = async (campusCode?: string): Promise<number | undefine
 const buildAvailabilityFilter = (majorId?: number, campusId?: number) => {
   if (!majorId && !campusId) return undefined;
   
-  const availabilityConditions = [];
+  // Xây dựng điều kiện cho truy vấn
+  let majorCondition;
+  let campusCondition;
   
   if (majorId) {
-    availabilityConditions.push(eq(scholarshipAvailability.major_id, majorId));
+    // Học bổng áp dụng cho ngành cụ thể HOẶC áp dụng cho tất cả ngành (major_id IS NULL)
+    majorCondition = sql`(${scholarshipAvailability.major_id} = ${majorId} OR ${scholarshipAvailability.major_id} IS NULL)`;
   }
   
   if (campusId) {
-    availabilityConditions.push(eq(scholarshipAvailability.campus_id, campusId));
+    // Học bổng áp dụng cho cơ sở cụ thể HOẶC áp dụng cho tất cả cơ sở (campus_id IS NULL)
+    campusCondition = sql`(${scholarshipAvailability.campus_id} = ${campusId} OR ${scholarshipAvailability.campus_id} IS NULL)`;
   }
+  
+  // Xây dựng điều kiện cuối cùng
+  const conditions = [eq(scholarshipAvailability.scholarship_id, scholarships.id)];
+  if (majorCondition) conditions.push(majorCondition);
+  if (campusCondition) conditions.push(campusCondition);
   
   return exists(
     db.select({ dummy: sql`1` })
       .from(scholarshipAvailability)
-      .where(and(
-        eq(scholarshipAvailability.scholarship_id, scholarships.id),
-        ...availabilityConditions
-      ))
+      .where(and(...conditions))
   );
 };
 
