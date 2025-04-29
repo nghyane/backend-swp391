@@ -11,34 +11,32 @@ export enum LogLevel {
 }
 
 /**
+ * Logger configuration interface
+ */
+export interface LoggerConfig {
+  minLevel: LogLevel;
+  useColors: boolean;
+  useEmojis: boolean;
+  includeTimestamp: boolean;
+}
+
+/**
+ * Log context interface
+ */
+export interface LogContext {
+  [key: string]: any;
+}
+
+/**
  * ANSI color codes for terminal output
  */
 const colors = {
   reset: '\x1b[0m',
-  bright: '\x1b[1m',
   dim: '\x1b[2m',
-  underscore: '\x1b[4m',
-  blink: '\x1b[5m',
-  reverse: '\x1b[7m',
-  hidden: '\x1b[8m',
-
-  black: '\x1b[30m',
-  red: '\x1b[31m',
+  cyan: '\x1b[36m',
   green: '\x1b[32m',
   yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m',
-
-  bgBlack: '\x1b[40m',
-  bgRed: '\x1b[41m',
-  bgGreen: '\x1b[42m',
-  bgYellow: '\x1b[43m',
-  bgBlue: '\x1b[44m',
-  bgMagenta: '\x1b[45m',
-  bgCyan: '\x1b[46m',
-  bgWhite: '\x1b[47m'
+  red: '\x1b[31m',
 };
 
 /**
@@ -62,125 +60,179 @@ const levelEmojis = {
 };
 
 /**
- * Current environment
+ * Default logger configuration based on environment
  */
-const NODE_ENV = env.NODE_ENV || 'development';
-
-/**
- * Minimum log level based on environment
- * - In production, we only log INFO and above
- * - In other environments, we log all levels
- */
-const MIN_LOG_LEVEL = NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG;
+const defaultConfig: LoggerConfig = {
+  minLevel: env.NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG,
+  useColors: true,
+  useEmojis: true,
+  includeTimestamp: true
+};
 
 /**
  * Format the current timestamp
  * @returns Formatted timestamp string
  */
-const getTimestamp = (): string => {
-  const now = new Date();
-  return now.toISOString();
-};
+const getTimestamp = (): string => new Date().toISOString();
 
 /**
- * Format a log message with timestamp, level, and color
- * @param level Log level
- * @param args Arguments to log
- * @returns Formatted log message
+ * Format a value for logging
+ * @param value Value to format
+ * @returns Formatted string
  */
-const formatLogMessage = (level: LogLevel, args: any[]): string => {
-  const timestamp = getTimestamp();
-  const color = levelColors[level];
-  const emoji = levelEmojis[level];
-
-  // Format the arguments
-  const formattedArgs = args.map(arg => {
-    if (arg instanceof Error) {
-      return `${arg.message}\n${arg.stack}`;
-    } else if (typeof arg === 'object') {
-      try {
-        return JSON.stringify(arg, null, 2);
-      } catch (e) {
-        return String(arg);
-      }
-    } else {
-      return String(arg);
+const formatValue = (value: any): string => {
+  if (value instanceof Error) {
+    return `${value.message}\n${value.stack}`;
+  } else if (typeof value === 'object' && value !== null) {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
     }
-  }).join(' ');
-
-  // Return the formatted message
-  return `${colors.dim}[${timestamp}]${colors.reset} ${color}${emoji} [${level}]${colors.reset} ${formattedArgs}`;
-};
-
-/**
- * Check if the given log level should be logged
- * @param level Log level to check
- * @returns True if the level should be logged
- */
-const shouldLog = (level: LogLevel): boolean => {
-  const levels = Object.values(LogLevel);
-  const minLevelIndex = levels.indexOf(MIN_LOG_LEVEL);
-  const currentLevelIndex = levels.indexOf(level);
-
-  return currentLevelIndex >= minLevelIndex;
-};
-
-/**
- * Log a message at the specified level
- * @param level Log level
- * @param args Arguments to log
- */
-const logAtLevel = (level: LogLevel, ...args: any[]): void => {
-  if (!shouldLog(level)) return;
-
-  const formattedMessage = formatLogMessage(level, args);
-
-  switch (level) {
-    case LogLevel.ERROR:
-      console.error(formattedMessage);
-      break;
-    case LogLevel.WARN:
-      console.warn(formattedMessage);
-      break;
-    default:
-      console.log(formattedMessage);
   }
+  return String(value);
 };
 
 /**
- * Logger object with methods for different log levels
+ * Logger class with configurable options
  */
-export const logger = {
+class Logger {
+  private config: LoggerConfig;
+
+  constructor(config: Partial<LoggerConfig> = {}) {
+    this.config = { ...defaultConfig, ...config };
+  }
+
+  /**
+   * Create a new logger with updated configuration
+   * @param config Configuration overrides
+   * @returns New logger instance
+   */
+  configure(config: Partial<LoggerConfig>): Logger {
+    return new Logger({ ...this.config, ...config });
+  }
+
+  /**
+   * Format a log message with timestamp, level, and color
+   * @param level Log level
+   * @param message Main message
+   * @param context Optional context object
+   * @returns Formatted log message
+   */
+  private formatLogMessage(level: LogLevel, message: string, context?: LogContext): string {
+    const parts: string[] = [];
+
+    // Add timestamp if configured
+    if (this.config.includeTimestamp) {
+      const timestamp = getTimestamp();
+      parts.push(this.config.useColors ? `${colors.dim}[${timestamp}]${colors.reset}` : `[${timestamp}]`);
+    }
+
+    // Add level with color/emoji if configured
+    const levelColor = this.config.useColors ? levelColors[level] : '';
+    const levelReset = this.config.useColors ? colors.reset : '';
+    const emoji = this.config.useEmojis ? `${levelEmojis[level]} ` : '';
+    parts.push(`${levelColor}${emoji}[${level}]${levelReset}`);
+
+    // Add message
+    parts.push(message);
+
+    // Add context if provided
+    if (context && Object.keys(context).length > 0) {
+      parts.push(formatValue(context));
+    }
+
+    return parts.join(' ');
+  }
+
+  /**
+   * Check if the given log level should be logged
+   * @param level Log level to check
+   * @returns True if the level should be logged
+   */
+  private shouldLog(level: LogLevel): boolean {
+    const levels = Object.values(LogLevel);
+    const minLevelIndex = levels.indexOf(this.config.minLevel);
+    const currentLevelIndex = levels.indexOf(level);
+    return currentLevelIndex >= minLevelIndex;
+  }
+
+  /**
+   * Log a message at the specified level
+   * @param level Log level
+   * @param message Main message
+   * @param context Optional context object
+   */
+  private logAtLevel(level: LogLevel, message: string, context?: LogContext): void {
+    if (!this.shouldLog(level)) return;
+
+    const formattedMessage = this.formatLogMessage(level, message, context);
+
+    switch (level) {
+      case LogLevel.ERROR:
+        console.error(formattedMessage);
+        break;
+      case LogLevel.WARN:
+        console.warn(formattedMessage);
+        break;
+      default:
+        console.log(formattedMessage);
+    }
+  }
+
   /**
    * Log a debug message
-   * @param args Arguments to log
+   * @param message Main message
+   * @param context Optional context object
    */
-  debug: (...args: any[]): void => logAtLevel(LogLevel.DEBUG, ...args),
+  debug(message: string, context?: LogContext): void {
+    this.logAtLevel(LogLevel.DEBUG, message, context);
+  }
 
   /**
    * Log an info message
-   * @param args Arguments to log
+   * @param message Main message
+   * @param context Optional context object
    */
-  info: (...args: any[]): void => logAtLevel(LogLevel.INFO, ...args),
+  info(message: string, context?: LogContext): void {
+    this.logAtLevel(LogLevel.INFO, message, context);
+  }
 
   /**
    * Log a warning message
-   * @param args Arguments to log
+   * @param message Main message
+   * @param context Optional context object
    */
-  warn: (...args: any[]): void => logAtLevel(LogLevel.WARN, ...args),
+  warn(message: string, context?: LogContext): void {
+    this.logAtLevel(LogLevel.WARN, message, context);
+  }
 
   /**
    * Log an error message
-   * @param args Arguments to log
+   * @param message Main message
+   * @param error Optional error object
+   * @param context Optional additional context
    */
-  error: (...args: any[]): void => logAtLevel(LogLevel.ERROR, ...args)
-};
+  error(message: string, error?: Error, context?: LogContext): void {
+    const errorContext = error ? { error: { message: error.message, stack: error.stack }, ...context } : context;
+    this.logAtLevel(LogLevel.ERROR, message, errorContext);
+  }
+}
+
+// Create default logger instance
+const defaultLogger = new Logger();
 
 /**
- * Legacy log function for backward compatibility
- * @deprecated Use logger.info() instead
- * @param args Arguments to log
+ * Export the default logger instance
  */
-export const log = (...args: any[]): void => {
-  logger.info(...args);
+export const logger = defaultLogger;
+
+/**
+ * Create a new logger with custom configuration
+ * @param config Logger configuration
+ * @returns Configured logger instance
+ */
+export const createLogger = (config: Partial<LoggerConfig> = {}): Logger => {
+  return defaultLogger.configure(config);
 };
+
