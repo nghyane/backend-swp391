@@ -8,9 +8,9 @@ const DEFAULT_QUERY_OPTIONS = {
   orderBy: campuses.name
 };
 
-export const getAllCampuses = async (filters?: CampusQueryParams): Promise<Campus[]> => {
+export const getAllCampuses = async (filters?: CampusQueryParams) => {
   if (!filters || Object.keys(filters).length === 0) {
-    return await db.query.campuses.findMany(DEFAULT_QUERY_OPTIONS);
+    return db.query.campuses.findMany(DEFAULT_QUERY_OPTIONS);
   }
   
   const conditions: SQL[] = [
@@ -20,10 +20,10 @@ export const getAllCampuses = async (filters?: CampusQueryParams): Promise<Campu
   ].filter(Boolean) as SQL[];
   
   if (conditions.length === 0) {
-    return await db.query.campuses.findMany(DEFAULT_QUERY_OPTIONS);
+    return db.query.campuses.findMany(DEFAULT_QUERY_OPTIONS);
   }
   
-  return await db.query.campuses.findMany({
+  return db.query.campuses.findMany({
     ...DEFAULT_QUERY_OPTIONS,
     where: or(...conditions)
   });
@@ -69,11 +69,6 @@ export const deleteCampus = async (id: number): Promise<void> => {
 
 export const getCampusMajors = async (campusId: number): Promise<unknown> => {
   // TODO: Implement this function when the relationship is established
-  throw new Error('Not implemented');
-};
-
-export const getCampusFacilities = async (campusId: number): Promise<unknown> => {
-  // TODO: Implement this function when the facilities schema is defined
   throw new Error('Not implemented');
 };
 

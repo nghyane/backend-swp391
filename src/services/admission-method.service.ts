@@ -36,7 +36,7 @@ const DEFAULT_QUERY_OPTIONS = {
 export const getAllAdmissionMethods = async (filters?: AdmissionMethodQueryParams) => {
   // If no filters, return all admission methods
   if (!filters || Object.keys(filters).length === 0) {
-    return await db.query.admissionMethods.findMany(DEFAULT_QUERY_OPTIONS);
+    return db.query.admissionMethods.findMany(DEFAULT_QUERY_OPTIONS);
   }
 
   // Handle basic name filter
@@ -45,7 +45,7 @@ export const getAllAdmissionMethods = async (filters?: AdmissionMethodQueryParam
 
   // If we don't have relational filters, just filter by name
   if (!hasRelationalFilters(filters)) {
-    return await db.query.admissionMethods.findMany({
+    return db.query.admissionMethods.findMany({
       ...DEFAULT_QUERY_OPTIONS,
       where: nameFilter
     });
@@ -161,7 +161,7 @@ export const getAllAdmissionMethods = async (filters?: AdmissionMethodQueryParam
   }
 
   // Return filtered admission methods
-  return await db.query.admissionMethods.findMany({
+  return db.query.admissionMethods.findMany({
     ...DEFAULT_QUERY_OPTIONS,
     where: and(...finalConditions)
   });
