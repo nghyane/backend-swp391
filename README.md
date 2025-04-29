@@ -9,7 +9,7 @@ This project provides the backend infrastructure for an AI-powered admission con
 - **Language:** TypeScript (strict mode enabled)
 - **Framework:** Express.js
 - **ORM:** Drizzle ORM (PostgreSQL)
-- **Other Libraries:** body-parser, dotenv, morgan, uuid
+- **Other Libraries:** body-parser, dotenv, morgan, swagger-jsdoc, swagger-ui-express, uuid
 
 ## 3. Directory Structure
 ```
@@ -17,6 +17,7 @@ src/
 ├── api/           # Routes and controllers
 ├── config/        # Application configuration
 ├── db/            # Database connection and schema
+├── docs/          # API documentation (OpenAPI/Swagger)
 ├── middlewares/   # Common middlewares (error, session)
 ├── services/      # Business logic (planned)
 ├── utils/         # Utilities (logger, helpers)
@@ -40,7 +41,8 @@ src/
 
 ### Technical Features
 - **RESTful API Architecture** with TypeScript type safety
-- **Robust Validation** for all inputs using express-validator
+- **Interactive API Documentation** using Swagger/OpenAPI
+- **Robust Validation** for all inputs using Zod
 - **Centralized Error Handling** with consistent response formats
 - **Type-safe Database Access** using Drizzle ORM
 - **Configurable Environment** via environment variables
@@ -88,15 +90,15 @@ pnpm run migrate
 pnpm run dev
 ```
 
-### API Documentation
-The project includes a Postman collection file that documents all available API endpoints.
+### Interactive API Documentation
+The project includes interactive API documentation using Swagger/OpenAPI.
 
-```bash
-# Import the Postman collection
-# File: postman.json (excluded from git repository)
+When the server is running, you can access the documentation at:
+```
+http://localhost:4000/docs
 ```
 
-You can also generate a new Postman collection file with:
+This provides a complete, interactive documentation of all API endpoints with the ability to try them directly from the browser.
 
 ### Testing the Chatbot
 You can test the Zalo webhook endpoint using:
