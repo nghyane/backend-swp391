@@ -1,0 +1,63 @@
+# Scholarship API Endpoints
+
+# GET /scholarships
+/scholarships:
+  get:
+    tags:
+      - Scholarships
+    summary: Get all scholarships
+    description: Retrieve a list of all scholarships with optional filtering
+    parameters:
+      - $ref: '#/components/parameters/pageParam'
+      - $ref: '#/components/parameters/limitParam'
+      - $ref: '#/components/parameters/sortByParam'
+      - $ref: '#/components/parameters/sortOrderParam'
+      - $ref: '#/components/parameters/nameFilterParam'
+      - $ref: '#/components/parameters/majorIdParam'
+      - $ref: '#/components/parameters/majorCodeParam'
+      - $ref: '#/components/parameters/campusIdParam'
+      - $ref: '#/components/parameters/campusCodeParam'
+    responses:
+      200:
+        description: Successful operation
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Scholarship'
+      400:
+        $ref: '#/components/responses/BadRequest'
+      500:
+        $ref: '#/components/responses/InternalServerError'
+
+# GET /scholarships/{id}
+/scholarships/{id}:
+  get:
+    tags:
+      - Scholarships
+    summary: Get scholarship by ID
+    description: Retrieve a specific scholarship by its ID
+    parameters:
+      - $ref: '#/components/parameters/idPathParam'
+    responses:
+      200:
+        description: Successful operation
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/Scholarship'
+      404:
+        $ref: '#/components/responses/NotFound'
+      500:
+        $ref: '#/components/responses/InternalServerError'
