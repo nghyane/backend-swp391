@@ -14,10 +14,7 @@ const contactSchema = z.object({
 export const campusQuerySchema = z.object({
   name: z.string().optional(),
   code: z.string().optional(),
-  city: z.string().optional(),
-  address: z.string().optional(),
-  email: z.string().optional(),
-  phone: z.string().optional()
+  address: z.string().optional()
 }).strict().merge(commonQuerySchema);
 
 // Create schema
@@ -25,7 +22,6 @@ export const campusCreateSchema = z.object({
   code: z.string().min(1).max(10),
   name: z.string().min(1).max(255),
   address: z.string().optional(),
-  city: z.string().optional(),
   contact: contactSchema.optional().or(z.string())
 }).strict();
 
@@ -34,7 +30,6 @@ export const campusUpdateSchema = z.object({
   code: z.string().max(10).optional(),
   name: z.string().max(255).optional(),
   address: z.string().optional(),
-  city: z.string().optional(),
   contact: contactSchema.optional().or(z.string())
 }).strict();
 
@@ -44,10 +39,10 @@ export const campusUpdateSchema = z.object({
 export const campusValidators = {
   // Query validator
   query: validateZod(campusQuerySchema, 'query'),
-  
+
   // Create validator
   create: validateZod(campusCreateSchema, 'body'),
-  
+
   // Update validator
   update: validateZod(campusUpdateSchema, 'body')
 };

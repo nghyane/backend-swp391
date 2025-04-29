@@ -37,20 +37,20 @@ export const admissionMethodUpdateSchema = z.object({
 
 // Schema for Major association
 export const admissionMethodAssociateSchema = z.object({
-  admissionMethodId: z.number().int().positive(),
-  majorId: z.number().int().positive(),
-  academicYearId: z.number().int().positive(),
-  campusId: z.number().int().positive().optional(),
-  minScore: z.number().int().min(0).optional(),
-  isActive: z.boolean().optional()
+  admission_method_id: z.number().int().positive(),
+  major_id: z.number().int().positive(),
+  academic_year_id: z.number().int().positive(),
+  campus_id: z.number().int().positive().optional(),
+  min_score: z.number().int().min(0).optional(),
+  is_active: z.boolean().optional()
 }).strict();
 
 // Schema for Global Application
 export const admissionMethodGlobalAppSchema = z.object({
-  admissionMethodId: z.number().int().positive(),
-  academicYearId: z.number().int().positive(),
-  campusId: z.number().int().positive().optional(),
-  isActive: z.boolean().optional(),
+  admission_method_id: z.number().int().positive(),
+  academic_year_id: z.number().int().positive(),
+  campus_id: z.number().int().positive().optional(),
+  is_active: z.boolean().optional(),
   note: z.string().optional()
 }).strict();
 

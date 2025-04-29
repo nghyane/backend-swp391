@@ -72,14 +72,6 @@ export const validateZod = <T extends z.ZodTypeAny>(
 
 // Schema for common query parameters
 export const commonQuerySchema = z.object({
-  // Pagination
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().optional(),
-
-  // Sorting
-  sort_by: z.string().optional(),
-  sort_order: z.enum(['asc', 'desc']).optional(),
-
   // Filtering
   name: z.string().optional(),
 }).strict().partial();
@@ -104,12 +96,12 @@ export const createParamSchema = (paramName: string) => {
 export const validateId = validateZod(idParamSchema, 'params');
 
 // Common entity ID validators
-export const validateCampusId = validateZod(createParamSchema('campusId'), 'params');
-export const validateMajorId = validateZod(createParamSchema('majorId'), 'params');
-export const validateScholarshipId = validateZod(createParamSchema('scholarshipId'), 'params');
-export const validateDormitoryId = validateZod(createParamSchema('dormitoryId'), 'params');
-export const validateAdmissionMethodId = validateZod(createParamSchema('admissionMethodId'), 'params');
-export const validateMajorCode = validateZod(createParamSchema('majorCode'), 'params');
+export const validateCampusId = validateZod(createParamSchema('campus_id'), 'params');
+export const validateMajorId = validateZod(createParamSchema('major_id'), 'params');
+export const validateScholarshipId = validateZod(createParamSchema('scholarship_id'), 'params');
+export const validateDormitoryId = validateZod(createParamSchema('dormitory_id'), 'params');
+export const validateAdmissionMethodId = validateZod(createParamSchema('admission_method_id'), 'params');
+export const validateMajorCode = validateZod(createParamSchema('major_code'), 'params');
 /**
  * Custom param validator
  */

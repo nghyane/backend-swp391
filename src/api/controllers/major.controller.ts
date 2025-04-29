@@ -34,11 +34,11 @@ export const getAllMajors = catch$(async (req: Request, res: Response): Promise<
  */
 export const getMajorByCode = catch$(async (req: Request, res: Response): Promise<void> => {
   // Check and get the major code from validated params
-  if (!req.validatedParams?.majorCode) {
+  if (!req.validatedParams?.major_code) {
     throw new Error('Major code is required');
   }
 
-  const code = req.validatedParams.majorCode as string;
+  const code = req.validatedParams.major_code as string;
   const queryParams = req.validatedQuery as MajorQueryParams || {};
 
   // Use current year if no academic year is specified
@@ -54,7 +54,7 @@ export const getMajorByCode = catch$(async (req: Request, res: Response): Promis
 
 export const getMajorsByCampus = catch$(async (req: Request, res: Response): Promise<void> => {
   // Using validated data from Zod with type inference
-  const campusId = req.validatedParams?.campusId as number;
+  const campusId = req.validatedParams?.campus_id as number;
   const { academic_year } = req.validatedQuery as MajorQueryParams;
 
   // Set default academic year to current year if not specified

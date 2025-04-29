@@ -61,12 +61,12 @@ export const associateMajorWithAdmissionMethod = catch$(async (req: Request, res
   const data = req.body as AdmissionMethodAssociateParams;
 
   const result = await admissionMethodService.associateMajorWithAdmissionMethod(
-    data.admissionMethodId,
-    data.majorId,
-    data.academicYearId,
-    data.campusId,
-    data.minScore,
-    data.isActive
+    data.admission_method_id,
+    data.major_id,
+    data.academic_year_id,
+    data.campus_id,
+    data.min_score,
+    data.is_active
   );
 
   reply(res, result, 'Major successfully associated with admission method', 201);
@@ -80,9 +80,9 @@ export const createGlobalAdmissionMethodApplication = catch$(async (req: Request
   const data = req.body as AdmissionMethodGlobalAppParams;
 
   const result = await admissionMethodService.createGlobalAdmissionMethodApplication(
-    data.admissionMethodId,
-    data.academicYearId,
-    data.campusId,
+    data.admission_method_id,
+    data.academic_year_id,
+    data.campus_id,
     data.note
   );
 
@@ -95,7 +95,7 @@ export const createGlobalAdmissionMethodApplication = catch$(async (req: Request
  */
 export const getAdmissionMethodsByMajor = catch$(async (req: Request, res: Response): Promise<void> => {
   // Using validated data from Zod
-  const majorCode = req.validatedParams?.majorCode as string;
+  const majorCode = req.validatedParams?.major_code as string;
 
   const admissionMethods = await admissionMethodService.getAdmissionMethodsByMajorCode(majorCode);
 

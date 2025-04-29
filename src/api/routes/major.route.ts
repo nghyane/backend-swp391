@@ -8,8 +8,8 @@ const router = Router();
 // Major routes - Queries
 router.get("/", majorValidators.query, majorController.getAllMajors);
 
-router.get("/campus/:campusId", validateCampusId, majorValidators.query, majorController.getMajorsByCampus);
-router.get("/:majorCode", validateMajorCode, majorController.getMajorByCode);
+router.get("/campus/:campus_id", validateCampusId, majorValidators.query, majorController.getMajorsByCampus);
+router.get("/:major_code", validateMajorCode, majorController.getMajorByCode);
 
 // Major routes - CRUD operations
 router.post("/", majorValidators.create, majorController.createMajor);
