@@ -9,7 +9,6 @@ const router = Router();
 router.get("/", campusValidators.query, campusController.getAllCampuses);
 router.get("/:id", validateId, campusController.getCampusById);
 router.get("/:id/majors", validateId, campusController.getCampusMajors);
-router.get("/:id/facilities", validateId, campusController.getCampusFacilities);
 
 // Campus routes - CRUD operations
 router.post("/", campusValidators.create, campusController.createCampus);

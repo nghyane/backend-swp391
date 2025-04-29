@@ -29,14 +29,6 @@ export const getDormitoryById = catch$(async (req: Request, res: Response): Prom
   reply(res, dormitory, 'Dormitory retrieved successfully');
 });
 
-export const getDormitoryAvailability = catch$(async (req: Request, res: Response): Promise<void> => {
-  replyError(res, 'Not implemented yet', 501);
-});
-
-export const getDormitoryFacilities = catch$(async (req: Request, res: Response): Promise<void> => {
-  replyError(res, 'Not implemented yet', 501);
-});
-
 /**
  * Create a new dormitory
  * This endpoint creates a new dormitory

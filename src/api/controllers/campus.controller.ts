@@ -73,10 +73,6 @@ export const getCampusMajors = catch$(async (req: Request, res: Response): Promi
   replyError(res, 'Not implemented yet', 501);
 });
 
-export const getCampusFacilities = catch$(async (req: Request, res: Response): Promise<void> => {
-
-  replyError(res, 'Not implemented yet', 501);
-});
 
 
 

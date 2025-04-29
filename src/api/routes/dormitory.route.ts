@@ -8,8 +8,6 @@ const router = Router();
 // Dormitory routes - GET
 router.get("/", dormitoryValidators.query, dormitoryController.getAllDormitories);
 router.get("/:id", validateId, dormitoryController.getDormitoryById);
-router.get("/:id/availability", validateId, dormitoryController.getDormitoryAvailability);
-router.get("/:id/facilities", validateId, dormitoryController.getDormitoryFacilities);
 
 // Dormitory routes - CRUD operations
 router.post("/", dormitoryValidators.create, dormitoryController.createDormitory);
