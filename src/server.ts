@@ -47,24 +47,32 @@ async function gracefulShutdown(server: any, signal: string) {
   }, SHUTDOWN_TIMEOUT);
 
   try {
-    // Drain the queue (wait for pending tasks to complete)
-    logger.info("⏳ Draining message queues...");
-    await zaloQueue.drain();
-    logger.info("✅ Message queues drained");
+    // Drain the queue and close resources in parallel
+    const shutdownTasks = [
+      // Drain the queue
+      (async () => {
+        logger.info("⏳ Draining message queues...");
+        await zaloQueue.drain();
+        logger.info("✅ Message queues drained");
+      })(),
 
-    // Close database connection
-    logger.info("📊 Closing database connection...");
-    await closeDb();
-    logger.info("✅ Database connection closed");
+      // Close database connection
+      (async () => {
+        logger.info("📊 Closing database connection...");
+        await closeDb();
+        logger.info("✅ Database connection closed");
+      })(),
 
-    // Close HTTP server
-    await new Promise<void>((resolve) => {
-      server.close(() => {
-        logger.info("🔒 HTTP server closed");
-        resolve();
-      });
-    });
+      // Close HTTP server
+      new Promise<void>((resolve) => {
+        server.close(() => {
+          logger.info("🔒 HTTP server closed");
+          resolve();
+        });
+      })
+    ];
 
+    await Promise.all(shutdownTasks);
   } catch (error) {
     logger.error("❌ Error during shutdown:", error);
   } finally {
