@@ -15,7 +15,6 @@ const router = Router();
  *       - $ref: '#/components/parameters/AcademicYearQuery'
  *       - $ref: '#/components/parameters/NameQuery'
  *       - $ref: '#/components/parameters/MajorCodeQuery'
- *       - $ref: '#/components/parameters/CampusIdQuery'
  *       - $ref: '#/components/parameters/CampusCodeQuery'
  *     responses:
  *       200:

@@ -16,13 +16,7 @@ const router = Router();
  *     summary: Xử lý webhook từ các nền tảng khác nhau
  *     tags: [Webhooks]
  *     parameters:
- *       - in: path
- *         name: platform
- *         required: true
- *         schema:
- *           type: string
- *           enum: [zalo, facebook, hubspot]
- *         description: Nền tảng gửi webhook
+ *       - $ref: '#/components/parameters/PlatformParam'
  *     requestBody:
  *       required: true
  *       content:
@@ -31,11 +25,9 @@ const router = Router();
  *             type: object
  *     responses:
  *       200:
- *         description: Webhook đã được xử lý
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.all(
   "/:platform",

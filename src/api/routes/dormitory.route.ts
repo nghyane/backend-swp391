@@ -13,15 +13,12 @@ const router = Router();
  *     tags: [Dormitories]
  *     parameters:
  *       - $ref: '#/components/parameters/NameQuery'
- *       - $ref: '#/components/parameters/CampusIdQuery'
  *       - $ref: '#/components/parameters/CampusCodeQuery'
  *     responses:
  *       200:
- *         description: Danh sách ký túc xá
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.get("/", dormitoryValidators.query, dormitoryController.getAllDormitories);
 
@@ -35,11 +32,9 @@ router.get("/", dormitoryValidators.query, dormitoryController.getAllDormitories
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Thông tin ký túc xá
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/:id", validateId, dormitoryController.getDormitoryById);
 
@@ -57,11 +52,9 @@ router.get("/:id", validateId, dormitoryController.getDormitoryById);
  *             $ref: '#/components/schemas/Dormitory'
  *     responses:
  *       201:
- *         description: Ký túc xá đã được tạo
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.post("/", dormitoryValidators.create, dormitoryController.createDormitory);
 
@@ -81,11 +74,11 @@ router.post("/", dormitoryValidators.create, dormitoryController.createDormitory
  *             $ref: '#/components/schemas/Dormitory'
  *     responses:
  *       200:
- *         description: Ký túc xá đã được cập nhật
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.put("/:id", validateId, dormitoryValidators.update, dormitoryController.updateDormitory);
 
@@ -99,11 +92,9 @@ router.put("/:id", validateId, dormitoryValidators.update, dormitoryController.u
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Ký túc xá đã được xóa
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.delete("/:id", validateId, dormitoryController.deleteDormitory);
 

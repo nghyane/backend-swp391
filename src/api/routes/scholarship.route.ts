@@ -13,17 +13,13 @@ const router = Router();
  *     tags: [Scholarships]
  *     parameters:
  *       - $ref: '#/components/parameters/NameQuery'
- *       - $ref: '#/components/parameters/MajorIdQuery'
  *       - $ref: '#/components/parameters/MajorCodeQuery'
- *       - $ref: '#/components/parameters/CampusIdQuery'
  *       - $ref: '#/components/parameters/CampusCodeQuery'
  *     responses:
  *       200:
- *         description: Danh sách học bổng
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.get("/", scholarshipValidators.query, scholarshipController.getAllScholarships);
 
@@ -37,11 +33,9 @@ router.get("/", scholarshipValidators.query, scholarshipController.getAllScholar
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Thông tin học bổng
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/:id", validateId, scholarshipController.getScholarshipById);
 
@@ -59,11 +53,9 @@ router.get("/:id", validateId, scholarshipController.getScholarshipById);
  *             $ref: '#/components/schemas/Scholarship'
  *     responses:
  *       201:
- *         description: Học bổng đã được tạo
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.post("/", scholarshipValidators.create, scholarshipController.createScholarship);
 
@@ -83,11 +75,11 @@ router.post("/", scholarshipValidators.create, scholarshipController.createSchol
  *             $ref: '#/components/schemas/Scholarship'
  *     responses:
  *       200:
- *         description: Học bổng đã được cập nhật
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.put("/:id", validateId, scholarshipValidators.update, scholarshipController.updateScholarship);
 
@@ -101,11 +93,9 @@ router.put("/:id", validateId, scholarshipValidators.update, scholarshipControll
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Học bổng đã được xóa
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.delete("/:id", validateId, scholarshipController.deleteScholarship);
 

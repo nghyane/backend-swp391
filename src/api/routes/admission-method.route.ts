@@ -21,11 +21,9 @@ const router = Router();
  *       - $ref: '#/components/parameters/IsActiveQuery'
  *     responses:
  *       200:
- *         description: Danh sách phương thức xét tuyển
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.get("/", admissionMethodValidators.query, admissionMethodController.getAllAdmissionMethods);
 
@@ -41,11 +39,9 @@ router.get("/", admissionMethodValidators.query, admissionMethodController.getAl
  *       - $ref: '#/components/parameters/IsActiveQuery'
  *     responses:
  *       200:
- *         description: Danh sách phương thức xét tuyển theo mã ngành
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/major/:majorCode", admissionMethodController.getAdmissionMethodsByMajor);
 
@@ -59,11 +55,9 @@ router.get("/major/:majorCode", admissionMethodController.getAdmissionMethodsByM
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Thông tin phương thức xét tuyển
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/:id", validateId, admissionMethodController.getAdmissionMethodById);
 
@@ -77,11 +71,9 @@ router.get("/:id", validateId, admissionMethodController.getAdmissionMethodById)
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Yêu cầu của phương thức xét tuyển
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/:id/requirements", validateId, admissionMethodController.getAdmissionMethodRequirements);
 
@@ -96,11 +88,9 @@ router.get("/:id/requirements", validateId, admissionMethodController.getAdmissi
  *       - $ref: '#/components/parameters/AcademicYearQuery'
  *     responses:
  *       200:
- *         description: Danh sách ngành học theo phương thức xét tuyển
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/:id/majors", validateId, admissionMethodController.getMajorsByAdmissionMethod);
 
@@ -118,11 +108,9 @@ router.get("/:id/majors", validateId, admissionMethodController.getMajorsByAdmis
  *             $ref: '#/components/schemas/AdmissionMethod'
  *     responses:
  *       201:
- *         description: Phương thức xét tuyển đã được tạo
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.post("/", admissionMethodValidators.create, admissionMethodController.createAdmissionMethod);
 
@@ -148,11 +136,11 @@ router.post("/", admissionMethodValidators.create, admissionMethodController.cre
  *                 type: integer
  *     responses:
  *       201:
- *         description: Liên kết thành công
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.post("/associate-major", admissionMethodValidators.associateMajor, admissionMethodController.associateMajorWithAdmissionMethod);
 
@@ -179,11 +167,9 @@ router.post("/associate-major", admissionMethodValidators.associateMajor, admiss
  *                   type: integer
  *     responses:
  *       201:
- *         description: Đơn xét tuyển đã được tạo
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.post("/global-application", admissionMethodValidators.globalApplication, admissionMethodController.createGlobalAdmissionMethodApplication);
 
@@ -203,11 +189,11 @@ router.post("/global-application", admissionMethodValidators.globalApplication, 
  *             $ref: '#/components/schemas/AdmissionMethod'
  *     responses:
  *       200:
- *         description: Phương thức xét tuyển đã được cập nhật
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.put("/:id", validateId, admissionMethodValidators.update, admissionMethodController.updateAdmissionMethod);
 
@@ -221,11 +207,9 @@ router.put("/:id", validateId, admissionMethodValidators.update, admissionMethod
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Phương thức xét tuyển đã được xóa
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.delete("/:id", validateId, admissionMethodController.deleteAdmissionMethod);
 

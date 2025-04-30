@@ -16,11 +16,7 @@ const router = Router();
  *       - $ref: '#/components/parameters/CampusCodeQuery'
  *     responses:
  *       200:
- *         description: Danh sách cơ sở
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
  */
 router.get("/", campusValidators.query, campusController.getAllCampuses);
 
@@ -34,11 +30,9 @@ router.get("/", campusValidators.query, campusController.getAllCampuses);
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Thông tin cơ sở
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/:id", validateId, campusController.getCampusById);
 
@@ -53,11 +47,9 @@ router.get("/:id", validateId, campusController.getCampusById);
  *       - $ref: '#/components/parameters/AcademicYearQuery'
  *     responses:
  *       200:
- *         description: Danh sách ngành học của cơ sở
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/:id/majors", validateId, campusController.getCampusMajors);
 
@@ -75,11 +67,9 @@ router.get("/:id/majors", validateId, campusController.getCampusMajors);
  *             $ref: '#/components/schemas/Campus'
  *     responses:
  *       201:
- *         description: Cơ sở đã được tạo
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
  */
 router.post("/", campusValidators.create, campusController.createCampus);
 
@@ -99,11 +89,11 @@ router.post("/", campusValidators.create, campusController.createCampus);
  *             $ref: '#/components/schemas/Campus'
  *     responses:
  *       200:
- *         description: Cơ sở đã được cập nhật
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequestError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.put("/:id", validateId, campusValidators.update, campusController.updateCampus);
 
@@ -117,11 +107,9 @@ router.put("/:id", validateId, campusValidators.update, campusController.updateC
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Cơ sở đã được xóa
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
 router.delete("/:id", validateId, campusController.deleteCampus);
 
