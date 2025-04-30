@@ -1,0 +1,172 @@
+components:
+  schemas:
+    Campus:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID của cơ sở
+        name:
+          type: string
+          description: Tên cơ sở
+        code:
+          type: string
+          description: Mã cơ sở
+        address:
+          type: string
+          description: Địa chỉ cơ sở
+        contact:
+          type: object
+          properties:
+            phone:
+              type: string
+              description: Số điện thoại liên hệ
+            email:
+              type: string
+              description: Email liên hệ
+          description: Thông tin liên hệ của cơ sở
+        description:
+          type: string
+          description: Mô tả về cơ sở
+      required:
+        - name
+        - code
+    
+    Major:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID của ngành học
+        name:
+          type: string
+          description: Tên ngành học
+        code:
+          type: string
+          description: Mã ngành học
+        description:
+          type: string
+          description: Mô tả về ngành học
+      required:
+        - name
+        - code
+    
+    MajorCampusLink:
+      type: object
+      properties:
+        major_id:
+          type: integer
+          description: ID của ngành học
+        campus_id:
+          type: integer
+          description: ID của cơ sở
+        academic_year:
+          type: integer
+          description: Năm học
+        quota:
+          type: integer
+          description: Chỉ tiêu tuyển sinh
+        tuition_fee:
+          type: integer
+          description: Học phí
+      required:
+        - major_id
+        - campus_id
+        - academic_year
+    
+    Scholarship:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID của học bổng
+        name:
+          type: string
+          description: Tên học bổng
+        description:
+          type: string
+          description: Mô tả về học bổng
+        amount:
+          type: number
+          description: Giá trị học bổng
+        condition:
+          type: string
+          description: "Điều kiện xét học bổng"
+        major_id:
+          type: integer
+          description: ID của ngành học liên quan
+        campus_id:
+          type: integer
+          description: ID của cơ sở liên quan
+        application_url:
+          type: string
+          description: URL để đăng ký học bổng
+      required:
+        - name
+        - amount
+    
+    Dormitory:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID của ký túc xá
+        name:
+          type: string
+          description: Tên ký túc xá
+        campus_id:
+          type: integer
+          description: ID của cơ sở liên kết
+        capacity:
+          type: integer
+          description: Sức chứa của ký túc xá
+        description:
+          type: string
+          description: Mô tả về ký túc xá
+      required:
+        - name
+        - campus_id
+    
+    AdmissionMethod:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID của phương thức xét tuyển
+        name:
+          type: string
+          description: Tên phương thức xét tuyển
+        description:
+          type: string
+          description: Mô tả về phương thức xét tuyển
+        application_url:
+          type: string
+          description: URL để đăng ký xét tuyển
+      required:
+        - name
+    
+    AdmissionMethodAssociate:
+      type: object
+      properties:
+        admission_method_id:
+          type: integer
+          description: ID của phương thức xét tuyển
+        major_id:
+          type: integer
+          description: ID của ngành học
+        academic_year_id:
+          type: integer
+          description: ID của năm học
+        campus_id:
+          type: integer
+          description: ID của cơ sở
+        min_score:
+          type: integer
+          description: Điểm tối thiểu để xét tuyển
+        is_active:
+          type: boolean
+          description: Trạng thái hoạt động
+      required:
+        - admission_method_id
+        - major_id
+        - academic_year_id

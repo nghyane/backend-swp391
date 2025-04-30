@@ -1,0 +1,58 @@
+components:
+  responses:
+    SuccessResponse:
+      description: Thành công
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                default: success
+                description: Trạng thái thành công
+              message:
+                type: string
+                description: Thông báo thành công
+              data:
+                type: object
+                description: Dữ liệu trả về
+    
+    ErrorResponse:
+      description: Lỗi
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                default: error
+                description: Trạng thái lỗi
+              message:
+                type: string
+                description: Thông báo lỗi
+              error:
+                type: object
+                description: Chi tiết lỗi
+    
+    BadRequestError:
+      description: Yêu cầu không hợp lệ
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    
+    NotFoundError:
+      description: Không tìm thấy
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    
+    ServerError:
+      description: Lỗi máy chủ
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

@@ -19,11 +19,7 @@ const router = Router();
  *       - $ref: '#/components/parameters/CampusCodeQuery'
  *     responses:
  *       200:
- *         description: Danh sách ngành học
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
  */
 router.get("/", majorValidators.query, majorController.getAllMajors);
 
@@ -38,11 +34,7 @@ router.get("/", majorValidators.query, majorController.getAllMajors);
  *       - $ref: '#/components/parameters/AcademicYearQuery'
  *     responses:
  *       200:
- *         description: Danh sách ngành học theo cơ sở
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
  */
 router.get("/campus/:campus_id", validateCampusId, majorValidators.query, majorController.getMajorsByCampus);
 
@@ -57,11 +49,7 @@ router.get("/campus/:campus_id", validateCampusId, majorValidators.query, majorC
  *       - $ref: '#/components/parameters/AcademicYearQuery'
  *     responses:
  *       200:
- *         description: Thông tin ngành học
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
  */
 router.get("/:major_code", validateMajorCode, majorController.getMajorByCode);
 
@@ -79,11 +67,7 @@ router.get("/:major_code", validateMajorCode, majorController.getMajorByCode);
  *             $ref: '#/components/schemas/Major'
  *     responses:
  *       201:
- *         description: Ngành học đã được tạo
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
  */
 router.post("/", majorValidators.create, majorController.createMajor);
 
@@ -103,11 +87,7 @@ router.post("/", majorValidators.create, majorController.createMajor);
  *             $ref: '#/components/schemas/Major'
  *     responses:
  *       200:
- *         description: Ngành học đã được cập nhật
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
  */
 router.put("/:id", validateId, majorValidators.update, majorController.updateMajor);
 
@@ -121,11 +101,7 @@ router.put("/:id", validateId, majorValidators.update, majorController.updateMaj
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
- *         description: Ngành học đã được xóa
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/SuccessResponse'
+ *         $ref: '#/components/responses/SuccessResponse'
  */
 router.delete("/:id", validateId, majorController.deleteMajor);
 

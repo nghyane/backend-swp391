@@ -24,7 +24,7 @@ const swaggerOptions = {
   },
   // Bao gồm file định nghĩa components và các routes
   apis: [
-    './src/docs/swagger.ts',
+    './src/docs/components/*.yaml',
     './src/api/routes/*.ts',
   ],
 };
