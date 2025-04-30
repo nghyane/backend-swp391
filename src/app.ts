@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import apiRouter from "./api";
 import { errorHandler } from "./middlewares/error.middleware";
-import swaggerRouter from "./middlewares/swagger.middleware";
+import { setupSwagger } from "./docs/swagger-config";
 
 const app: Application = express();
 
@@ -15,8 +15,8 @@ app.use(morgan(
 // API routes
 app.use("/api", apiRouter);
 
-// Swagger documentation
-app.use("/docs", swaggerRouter);
+// Thiết lập Swagger UI
+setupSwagger(app);
 
 // Error handler middleware must be registered last
 app.use(errorHandler);

@@ -5,27 +5,228 @@ import { validateId } from "../../middlewares/validators/zod.validator";
 
 const router = Router();
 
-// Admission method routes
-// GET routes
+/**
+ * @swagger
+ * /admission-methods:
+ *   get:
+ *     summary: Lấy danh sách phương thức xét tuyển
+ *     tags: [Admission Methods]
+ *     parameters:
+ *       - $ref: '#/components/parameters/NameQuery'
+ *       - $ref: '#/components/parameters/MajorIdQuery'
+ *       - $ref: '#/components/parameters/MajorCodeQuery'
+ *       - $ref: '#/components/parameters/CampusIdQuery'
+ *       - $ref: '#/components/parameters/CampusCodeQuery'
+ *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *       - $ref: '#/components/parameters/IsActiveQuery'
+ *     responses:
+ *       200:
+ *         description: Danh sách phương thức xét tuyển
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/", admissionMethodValidators.query, admissionMethodController.getAllAdmissionMethods);
 
-// No need to validate majorCode as it's a string
+/**
+ * @swagger
+ * /admission-methods/major/{majorCode}:
+ *   get:
+ *     summary: Lấy danh sách phương thức xét tuyển theo mã ngành
+ *     tags: [Admission Methods]
+ *     parameters:
+ *       - $ref: '#/components/parameters/MajorCodeParam'
+ *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *       - $ref: '#/components/parameters/IsActiveQuery'
+ *     responses:
+ *       200:
+ *         description: Danh sách phương thức xét tuyển theo mã ngành
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/major/:majorCode", admissionMethodController.getAdmissionMethodsByMajor);
 
-// Validate ID param
+/**
+ * @swagger
+ * /admission-methods/{id}:
+ *   get:
+ *     summary: Lấy thông tin phương thức xét tuyển theo ID
+ *     tags: [Admission Methods]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200:
+ *         description: Thông tin phương thức xét tuyển
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/:id", validateId, admissionMethodController.getAdmissionMethodById);
+
+/**
+ * @swagger
+ * /admission-methods/{id}/requirements:
+ *   get:
+ *     summary: Lấy yêu cầu của phương thức xét tuyển
+ *     tags: [Admission Methods]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200:
+ *         description: Yêu cầu của phương thức xét tuyển
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/:id/requirements", validateId, admissionMethodController.getAdmissionMethodRequirements);
+
+/**
+ * @swagger
+ * /admission-methods/{id}/majors:
+ *   get:
+ *     summary: Lấy danh sách ngành học theo phương thức xét tuyển
+ *     tags: [Admission Methods]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *     responses:
+ *       200:
+ *         description: Danh sách ngành học theo phương thức xét tuyển
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/:id/majors", validateId, admissionMethodController.getMajorsByAdmissionMethod);
 
-// POST routes
+/**
+ * @swagger
+ * /admission-methods:
+ *   post:
+ *     summary: Tạo phương thức xét tuyển mới
+ *     tags: [Admission Methods]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AdmissionMethod'
+ *     responses:
+ *       201:
+ *         description: Phương thức xét tuyển đã được tạo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.post("/", admissionMethodValidators.create, admissionMethodController.createAdmissionMethod);
+
+/**
+ * @swagger
+ * /admission-methods/associate-major:
+ *   post:
+ *     summary: Liên kết ngành học với phương thức xét tuyển
+ *     tags: [Admission Methods]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - admission_method_id
+ *               - major_id
+ *             properties:
+ *               admission_method_id:
+ *                 type: integer
+ *               major_id:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Liên kết thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.post("/associate-major", admissionMethodValidators.associateMajor, admissionMethodController.associateMajorWithAdmissionMethod);
+
+/**
+ * @swagger
+ * /admission-methods/global-application:
+ *   post:
+ *     summary: Tạo đơn xét tuyển toàn cầu
+ *     tags: [Admission Methods]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               student_info:
+ *                 type: object
+ *               admission_method_id:
+ *                 type: integer
+ *               majors:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       201:
+ *         description: Đơn xét tuyển đã được tạo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.post("/global-application", admissionMethodValidators.globalApplication, admissionMethodController.createGlobalAdmissionMethodApplication);
 
-// PUT route - Update existing admission method
+/**
+ * @swagger
+ * /admission-methods/{id}:
+ *   put:
+ *     summary: Cập nhật thông tin phương thức xét tuyển
+ *     tags: [Admission Methods]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AdmissionMethod'
+ *     responses:
+ *       200:
+ *         description: Phương thức xét tuyển đã được cập nhật
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.put("/:id", validateId, admissionMethodValidators.update, admissionMethodController.updateAdmissionMethod);
 
-// DELETE route - Delete admission method
+/**
+ * @swagger
+ * /admission-methods/{id}:
+ *   delete:
+ *     summary: Xóa phương thức xét tuyển
+ *     tags: [Admission Methods]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200:
+ *         description: Phương thức xét tuyển đã được xóa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.delete("/:id", validateId, admissionMethodController.deleteAdmissionMethod);
 
 export default router;

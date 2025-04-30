@@ -139,7 +139,7 @@ export const getDormitoriesByCampusId = async (campusId: number) => {
     columns: { id: true }
   });
 
-  if (!campusExists) throw new NotFoundError("Campus with ID", campusId.toString());
+  if (!campusExists) throw new NotFoundError("Campus", campusId);
 
   // Get dormitories for this campus
   return await db.query.dormitories.findMany({

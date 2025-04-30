@@ -73,7 +73,7 @@ export const validateZod = <T extends z.ZodTypeAny>(
 // Schema for common query parameters
 export const commonQuerySchema = z.object({
   // Filtering
-  name: z.string().optional(),
+  name: z.string().optional()
 }).strict().partial();
 
 // Schema for ID in params

@@ -7,7 +7,6 @@ import { eq, ilike, or, and, SQL, inArray } from 'drizzle-orm';
 import { db } from '@/db/index';
 import {
   majors,
-  careers,
   majorCampusAdmission,
   academicYears,
   campuses,
@@ -15,66 +14,52 @@ import {
 } from '@/db/schema';
 import { MajorQueryParams } from '@/middlewares/validators/major.validator';
 import { NotFoundError } from '@/utils/errors';
-import { Major } from '@/types/major.types';
 
-// ===== QUERY STRUCTURE CONSTANTS =====
+// ===== QUERY CONFIGURATIONS =====
 
 /**
- * Common column selections for different entities
+ * Common query configurations for major-related queries
  */
-const COLUMN_SELECTIONS = {
-  campus: {
-    columns: { code: true, name: true }
-  },
-  academicYear: {
-    columns: { year: true }
-  },
-  major: {
+const QUERY_CONFIG = {
+  // Basic major fields to select
+  majorFields: {
     id: true,
     name: true,
     code: true
   },
-  majorCampusAdmission: {
-    tuition_fee: true,
-    quota: true
-  },
-  scholarship: {
-    columns: { name: true, description: true }
-  }
-};
 
-/**
- * Relation configurations for different query types
- */
-const RELATION_CONFIGS = {
-  // Default query options for listing majors
-  defaultMajorQuery: {
-    columns: COLUMN_SELECTIONS.major,
-    with: {
-      majorCampusAdmissions: {
-        with: {
-          campus: COLUMN_SELECTIONS.campus,
-          academicYear: COLUMN_SELECTIONS.academicYear
-        },
-        columns: COLUMN_SELECTIONS.majorCampusAdmission
+  // Default relations for listing majors
+  defaultRelations: {
+    careers: true as const,
+    majorCampusAdmissions: {
+      with: {
+        campus: { columns: { code: true, name: true } },
+        academicYear: { columns: { year: true } }
+      },
+      columns: {
+        tuition_fee: true,
+        quota: true
       }
     }
   },
 
-  // Relations for major with campus
-  majorWithCampus: {
-    major: {
+  // Full relations for detailed major views
+  detailRelations: {
+    careers: true as const,
+    admissionMethodApplications: true as const,
+    majorCampusAdmissions: {
       with: {
-        careers: true as const
+        campus: true as const,
+        academicYear: true as const
       }
     },
-    campus: true as const
-  },
-
-  // Core relations for major detail views
-  majorDetail: {
-    careers: true as const,
-    admissionMethodApplications: true as const
+    scholarshipAvailabilities: {
+      with: {
+        scholarship: true as const,
+        academicYear: true as const,
+        campus: true as const
+      }
+    }
   }
 };
 
@@ -93,20 +78,6 @@ const getAcademicYearId = async (year: number): Promise<number | null> => {
   return record ? record.id : null;
 };
 
-/**
- * Build filter conditions for academic year
- * @param academicYear Calendar year to filter by
- * @returns SQL condition or undefined if no year provided
- */
-const buildAcademicYearCondition = async (academicYear?: number): Promise<SQL | undefined> => {
-  if (!academicYear) return undefined;
-
-  const yearId = await getAcademicYearId(academicYear);
-  if (!yearId) return undefined;
-
-  return eq(majorCampusAdmission.academic_year_id, yearId);
-};
-
 // ===== EXPORTED SERVICE FUNCTIONS =====
 
 /**
@@ -117,64 +88,61 @@ const buildAcademicYearCondition = async (academicYear?: number): Promise<SQL | 
 export const getAllMajors = async (filters?: MajorQueryParams) => {
   // Return all majors if no filters provided
   if (!filters) {
-    return await db.query.majors.findMany(RELATION_CONFIGS.defaultMajorQuery);
-  }
-
-  // Handle filtering by campus and academic year
-  if (filters.campus_id || filters.academic_year) {
-    // Build admission conditions
-    const admissionConditions: SQL[] = [];
-
-    if (filters.campus_id) {
-      admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
-    }
-
-    if (filters.academic_year) {
-      const yearId = await getAcademicYearId(filters.academic_year);
-      if (!yearId) return []; // Year not found, return empty array
-
-      admissionConditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
-    }
-
-    // Get major IDs from admission records
-    const admissions = await db.query.majorCampusAdmission.findMany({
-      where: admissionConditions.length > 0 ? and(...admissionConditions) : undefined,
-      columns: { major_id: true }
-    });
-
-    if (admissions.length === 0) return [];
-
-    const majorIds = admissions.map(a => a.major_id);
-
-    // Build name/code filter conditions
-    const nameConditions: SQL[] = [];
-    if (filters.name) nameConditions.push(ilike(majors.name, `%${filters.name}%`));
-    if (filters.major_code) nameConditions.push(ilike(majors.code, `%${filters.major_code}%`));
-
-    // Build major ID condition
-    const majorIdCondition = majorIds.length === 1
-      ? eq(majors.id, majorIds[0])
-      : inArray(majors.id, majorIds);
-
-    // Combine conditions
-    const whereCondition = nameConditions.length > 0
-      ? and(or(...nameConditions), majorIdCondition)
-      : majorIdCondition;
-
     return await db.query.majors.findMany({
-      ...RELATION_CONFIGS.defaultMajorQuery,
-      where: whereCondition
+      columns: QUERY_CONFIG.majorFields,
+      with: QUERY_CONFIG.defaultRelations
     });
   }
 
-  // Filter by name and code only
-  const conditions: SQL[] = [];
-  if (filters.name) conditions.push(ilike(majors.name, `%${filters.name}%`));
-  if (filters.major_code) conditions.push(ilike(majors.code, `%${filters.major_code}%`));
+  // Build name/code filter conditions
+  const nameConditions: SQL[] = [];
+  if (filters.name) nameConditions.push(ilike(majors.name, `%${filters.name}%`));
+  if (filters.major_code) nameConditions.push(ilike(majors.code, `%${filters.major_code}%`));
+
+  // If no campus or academic year filter, just filter by name/code
+  if (!filters.campus_id && !filters.academic_year) {
+    return await db.query.majors.findMany({
+      columns: QUERY_CONFIG.majorFields,
+      with: QUERY_CONFIG.defaultRelations,
+      where: nameConditions.length > 0 ? or(...nameConditions) : undefined
+    });
+  }
+
+  // Handle filtering by campus and/or academic year
+  const admissionConditions: SQL[] = [];
+
+  if (filters.campus_id) {
+    admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
+  }
+
+  if (filters.academic_year) {
+    const yearId = await getAcademicYearId(filters.academic_year);
+    if (!yearId) return []; // Year not found, return empty array
+    admissionConditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
+  }
+
+  // Get major IDs from admission records
+  const admissions = await db.query.majorCampusAdmission.findMany({
+    where: and(...admissionConditions),
+    columns: { major_id: true }
+  });
+
+  if (admissions.length === 0) return [];
+
+  const majorIds = admissions.map(a => a.major_id);
+  const majorIdCondition = majorIds.length === 1
+    ? eq(majors.id, majorIds[0])
+    : inArray(majors.id, majorIds);
+
+  // Combine conditions
+  const whereCondition = nameConditions.length > 0
+    ? and(or(...nameConditions), majorIdCondition)
+    : majorIdCondition;
 
   return await db.query.majors.findMany({
-    ...RELATION_CONFIGS.defaultMajorQuery,
-    where: conditions.length > 0 ? or(...conditions) : undefined
+    columns: QUERY_CONFIG.majorFields,
+    with: QUERY_CONFIG.defaultRelations,
+    where: whereCondition
   });
 };
 
@@ -187,26 +155,10 @@ export const getAllMajors = async (filters?: MajorQueryParams) => {
 export const getMajorById = async (id: number) => {
   const result = await db.query.majors.findFirst({
     where: eq(majors.id, id),
-    with: {
-      ...RELATION_CONFIGS.majorDetail,
-      majorCampusAdmissions: {
-        with: {
-          campus: true,
-          academicYear: true
-        }
-      },
-      scholarshipAvailabilities: {
-        with: {
-          scholarship: true,
-          academicYear: true,
-          campus: true
-        }
-      }
-    }
+    with: QUERY_CONFIG.detailRelations
   });
 
-  if (!result) throw new NotFoundError('Major with ID', id.toString());
-
+  if (!result) throw new NotFoundError('Major', id);
   return result;
 };
 
@@ -222,13 +174,17 @@ export const getMajorsByCampusId = async (campusId: number, academicYear?: numbe
   if (academicYear) {
     const yearId = await getAcademicYearId(academicYear);
     if (!yearId) return [];
-
     conditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
   }
 
   return await db.query.majorCampusAdmission.findMany({
     where: and(...conditions),
-    with: RELATION_CONFIGS.majorWithCampus
+    with: {
+      major: {
+        with: { careers: true as const }
+      },
+      campus: true as const
+    }
   });
 };
 
@@ -240,15 +196,12 @@ export const getMajorsByCampusId = async (campusId: number, academicYear?: numbe
  * @throws NotFoundError if campus not found
  */
 export const getMajorsByCampusCode = async (campusCode: string, academicYear?: number) => {
-  // Find campus by code
   const campus = await db.query.campuses.findFirst({
     where: eq(campuses.code, campusCode),
     columns: { id: true }
   });
 
-  if (!campus) throw new NotFoundError('Campus with code', campusCode);
-
-  // Reuse getMajorsByCampusId to avoid code duplication
+  if (!campus) throw new NotFoundError('Campus', campusCode);
   return await getMajorsByCampusId(campus.id, academicYear);
 };
 
@@ -262,78 +215,46 @@ export const getMajorsByCampusCode = async (campusCode: string, academicYear?: n
 export const getMajorByCode = async (code: string, academicYear?: number) => {
   // Get academic year ID if provided
   let academicYearId: number | undefined;
-
   if (academicYear) {
     const yearId = await getAcademicYearId(academicYear);
     if (yearId) academicYearId = yearId;
   }
 
-  // Build relation configurations
-  const majorCampusRelations = {
-    with: {
-      campus: COLUMN_SELECTIONS.campus,
-      academicYear: COLUMN_SELECTIONS.academicYear
-    },
-    columns: COLUMN_SELECTIONS.majorCampusAdmission
-  };
-
-  const scholarshipRelations = {
-    with: {
-      scholarship: COLUMN_SELECTIONS.scholarship,
-      academicYear: COLUMN_SELECTIONS.academicYear,
-      campus: COLUMN_SELECTIONS.campus
-    }
-  };
-
-  // Query major details
+  // Query major details with filtered relations
   const result = await db.query.majors.findFirst({
     where: eq(majors.code, code),
     with: {
-      ...RELATION_CONFIGS.majorDetail,
+      careers: true as const,
+      admissionMethodApplications: true as const,
       majorCampusAdmissions: academicYearId ? {
         where: eq(majorCampusAdmission.academic_year_id, academicYearId),
-        ...majorCampusRelations
-      } : majorCampusRelations,
+        with: {
+          campus: true as const,
+          academicYear: true as const
+        }
+      } : {
+        with: {
+          campus: true as const,
+          academicYear: true as const
+        }
+      },
       scholarshipAvailabilities: academicYearId ? {
         where: eq(scholarshipAvailability.academic_year_id, academicYearId),
-        ...scholarshipRelations
-      } : scholarshipRelations
+        with: {
+          scholarship: true as const,
+          academicYear: true as const,
+          campus: true as const
+        }
+      } : {
+        with: {
+          scholarship: true as const,
+          academicYear: true as const,
+          campus: true as const
+        }
+      }
     }
   });
 
-  if (!result) throw new NotFoundError('Major with code', code);
-
+  if (!result) throw new NotFoundError('Major', code);
   return result;
-};
-
-// ===== CRUD OPERATIONS (TO BE IMPLEMENTED) =====
-
-/**
- * Create a new major
- * @param data Major data without id
- * @returns Created major
- */
-export const createMajor = async (data: Omit<Major, 'id'>) => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
-};
-
-/**
- * Update an existing major
- * @param id Major ID
- * @param data Updated major data
- * @returns Updated major
- */
-export const updateMajor = async (id: number, data: Partial<Omit<Major, 'id'>>) => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
-};
-
-/**
- * Delete a major
- * @param id Major ID
- */
-export const deleteMajor = async (id: number): Promise<void> => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
 };

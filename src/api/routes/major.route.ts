@@ -5,15 +5,128 @@ import { validateId, validateCampusId, validateMajorCode } from "../../middlewar
 
 const router = Router();
 
-// Major routes - Queries
+/**
+ * @swagger
+ * /majors:
+ *   get:
+ *     summary: Lấy danh sách ngành học
+ *     tags: [Majors]
+ *     parameters:
+ *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *       - $ref: '#/components/parameters/NameQuery'
+ *       - $ref: '#/components/parameters/MajorCodeQuery'
+ *       - $ref: '#/components/parameters/CampusIdQuery'
+ *       - $ref: '#/components/parameters/CampusCodeQuery'
+ *     responses:
+ *       200:
+ *         description: Danh sách ngành học
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/", majorValidators.query, majorController.getAllMajors);
 
+/**
+ * @swagger
+ * /majors/campus/{campus_id}:
+ *   get:
+ *     summary: Lấy danh sách ngành học theo cơ sở
+ *     tags: [Majors]
+ *     parameters:
+ *       - $ref: '#/components/parameters/CampusIdParam'
+ *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *     responses:
+ *       200:
+ *         description: Danh sách ngành học theo cơ sở
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/campus/:campus_id", validateCampusId, majorValidators.query, majorController.getMajorsByCampus);
+
+/**
+ * @swagger
+ * /majors/{major_code}:
+ *   get:
+ *     summary: Lấy thông tin ngành học theo mã
+ *     tags: [Majors]
+ *     parameters:
+ *       - $ref: '#/components/parameters/MajorCodeParam'
+ *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *     responses:
+ *       200:
+ *         description: Thông tin ngành học
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.get("/:major_code", validateMajorCode, majorController.getMajorByCode);
 
-// Major routes - CRUD operations
+/**
+ * @swagger
+ * /majors:
+ *   post:
+ *     summary: Tạo ngành học mới
+ *     tags: [Majors]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Major'
+ *     responses:
+ *       201:
+ *         description: Ngành học đã được tạo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.post("/", majorValidators.create, majorController.createMajor);
+
+/**
+ * @swagger
+ * /majors/{id}:
+ *   put:
+ *     summary: Cập nhật thông tin ngành học
+ *     tags: [Majors]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Major'
+ *     responses:
+ *       200:
+ *         description: Ngành học đã được cập nhật
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.put("/:id", validateId, majorValidators.update, majorController.updateMajor);
+
+/**
+ * @swagger
+ * /majors/{id}:
+ *   delete:
+ *     summary: Xóa ngành học
+ *     tags: [Majors]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200:
+ *         description: Ngành học đã được xóa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ */
 router.delete("/:id", validateId, majorController.deleteMajor);
 
 export default router;

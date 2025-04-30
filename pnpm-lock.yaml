@@ -8,12 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@types/swagger-jsdoc':
-        specifier: ^6.0.4
-        version: 6.0.4
-      '@types/swagger-ui-express':
-        specifier: ^4.1.8
-        version: 4.1.8
       body-parser:
         specifier: ^2.2.0
         version: 2.2.0
@@ -60,6 +54,12 @@ importers:
       '@types/pg':
         specifier: ^8.11.13
         version: 8.11.14
+      '@types/swagger-jsdoc':
+        specifier: ^6.0.4
+        version: 6.0.4
+      '@types/swagger-ui-express':
+        specifier: ^4.1.8
+        version: 4.1.8
       drizzle-kit:
         specifier: ^0.31.0
         version: 0.31.0

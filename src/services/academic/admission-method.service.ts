@@ -255,7 +255,7 @@ export const getAdmissionMethodsByMajorCode = async (majorCode: string) => {
     where: eq(majors.code, majorCode)
   });
 
-  if (!major) throw new NotFoundError('Major with code', majorCode);
+  if (!major) throw new NotFoundError('Major', majorCode);
 
   // Get all admission methods for this major through the applications table
   const result = await db.query.admissionMethodApplications.findMany({

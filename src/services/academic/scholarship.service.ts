@@ -192,7 +192,7 @@ export const getScholarshipById = async (id: number): Promise<Scholarship> => {
     with: RELATION_CONFIGS.fullDetailRelations
   });
 
-  if (!result) throw new NotFoundError('Scholarship with ID', id.toString());
+  if (!result) throw new NotFoundError('Scholarship', id);
 
   return result;
 };
@@ -206,7 +206,7 @@ export const getScholarshipById = async (id: number): Promise<Scholarship> => {
 export const getScholarshipsByMajorCode = async (majorCode: string): Promise<Scholarship[]> => {
   // Get major ID from code
   const majorId = await resolveMajorCode(majorCode);
-  if (!majorId) throw new NotFoundError('Major with code', majorCode);
+  if (!majorId) throw new NotFoundError('Major', majorCode);
 
   // Find scholarships with availabilities for this major
   return await db.query.scholarships.findMany({
