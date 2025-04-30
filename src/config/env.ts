@@ -20,6 +20,7 @@ type EnvironmentVariables = {
   ZALO_APP_ACCESS_TOKEN: string;
   AI_AGENT_BASE_URL: string;
   AI_AGENT_APP_NAME: string;
+  HUBSPOT_ACCESS_TOKEN: string;
 };
 
 /**
@@ -30,7 +31,8 @@ const requiredEnvVars: Array<keyof EnvironmentVariables> = [
   "PORT",
   "ZALO_APP_ACCESS_TOKEN",
   "AI_AGENT_BASE_URL",
-  "AI_AGENT_APP_NAME"
+  "AI_AGENT_APP_NAME",
+  "HUBSPOT_ACCESS_TOKEN"  
 ];
 
 // Check for missing required environment variables
@@ -55,7 +57,8 @@ const env: EnvironmentVariables = {
 
   ZALO_APP_ACCESS_TOKEN: process.env.ZALO_APP_ACCESS_TOKEN!,
   AI_AGENT_BASE_URL: process.env.AI_AGENT_BASE_URL!,
-  AI_AGENT_APP_NAME: process.env.AI_AGENT_APP_NAME!
+  AI_AGENT_APP_NAME: process.env.AI_AGENT_APP_NAME!,
+  HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN!
 };
 
 export default env;

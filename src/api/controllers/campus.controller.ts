@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import * as campusService from "../../services/campus.service";
-import { Campus, CampusQueryParams } from "../../types/campus.types";
-import { catch$ } from "../../utils/catch";
-import { reply, replyError } from "../../utils/response";
+import * as campusService from "@/services/campus/campus.service";
+import { Campus, CampusQueryParams } from "@/types/campus.types";
+import { catch$ } from "@/utils/catch";
+import { reply, replyError } from "@/utils/response";
 
 export const getAllCampuses = catch$(async (req: Request, res: Response): Promise<void> => {
   // Using validated data from Zod with type inference

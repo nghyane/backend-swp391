@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import * as dormitoryService from "../../services/dormitory.service";
-import { catch$ } from "../../utils/catch";
-import { reply, replyError } from "../../utils/response";
-import { DormitoryQueryParams } from "../../types/dormitory.types";
+import * as dormitoryService from "@/services/campus/dormitory.service";
+import { catch$ } from "@/utils/catch";
+import { reply, replyError } from "@/utils/response";
+import { DormitoryQueryParams } from "@/types/dormitory.types";
 
 export const getAllDormitories = catch$(async (req: Request, res: Response): Promise<void> => {
   // Using validated data from Zod with type inference

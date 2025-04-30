@@ -13,7 +13,7 @@ const contactSchema = z.object({
 // Query schema - Campus only needs basic query parameters
 export const campusQuerySchema = z.object({
   name: z.string().optional(),
-  code: z.string().optional(),
+  campus_code: z.string().optional(),
   address: z.string().optional()
 }).strict().merge(commonQuerySchema);
 

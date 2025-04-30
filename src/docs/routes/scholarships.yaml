@@ -8,10 +8,6 @@
     summary: Get all scholarships
     description: Retrieve a list of all scholarships with optional filtering
     parameters:
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortByParam'
-      - $ref: '#/components/parameters/sortOrderParam'
       - $ref: '#/components/parameters/nameFilterParam'
       - $ref: '#/components/parameters/majorIdParam'
       - $ref: '#/components/parameters/majorCodeParam'

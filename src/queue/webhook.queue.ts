@@ -3,9 +3,9 @@
  */
 import fastq from 'fastq';
 import type { queueAsPromised } from 'fastq';
-import { ZaloWebhookEvent } from '../types/webhook.types';
-import { handleUserSendText } from '../services/webhook/zalo-webhook.service';
-import { logger } from '../utils/logger';
+import { ZaloWebhookEvent } from '@/types/webhook.types';
+import { handleUserSendText } from '@/services/integration/webhook/zalo-webhook.service';
+import { logger } from '@/utils/logger';
 
 export const zaloQueue: queueAsPromised<ZaloWebhookEvent, void> = fastq.promise(
   async (eventData: ZaloWebhookEvent) => {

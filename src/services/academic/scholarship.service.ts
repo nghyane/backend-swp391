@@ -3,17 +3,17 @@
  * Provides functions to interact with scholarship data
  */
 
-import { eq, and, ilike, sql, exists } from "drizzle-orm";
-import { db } from "../db";
+import { eq, and, ilike, sql, exists, SQL } from "drizzle-orm";
+import { db } from "@/db/index";
 import {
   scholarships,
   majors,
   campuses,
   scholarshipAvailability,
   academicYears
-} from "../db/schema";
-import { Scholarship, ScholarshipQueryParams } from '../types/scholarship.types';
-import { NotFoundError } from '../utils/errors';
+} from "@/db/schema";
+import { Scholarship, ScholarshipQueryParams } from '@/types/scholarship.types';
+import { NotFoundError } from '@/utils/errors';
 
 // ===== QUERY STRUCTURE CONSTANTS =====
 
@@ -79,8 +79,8 @@ const RELATION_CONFIGS = {
 // ===== HELPER FUNCTIONS =====
 
 /**
- * Resolve major code to major ID
- * @param majorCode Major code to resolve
+ * Resolve major code to ID
+ * @param majorCode Major code
  * @returns Major ID or undefined if not found
  */
 const resolveMajorCode = async (majorCode?: string): Promise<number | undefined> => {
@@ -95,8 +95,8 @@ const resolveMajorCode = async (majorCode?: string): Promise<number | undefined>
 };
 
 /**
- * Resolve campus code to campus ID
- * @param campusCode Campus code to resolve
+ * Resolve campus code to ID
+ * @param campusCode Campus code
  * @returns Campus ID or undefined if not found
  */
 const resolveCampusCode = async (campusCode?: string): Promise<number | undefined> => {
@@ -111,17 +111,16 @@ const resolveCampusCode = async (campusCode?: string): Promise<number | undefine
 };
 
 /**
- * Build availability filter conditions
+ * Build availability filter for scholarships
  * @param majorId Major ID to filter by
  * @param campusId Campus ID to filter by
- * @returns SQL exists condition or undefined
+ * @returns SQL condition for filtering scholarships by availability
  */
-const buildAvailabilityFilter = (majorId?: number, campusId?: number) => {
+const buildAvailabilityFilter = (majorId?: number, campusId?: number): SQL | undefined => {
   if (!majorId && !campusId) return undefined;
 
-  // Build conditions for the query
-  let majorCondition;
-  let campusCondition;
+  let majorCondition: SQL | undefined;
+  let campusCondition: SQL | undefined;
 
   if (majorId) {
     // Scholarship applies to specific major OR applies to all majors (major_id IS NULL)
@@ -229,32 +228,12 @@ export const getScholarshipsByCampusId = async (campusId: number): Promise<Schol
 };
 
 /**
- * Get scholarships by eligibility criteria
- * @param criteria Eligibility criteria to filter by
- * @returns Array of scholarships matching the eligibility criteria
- */
-export const getScholarshipsByEligibility = async (criteria: Record<string, any>): Promise<Scholarship[]> => {
-  // TODO: Implement this function when eligibility criteria are defined
-  throw new Error('Not implemented');
-};
-
-// ===== CRUD OPERATIONS (TO BE IMPLEMENTED) =====
-
-/**
  * Create a new scholarship
  * @param data Scholarship data without id
- * @param availabilities Array of campus, major, and academic year IDs where this scholarship is available
  * @returns Created scholarship
  */
-export const createScholarship = async (
-  data: Omit<typeof scholarships.$inferInsert, 'id'>,
-  availabilities: Array<{
-    campus_id: number;
-    major_id?: number;
-    academic_year_id: number;
-  }>
-): Promise<Scholarship> => {
-  // TODO: Implement this function when needed
+export const createScholarship = async (data: Omit<Scholarship, 'id'>): Promise<Scholarship> => {
+  // TODO: Implement this function
   throw new Error('Not implemented');
 };
 
@@ -262,19 +241,10 @@ export const createScholarship = async (
  * Update an existing scholarship
  * @param id Scholarship ID
  * @param data Updated scholarship data
- * @param availabilities Optional array of campus, major, and academic year IDs to replace existing availabilities
  * @returns Updated scholarship
  */
-export const updateScholarship = async (
-  id: number,
-  data: Partial<Omit<typeof scholarships.$inferInsert, 'id'>>,
-  availabilities?: Array<{
-    campus_id: number;
-    major_id?: number;
-    academic_year_id: number;
-  }>
-): Promise<Scholarship> => {
-  // TODO: Implement this function when needed
+export const updateScholarship = async (id: number, data: Partial<Omit<Scholarship, 'id'>>): Promise<Scholarship> => {
+  // TODO: Implement this function
   throw new Error('Not implemented');
 };
 
@@ -283,6 +253,6 @@ export const updateScholarship = async (
  * @param id Scholarship ID
  */
 export const deleteScholarship = async (id: number): Promise<void> => {
-  // TODO: Implement this function when needed
+  // TODO: Implement this function
   throw new Error('Not implemented');
 };

@@ -4,18 +4,18 @@
  */
 
 import { eq, ilike, or, and, SQL, inArray } from 'drizzle-orm';
-import { db } from '../db';
-import { 
-  majors, 
-  careers, 
-  majorCampusAdmission, 
-  academicYears, 
-  campuses, 
-  scholarshipAvailability 
-} from '../db/schema';
-import { MajorQueryParams } from '../middlewares/validators/major.validator';
-import { NotFoundError } from '../utils/errors';
-import { Major } from '../types/major.types';
+import { db } from '@/db/index';
+import {
+  majors,
+  careers,
+  majorCampusAdmission,
+  academicYears,
+  campuses,
+  scholarshipAvailability
+} from '@/db/schema';
+import { MajorQueryParams } from '@/middlewares/validators/major.validator';
+import { NotFoundError } from '@/utils/errors';
+import { Major } from '@/types/major.types';
 
 // ===== QUERY STRUCTURE CONSTANTS =====
 
@@ -60,7 +60,7 @@ const RELATION_CONFIGS = {
       }
     }
   },
-  
+
   // Relations for major with campus
   majorWithCampus: {
     major: {
@@ -70,7 +70,7 @@ const RELATION_CONFIGS = {
     },
     campus: true as const
   },
-  
+
   // Core relations for major detail views
   majorDetail: {
     careers: true as const,
@@ -100,10 +100,10 @@ const getAcademicYearId = async (year: number): Promise<number | null> => {
  */
 const buildAcademicYearCondition = async (academicYear?: number): Promise<SQL | undefined> => {
   if (!academicYear) return undefined;
-  
+
   const yearId = await getAcademicYearId(academicYear);
   if (!yearId) return undefined;
-  
+
   return eq(majorCampusAdmission.academic_year_id, yearId);
 };
 
@@ -124,54 +124,54 @@ export const getAllMajors = async (filters?: MajorQueryParams) => {
   if (filters.campus_id || filters.academic_year) {
     // Build admission conditions
     const admissionConditions: SQL[] = [];
-    
+
     if (filters.campus_id) {
       admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
     }
-    
+
     if (filters.academic_year) {
       const yearId = await getAcademicYearId(filters.academic_year);
       if (!yearId) return []; // Year not found, return empty array
-      
+
       admissionConditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
     }
-    
+
     // Get major IDs from admission records
     const admissions = await db.query.majorCampusAdmission.findMany({
       where: admissionConditions.length > 0 ? and(...admissionConditions) : undefined,
       columns: { major_id: true }
     });
-    
+
     if (admissions.length === 0) return [];
-    
+
     const majorIds = admissions.map(a => a.major_id);
-    
+
     // Build name/code filter conditions
     const nameConditions: SQL[] = [];
     if (filters.name) nameConditions.push(ilike(majors.name, `%${filters.name}%`));
-    if (filters.code) nameConditions.push(ilike(majors.code, `%${filters.code}%`));
-    
+    if (filters.major_code) nameConditions.push(ilike(majors.code, `%${filters.major_code}%`));
+
     // Build major ID condition
-    const majorIdCondition = majorIds.length === 1 
-      ? eq(majors.id, majorIds[0]) 
+    const majorIdCondition = majorIds.length === 1
+      ? eq(majors.id, majorIds[0])
       : inArray(majors.id, majorIds);
-    
+
     // Combine conditions
     const whereCondition = nameConditions.length > 0
       ? and(or(...nameConditions), majorIdCondition)
       : majorIdCondition;
-    
+
     return await db.query.majors.findMany({
       ...RELATION_CONFIGS.defaultMajorQuery,
       where: whereCondition
     });
   }
-  
+
   // Filter by name and code only
   const conditions: SQL[] = [];
   if (filters.name) conditions.push(ilike(majors.name, `%${filters.name}%`));
-  if (filters.code) conditions.push(ilike(majors.code, `%${filters.code}%`));
-  
+  if (filters.major_code) conditions.push(ilike(majors.code, `%${filters.major_code}%`));
+
   return await db.query.majors.findMany({
     ...RELATION_CONFIGS.defaultMajorQuery,
     where: conditions.length > 0 ? or(...conditions) : undefined
@@ -218,14 +218,14 @@ export const getMajorById = async (id: number) => {
  */
 export const getMajorsByCampusId = async (campusId: number, academicYear?: number) => {
   const conditions: SQL[] = [eq(majorCampusAdmission.campus_id, campusId)];
-  
+
   if (academicYear) {
     const yearId = await getAcademicYearId(academicYear);
     if (!yearId) return [];
-    
+
     conditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
   }
-  
+
   return await db.query.majorCampusAdmission.findMany({
     where: and(...conditions),
     with: RELATION_CONFIGS.majorWithCampus
@@ -245,9 +245,9 @@ export const getMajorsByCampusCode = async (campusCode: string, academicYear?: n
     where: eq(campuses.code, campusCode),
     columns: { id: true }
   });
-  
+
   if (!campus) throw new NotFoundError('Campus with code', campusCode);
-  
+
   // Reuse getMajorsByCampusId to avoid code duplication
   return await getMajorsByCampusId(campus.id, academicYear);
 };
@@ -262,7 +262,7 @@ export const getMajorsByCampusCode = async (campusCode: string, academicYear?: n
 export const getMajorByCode = async (code: string, academicYear?: number) => {
   // Get academic year ID if provided
   let academicYearId: number | undefined;
-  
+
   if (academicYear) {
     const yearId = await getAcademicYearId(academicYear);
     if (yearId) academicYearId = yearId;
@@ -276,7 +276,7 @@ export const getMajorByCode = async (code: string, academicYear?: number) => {
     },
     columns: COLUMN_SELECTIONS.majorCampusAdmission
   };
-  
+
   const scholarshipRelations = {
     with: {
       scholarship: COLUMN_SELECTIONS.scholarship,
@@ -300,9 +300,9 @@ export const getMajorByCode = async (code: string, academicYear?: number) => {
       } : scholarshipRelations
     }
   });
-  
+
   if (!result) throw new NotFoundError('Major with code', code);
-  
+
   return result;
 };
 
@@ -337,4 +337,3 @@ export const deleteMajor = async (id: number): Promise<void> => {
   // TODO: Implement this function
   throw new Error('Not implemented');
 };
-

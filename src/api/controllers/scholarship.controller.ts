@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import * as scholarshipService from "../../services/scholarship.service";
-import { catch$ } from "../../utils/catch";
-import { reply } from "../../utils/response";
-import { ScholarshipQueryParams } from "../../types/scholarship.types";
+import * as scholarshipService from "@/services/academic/scholarship.service";
+import { catch$ } from "@/utils/catch";
+import { reply } from "@/utils/response";
+import { ScholarshipQueryParams } from "@/types/scholarship.types";
 
 
 export const getAllScholarships = catch$(async (req: Request, res: Response): Promise<void> => {

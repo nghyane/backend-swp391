@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import * as majorService from "../../services/major.service";
-import { catch$ } from "../../utils/catch";
-import { reply } from "../../utils/response";
-import { MajorQueryParams } from "../../middlewares/validators/major.validator";
+import * as majorService from "@/services/academic/major.service";
+import { catch$ } from "@/utils/catch";
+import { reply } from "@/utils/response";
+import { MajorQueryParams } from "@/middlewares/validators/major.validator";
 
 export const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> => {
   // Using validated data from Zod with type inference

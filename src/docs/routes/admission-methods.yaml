@@ -8,11 +8,17 @@
     summary: Get all admission methods
     description: Retrieve a list of all admission methods with optional filtering
     parameters:
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortByParam'
-      - $ref: '#/components/parameters/sortOrderParam'
       - $ref: '#/components/parameters/nameFilterParam'
+      - $ref: '#/components/parameters/majorIdParam'
+      - $ref: '#/components/parameters/majorCodeParam'
+      - $ref: '#/components/parameters/campusIdParam'
+      - $ref: '#/components/parameters/campusCodeParam'
+      - $ref: '#/components/parameters/academicYearParam'
+      - name: is_active
+        in: query
+        description: Filter by active status
+        schema:
+          type: boolean
     responses:
       200:
         description: Successful operation

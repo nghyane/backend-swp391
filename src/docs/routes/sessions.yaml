@@ -7,9 +7,7 @@
       - Sessions
     summary: Get all sessions
     description: Retrieve a list of all chatbot sessions
-    parameters:
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
+    parameters: []
     responses:
       200:
         description: Successful operation

@@ -3,9 +3,9 @@
  * Provides functions to interact with Zalo OA API and process webhook events
  */
 
-import { ZaloWebhookEvent } from "../../types/webhook.types";
-import { getOrCreateSession } from "../session/session.service";
-import env from "../../config/env";
+import { ZaloWebhookEvent } from "@/types/webhook.types";
+import { getOrCreateSession } from "@/services/session/session.service";
+import env from "@/config/env";
 
 /**
  * Verify Zalo webhook with provided tokens
@@ -28,17 +28,17 @@ export const handleUserSendText = async (eventData: ZaloWebhookEvent): Promise<v
   // Extract necessary data
   const userId = eventData.sender.id;
   const rawMessage = eventData.message.text;
-  
+
   // Remove command hashtags from message
   const message = rawMessage.replace(/#\w+/g, '').trim();
-  
+
   try {
     // 1. Get or create session
     const sessionId = await getOrCreateSession(userId, 'zalo');
-    
+
     // 2. Send message to AI Agent
     const aiResponses = await sendMessageToAI(message, userId, sessionId);
-    
+
     // 3. Send responses back to Zalo
     await sendResponsesToZalo(aiResponses, userId);
   } catch (error) {
@@ -68,13 +68,13 @@ async function sendMessageToAI(message: string, userId: string, sessionId: strin
       streaming: false
     })
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to send message to AI agent: ${response.statusText}`);
   }
-  
+
   const responseData = await response.json();
-  
+
   return responseData
     .map((item: any) => item?.content?.parts?.[0]?.text)
     .filter(Boolean);

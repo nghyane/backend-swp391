@@ -8,15 +8,11 @@
     summary: Get all majors
     description: Retrieve a list of all academic majors with optional filtering
     parameters:
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortByParam'
-      - $ref: '#/components/parameters/sortOrderParam'
       - $ref: '#/components/parameters/nameFilterParam'
       - $ref: '#/components/parameters/academicYearParam'
       - $ref: '#/components/parameters/campusIdParam'
       - $ref: '#/components/parameters/campusCodeParam'
-      - name: code
+      - name: major_code
         in: query
         description: Filter by major code
         schema:

@@ -8,14 +8,15 @@
     summary: Get all campuses
     description: Retrieve a list of all campuses with optional filtering
     parameters:
-      - $ref: '#/components/parameters/pageParam'
-      - $ref: '#/components/parameters/limitParam'
-      - $ref: '#/components/parameters/sortByParam'
-      - $ref: '#/components/parameters/sortOrderParam'
       - $ref: '#/components/parameters/nameFilterParam'
-      - name: code
+      - name: campus_code
         in: query
         description: Filter by campus code
+        schema:
+          type: string
+      - name: address
+        in: query
+        description: Filter by campus address
         schema:
           type: string
     responses:

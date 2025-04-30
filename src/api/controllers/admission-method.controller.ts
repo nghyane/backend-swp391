@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import * as admissionMethodService from "../../services/admission-method.service";
-import { catch$ } from "../../utils/catch";
-import { reply, replyError } from "../../utils/response";
+import * as admissionMethodService from "@/services/academic/admission-method.service";
+import { catch$ } from "@/utils/catch";
+import { reply, replyError } from "@/utils/response";
 import {
   AdmissionMethodQueryParams,
   AdmissionMethodCreateParams,
   AdmissionMethodUpdateParams,
   AdmissionMethodAssociateParams,
   AdmissionMethodGlobalAppParams
-} from "../../middlewares/validators/admission-method.validator";
+} from "@/middlewares/validators/admission-method.validator";
 
 
 export const getAllAdmissionMethods = catch$(async (req: Request, res: Response): Promise<void> => {
@@ -29,7 +29,7 @@ export const getAllAdmissionMethods = catch$(async (req: Request, res: Response)
 });
 
 export const getAdmissionMethodById = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Using validated data from Zod
+  // Using validated data from Zoda
   const id = req.validatedParams?.id as number;
   const admissionMethod = await admissionMethodService.getAdmissionMethodById(id);
 

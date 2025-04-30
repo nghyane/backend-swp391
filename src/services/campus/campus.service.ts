@@ -1,8 +1,8 @@
 import { eq, ilike, or, SQL } from 'drizzle-orm';
-import { db } from '../db';
-import { campuses } from '../db/schema';
-import { Campus, CampusQueryParams } from '../types/campus.types';
-import { NotFoundError } from '../utils/errors';
+import { db } from '@/db/index';
+import { campuses } from '@/db/schema';
+import { Campus, CampusQueryParams } from '@/types/campus.types';
+import { NotFoundError } from '@/utils/errors';
 
 const DEFAULT_QUERY_OPTIONS = {
   orderBy: campuses.name
@@ -12,17 +12,17 @@ export const getAllCampuses = async (filters?: CampusQueryParams) => {
   if (!filters || Object.keys(filters).length === 0) {
     return db.query.campuses.findMany(DEFAULT_QUERY_OPTIONS);
   }
-  
+
   const conditions: SQL[] = [
     filters.name && ilike(campuses.name, `%${filters.name}%`),
-    filters.code && eq(campuses.code, filters.code),
+    filters.campus_code && eq(campuses.code, filters.campus_code),
     filters.address && ilike(campuses.address, `%${filters.address}%`)
   ].filter(Boolean) as SQL[];
-  
+
   if (conditions.length === 0) {
     return db.query.campuses.findMany(DEFAULT_QUERY_OPTIONS);
   }
-  
+
   return db.query.campuses.findMany({
     ...DEFAULT_QUERY_OPTIONS,
     where: or(...conditions)
@@ -71,4 +71,3 @@ export const getCampusMajors = async (campusId: number): Promise<unknown> => {
   // TODO: Implement this function when the relationship is established
   throw new Error('Not implemented');
 };
-

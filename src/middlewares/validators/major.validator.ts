@@ -15,7 +15,7 @@ export const majorQuerySchema = z.object({
   academic_year: z.coerce.number().int().min(2000).max(2100).optional(),
   campus_id: z.coerce.number().int().positive().optional(),
   campus_code: z.string().optional(),
-  code: z.string().optional()
+  major_code: z.string().optional()
 }).strict().merge(commonQuerySchema);
 
 // Create schema

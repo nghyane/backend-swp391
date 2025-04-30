@@ -4,8 +4,8 @@
  */
 
 import { Request, Response } from "express";
-import { catch$ } from "../../../utils/catch";
-import { WebhookHandlerMap, WebhookPlatform } from "../../../types/webhook.types";
+import { catch$ } from "@/utils/catch";
+import { WebhookHandlerMap, WebhookPlatform } from "@/types/webhook.types";
 import { zaloWebhookHandler } from "./platform/zalo-webhook.handler";
 
 /**
@@ -18,7 +18,7 @@ const platformHandlers: WebhookHandlerMap = {
 /**
  * Routes webhook requests to appropriate platform handlers based on
  * the platform parameter and HTTP method
- * 
+ *
  * Note: Platform and method validation is handled by middleware
  */
 const routeWebhook = catch$(async (req: Request, res: Response): Promise<void> => {
@@ -27,7 +27,7 @@ const routeWebhook = catch$(async (req: Request, res: Response): Promise<void> =
   // the validator ensures platform is of type WebhookPlatform
   const platform = req.params.platform as WebhookPlatform;
   const handler = platformHandlers[platform];
-  
+
   // Route to appropriate handler method based on HTTP method
   // GET requests are for verification, POST requests are for receiving messages
   if (req.method === "GET") {

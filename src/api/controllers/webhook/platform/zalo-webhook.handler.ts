@@ -4,9 +4,9 @@
  */
 
 import { Request, Response } from "express";
-import { reply } from "../../../../utils/response";
-import { zaloWebhookService } from "../../../../services/webhook/zalo-webhook.service";
-import { queueZaloMessage } from "../../../../queue/webhook.queue";
+import { reply } from "@/utils/response";
+import { zaloWebhookService } from "@/services/integration/webhook/zalo-webhook.service";
+import { queueZaloMessage } from "@/queue/webhook.queue";
 
 /**
  * Verify Zalo webhook
