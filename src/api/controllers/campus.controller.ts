@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as campusService from "@/services/campus/campus.service";
-import { Campus, CampusQueryParams } from "@/types/campus.types";
+import { Campus, CampusQueryParams, CampusCreateParams, CampusUpdateParams } from "@/types/campus.types";
 import { catch$ } from "@/utils/catch";
 import { reply, replyError } from "@/utils/response";
 
@@ -33,12 +33,14 @@ export const getCampusById = catch$(async (req: Request, res: Response): Promise
  * This endpoint creates a new campus
  */
 export const createCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract campus data from request body (already validated by middleware)
-  // 2. Call campusService.createCampus with the data
-  // 3. Return the created campus with appropriate status code
+  // Extract campus data from request body (already validated by middleware)
+  const campusData = req.body as CampusCreateParams;
 
-  reply(res, { message: 'Not implemented' }, 'Campus creation endpoint not implemented', 501);
+  // Call service to create campus
+  const newCampus = await campusService.createCampus(campusData);
+
+  // Return the created campus with 201 Created status
+  reply(res, newCampus, 'Campus created successfully', 201);
 });
 
 /**
@@ -46,13 +48,17 @@ export const createCampus = catch$(async (req: Request, res: Response): Promise<
  * This endpoint updates a campus by ID
  */
 export const updateCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract campus ID from request params (already validated by middleware)
-  // 2. Extract update data from request body (already validated by middleware)
-  // 3. Call campusService.updateCampus with the ID and data
-  // 4. Return the updated campus
+  // Extract campus ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Campus update endpoint not implemented', 501);
+  // Extract update data from request body (already validated by middleware)
+  const updateData = req.body as CampusUpdateParams;
+
+  // Call service to update campus
+  const updatedCampus = await campusService.updateCampus(id, updateData);
+
+  // Return the updated campus
+  reply(res, updatedCampus, 'Campus updated successfully');
 });
 
 /**
@@ -60,17 +66,38 @@ export const updateCampus = catch$(async (req: Request, res: Response): Promise<
  * This endpoint deletes a campus by ID
  */
 export const deleteCampus = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract campus ID from request params
-  // 2. Call campusService.deleteCampus with the ID
-  // 3. Return success message
+  // Extract campus ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Campus deletion endpoint not implemented', 501);
+  // Call service to delete campus
+  await campusService.deleteCampus(id);
+
+  // Return success message with 200 OK status
+  reply(res, null, 'Campus deleted successfully');
 });
 
+/**
+ * Get majors offered at a specific campus
+ * This endpoint retrieves all majors available at a campus with optional academic year filter
+ */
 export const getCampusMajors = catch$(async (req: Request, res: Response): Promise<void> => {
+  // Extract campus ID from request params (already validated by middleware)
+  const campusId = req.validatedParams?.id as number;
 
-  replyError(res, 'Not implemented yet', 501);
+  // Extract optional academic year from query params
+  const academicYear = req.query.academic_year ? parseInt(req.query.academic_year as string) : undefined;
+
+  // Call service to get majors for this campus
+  const majors = await campusService.getCampusMajors(campusId, academicYear);
+
+  // Return the majors
+  reply(
+    res,
+    majors,
+    academicYear
+      ? `Majors for campus ID ${campusId} in academic year ${academicYear} retrieved successfully`
+      : `All majors for campus ID ${campusId} retrieved successfully`
+  );
 });
 
 
