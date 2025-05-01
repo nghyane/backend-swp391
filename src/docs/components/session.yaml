@@ -1,0 +1,22 @@
+components:
+  schemas:
+    Session:
+      type: object
+      properties:
+        session_id:
+          type: string
+          description: ID của phiên
+        platform:
+          type: string
+          description: Nền tảng của phiên (ví dụ zalo)
+        user_id:
+          type: string
+          description: ID người dùng trên nền tảng
+        hubspot_contact_id:
+          type: string
+          description: ID liên hệ HubSpot
+        anonymous:
+          type: boolean
+          description: Trạng thái ẩn danh của phiên
+      required:
+        - session_id

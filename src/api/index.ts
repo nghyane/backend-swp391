@@ -7,6 +7,7 @@ import admissionMethodRoutes from "./routes/admission-method.route";
 import webhookRoutes from "./routes/webhook.route";
 import authRoutes from "./routes/auth.route";
 import hubspotRoutes from "./routes/hubspot.route";
+import sessionRoutes from "./routes/session.route";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/admission-methods", admissionMethodRoutes);
 router.use("/webhooks", webhookRoutes);
 router.use("/auth", authRoutes);
 router.use("/hubspot", hubspotRoutes);
+router.use("/sessions", sessionRoutes);
 
 export default router;
