@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as dormitoryService from "@/services/campus/dormitory.service";
 import { catch$ } from "@/utils/catch";
 import { reply, replyError } from "@/utils/response";
-import { DormitoryQueryParams } from "@/types/dormitory.types";
+import { DormitoryQueryParams, DormitoryCreateParams, DormitoryUpdateParams } from "@/types/dormitory.types";
 
 export const getAllDormitories = catch$(async (req: Request, res: Response): Promise<void> => {
   // Using validated data from Zod with type inference
@@ -34,12 +34,14 @@ export const getDormitoryById = catch$(async (req: Request, res: Response): Prom
  * This endpoint creates a new dormitory
  */
 export const createDormitory = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract dormitory data from request body (already validated by middleware)
-  // 2. Call dormitoryService.createDormitory with the data
-  // 3. Return the created dormitory with appropriate status code
+  // Extract dormitory data from request body (already validated by middleware)
+  const dormitoryData = req.body as DormitoryCreateParams;
 
-  reply(res, { message: 'Not implemented' }, 'Dormitory creation endpoint not implemented', 501);
+  // Call service to create dormitory
+  const newDormitory = await dormitoryService.createDormitory(dormitoryData);
+
+  // Return the created dormitory with 201 Created status
+  reply(res, newDormitory, 'Dormitory created successfully', 201);
 });
 
 /**
@@ -47,13 +49,17 @@ export const createDormitory = catch$(async (req: Request, res: Response): Promi
  * This endpoint updates a dormitory by ID
  */
 export const updateDormitory = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract dormitory ID from request params (already validated by middleware)
-  // 2. Extract update data from request body (already validated by middleware)
-  // 3. Call dormitoryService.updateDormitory with the ID and data
-  // 4. Return the updated dormitory
+  // Extract dormitory ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Dormitory update endpoint not implemented', 501);
+  // Extract update data from request body (already validated by middleware)
+  const updateData = req.body as DormitoryUpdateParams;
+
+  // Call service to update dormitory
+  const updatedDormitory = await dormitoryService.updateDormitory(id, updateData);
+
+  // Return the updated dormitory
+  reply(res, updatedDormitory, 'Dormitory updated successfully');
 });
 
 /**
@@ -61,10 +67,12 @@ export const updateDormitory = catch$(async (req: Request, res: Response): Promi
  * This endpoint deletes a dormitory by ID
  */
 export const deleteDormitory = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract dormitory ID from request params
-  // 2. Call dormitoryService.deleteDormitory with the ID
-  // 3. Return success message
+  // Extract dormitory ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Dormitory deletion endpoint not implemented', 501);
+  // Call service to delete dormitory
+  await dormitoryService.deleteDormitory(id);
+
+  // Return success message with 200 OK status
+  reply(res, null, 'Dormitory deleted successfully');
 });

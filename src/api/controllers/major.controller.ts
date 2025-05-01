@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as majorService from "@/services/academic/major.service";
 import { catch$ } from "@/utils/catch";
 import { reply } from "@/utils/response";
-import { MajorQueryParams } from "@/middlewares/validators/major.validator";
+import { MajorQueryParams, MajorCreateParams, MajorUpdateParams } from "@/middlewares/validators/major.validator";
 
 export const getAllMajors = catch$(async (req: Request, res: Response): Promise<void> => {
   // Using validated data from Zod with type inference
@@ -71,12 +71,14 @@ export const getMajorsByCampus = catch$(async (req: Request, res: Response): Pro
  * This endpoint creates a new major
  */
 export const createMajor = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract major data from request body (already validated by middleware)
-  // 2. Call majorService.createMajor with the data
-  // 3. Return the created major with appropriate status code
+  // Extract major data from request body (already validated by middleware)
+  const majorData = req.body as MajorCreateParams;
 
-  reply(res, { message: 'Not implemented' }, 'Major creation endpoint not implemented', 501);
+  // Call service to create major
+  const newMajor = await majorService.createMajor(majorData);
+
+  // Return the created major with 201 Created status
+  reply(res, newMajor, 'Major created successfully', 201);
 });
 
 /**
@@ -84,13 +86,17 @@ export const createMajor = catch$(async (req: Request, res: Response): Promise<v
  * This endpoint updates a major by ID
  */
 export const updateMajor = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract major ID from request params (already validated by middleware)
-  // 2. Extract update data from request body (already validated by middleware)
-  // 3. Call majorService.updateMajor with the ID and data
-  // 4. Return the updated major
+  // Extract major ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Major update endpoint not implemented', 501);
+  // Extract update data from request body (already validated by middleware)
+  const updateData = req.body as MajorUpdateParams;
+
+  // Call service to update major
+  const updatedMajor = await majorService.updateMajor(id, updateData);
+
+  // Return the updated major
+  reply(res, updatedMajor, 'Major updated successfully');
 });
 
 /**
@@ -98,10 +104,12 @@ export const updateMajor = catch$(async (req: Request, res: Response): Promise<v
  * This endpoint deletes a major by ID
  */
 export const deleteMajor = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract major ID from request params
-  // 2. Call majorService.deleteMajor with the ID
-  // 3. Return success message
+  // Extract major ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Major deletion endpoint not implemented', 501);
+  // Call service to delete major
+  await majorService.deleteMajor(id);
+
+  // Return success message
+  reply(res, { id }, 'Major deleted successfully');
 });

@@ -8,6 +8,7 @@ import { db } from "@/db/index";
 import { dormitories, campuses } from "@/db/schema";
 import { Dormitory, DormitoryQueryParams } from "@/types/dormitory.types";
 import { NotFoundError } from "@/utils/errors";
+import { logger } from "@/utils/logger";
 
 // ===== QUERY STRUCTURE CONSTANTS =====
 
@@ -152,10 +153,27 @@ export const getDormitoriesByCampusId = async (campusId: number) => {
  * Create a new dormitory
  * @param data Dormitory data without id
  * @returns Created dormitory
+ * @throws Error if campus does not exist
  */
 export const createDormitory = async (data: Omit<Dormitory, 'id' | 'campus'> & { campus_id: number }) => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
+  // Verify campus exists
+  const campusExists = await db.query.campuses.findFirst({
+    where: eq(campuses.id, data.campus_id),
+    columns: { id: true }
+  });
+
+  if (!campusExists) {
+    throw new NotFoundError("Campus", data.campus_id);
+  }
+
+  // Insert new dormitory into database
+  const [newDormitory] = await db.insert(dormitories).values(data).returning();
+
+  // Get the complete dormitory with campus information
+  const result = await getDormitoryById(newDormitory.id);
+
+  logger.info(`Created new dormitory: ${newDormitory.name} at campus ID ${newDormitory.campus_id}`);
+  return result;
 };
 
 /**
@@ -163,17 +181,63 @@ export const createDormitory = async (data: Omit<Dormitory, 'id' | 'campus'> & {
  * @param id Dormitory ID
  * @param data Updated dormitory data
  * @returns Updated dormitory
+ * @throws NotFoundError if dormitory not found
+ * @throws NotFoundError if campus does not exist
  */
 export const updateDormitory = async (id: number, data: Partial<Omit<Dormitory, 'id' | 'campus'>> & { campus_id?: number }) => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
+  // Check if dormitory exists
+  const existingDormitory = await db.query.dormitories.findFirst({
+    where: eq(dormitories.id, id)
+  });
+
+  if (!existingDormitory) {
+    throw new NotFoundError('Dormitory', id);
+  }
+
+  // If updating campus_id, verify the campus exists
+  if (data.campus_id) {
+    const campusExists = await db.query.campuses.findFirst({
+      where: eq(campuses.id, data.campus_id),
+      columns: { id: true }
+    });
+
+    if (!campusExists) {
+      throw new NotFoundError("Campus", data.campus_id);
+    }
+  }
+
+  // Update dormitory in database
+  const [updatedDormitory] = await db
+    .update(dormitories)
+    .set(data)
+    .where(eq(dormitories.id, id))
+    .returning();
+
+  // Get the complete dormitory with campus information
+  const result = await getDormitoryById(updatedDormitory.id);
+
+  logger.info(`Updated dormitory: ${updatedDormitory.name} (ID: ${updatedDormitory.id})`);
+  return result;
 };
 
 /**
  * Delete a dormitory
  * @param id Dormitory ID
+ * @throws NotFoundError if dormitory not found
  */
 export const deleteDormitory = async (id: number): Promise<void> => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
+  // Check if dormitory exists
+  const existingDormitory = await db.query.dormitories.findFirst({
+    where: eq(dormitories.id, id),
+    columns: { id: true, name: true }
+  });
+
+  if (!existingDormitory) {
+    throw new NotFoundError('Dormitory', id);
+  }
+
+  // Delete dormitory from database
+  await db.delete(dormitories).where(eq(dormitories.id, id));
+
+  logger.info(`Deleted dormitory: ${existingDormitory.name} (ID: ${existingDormitory.id})`);
 };

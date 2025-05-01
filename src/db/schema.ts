@@ -35,7 +35,7 @@ export const careers = pgTable("careers", {
   salary_range: varchar("salary_range", { length: 100 }),
   category: varchar("category", { length: 100 }),
   info_url: varchar("info_url", { length: 255 }),
-  major_id: integer("major_id").references(() => majors.id).notNull(),
+  major_id: integer("major_id").references(() => majors.id, { onDelete: 'cascade' }).notNull(),
 }, (table) => [
   index("idx_career_major").on(table.major_id),
   index("idx_career_category").on(table.category),
@@ -57,9 +57,9 @@ export const campuses = pgTable("campuses", {
  */
 export const majorCampusAdmission = pgTable("major_campus_admission", {
   id: serial("id").primaryKey(),
-  major_id: integer("major_id").references(() => majors.id).notNull(),
-  campus_id: integer("campus_id").references(() => campuses.id).notNull(),
-  academic_year_id: integer("academic_year_id").references(() => academicYears.id).notNull(),
+  major_id: integer("major_id").references(() => majors.id, { onDelete: 'cascade' }).notNull(),
+  campus_id: integer("campus_id").references(() => campuses.id, { onDelete: 'cascade' }).notNull(),
+  academic_year_id: integer("academic_year_id").references(() => academicYears.id, { onDelete: 'cascade' }).notNull(),
   quota: integer("quota"),
   tuition_fee: integer("tuition_fee"),
 }, (table) => [
@@ -120,7 +120,7 @@ export const admissionMethods = pgTable("admission_methods", {
  */
 export const dormitories = pgTable("dormitories", {
   id: serial("id").primaryKey(),
-  campus_id: integer("campus_id").references(() => campuses.id).notNull(),
+  campus_id: integer("campus_id").references(() => campuses.id, { onDelete: 'cascade' }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   capacity: integer("capacity"),
@@ -135,10 +135,10 @@ export const dormitories = pgTable("dormitories", {
  */
 export const admissionMethodApplications = pgTable("admission_method_applications", {
   id: serial("id").primaryKey(),
-  admission_method_id: integer("admission_method_id").references(() => admissionMethods.id).notNull(),
-  academic_year_id: integer("academic_year_id").references(() => academicYears.id).notNull(),
-  campus_id: integer("campus_id").references(() => campuses.id),
-  major_id: integer("major_id").references(() => majors.id),
+  admission_method_id: integer("admission_method_id").references(() => admissionMethods.id, { onDelete: 'cascade' }).notNull(),
+  academic_year_id: integer("academic_year_id").references(() => academicYears.id, { onDelete: 'cascade' }).notNull(),
+  campus_id: integer("campus_id").references(() => campuses.id, { onDelete: 'set null' }),
+  major_id: integer("major_id").references(() => majors.id, { onDelete: 'set null' }),
   min_score: integer("min_score"),
   is_active: boolean("is_active").default(true),
   note: text("note"),
@@ -160,10 +160,10 @@ export const admissionMethodApplications = pgTable("admission_method_application
  */
 export const scholarshipAvailability = pgTable("scholarship_availability", {
   id: serial("id").primaryKey(),
-  scholarship_id: integer("scholarship_id").references(() => scholarships.id).notNull(),
-  academic_year_id: integer("academic_year_id").references(() => academicYears.id).notNull(),
-  campus_id: integer("campus_id").references(() => campuses.id),
-  major_id: integer("major_id").references(() => majors.id),
+  scholarship_id: integer("scholarship_id").references(() => scholarships.id, { onDelete: 'cascade' }).notNull(),
+  academic_year_id: integer("academic_year_id").references(() => academicYears.id, { onDelete: 'cascade' }).notNull(),
+  campus_id: integer("campus_id").references(() => campuses.id, { onDelete: 'set null' }),
+  major_id: integer("major_id").references(() => majors.id, { onDelete: 'set null' }),
 }, (table) => [
   index("idx_scholarship_year_campus_major").on(table.scholarship_id, table.academic_year_id, table.campus_id, table.major_id),
 ]);

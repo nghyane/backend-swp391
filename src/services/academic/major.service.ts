@@ -12,8 +12,9 @@ import {
   campuses,
   scholarshipAvailability
 } from '@/db/schema';
-import { MajorQueryParams } from '@/middlewares/validators/major.validator';
+import { MajorQueryParams, MajorCreateParams, MajorUpdateParams } from '@/middlewares/validators/major.validator';
 import { NotFoundError } from '@/utils/errors';
+import { logger } from '@/utils/logger';
 
 // ===== QUERY CONFIGURATIONS =====
 
@@ -257,4 +258,81 @@ export const getMajorByCode = async (code: string, academicYear?: number) => {
 
   if (!result) throw new NotFoundError('Major', code);
   return result;
+};
+
+/**
+ * Create a new major
+ * @param data Major data without id
+ * @returns Created major
+ * @throws Error if major with the same code already exists
+ */
+export const createMajor = async (data: MajorCreateParams) => {
+  // Check if major with the same code already exists
+  const existingMajor = await db.query.majors.findFirst({
+    where: eq(majors.code, data.code),
+    columns: { id: true }
+  });
+
+  if (existingMajor) {
+    throw new Error(`Major with code '${data.code}' already exists`);
+  }
+
+  // Insert new major into database
+  const [newMajor] = await db.insert(majors).values(data).returning();
+
+  logger.info(`Created new major: ${newMajor.name} (${newMajor.code})`);
+
+  // Return the created major with relations
+  return await getMajorById(newMajor.id);
+};
+
+/**
+ * Update an existing major
+ * @param id Major ID
+ * @param data Updated major data
+ * @returns Updated major
+ * @throws NotFoundError if major not found
+ */
+export const updateMajor = async (id: number, data: MajorUpdateParams) => {
+  // Check if major exists
+  await getMajorById(id);
+
+  // Update major in database
+  const [updatedMajor] = await db
+    .update(majors)
+    .set(data)
+    .where(eq(majors.id, id))
+    .returning();
+
+  logger.info(`Updated major: ${updatedMajor.name} (ID: ${updatedMajor.id})`);
+
+  // Return the updated major with relations
+  return await getMajorById(updatedMajor.id);
+};
+
+/**
+ * Delete a major
+ * @param id Major ID
+ * @throws NotFoundError if major not found
+ * @description Sau khi cập nhật database constraints, việc xóa major sẽ tự động:
+ * - Xóa careers (ON DELETE CASCADE)
+ * - Xóa majorCampusAdmission (ON DELETE CASCADE)
+ * - Set NULL cho scholarshipAvailability (ON DELETE SET NULL)
+ * - Set NULL cho admissionMethodApplications (ON DELETE SET NULL)
+ */
+export const deleteMajor = async (id: number): Promise<void> => {
+  // Check if major exists
+  const existingMajor = await db.query.majors.findFirst({
+    where: eq(majors.id, id),
+    columns: { id: true, name: true, code: true }
+  });
+
+  if (!existingMajor) {
+    throw new NotFoundError('Major', id);
+  }
+
+  // Delete major - các bảng liên quan sẽ được xử lý tự động bởi database constraints
+  await db.delete(majors).where(eq(majors.id, id));
+
+  logger.info(`Deleted major: ${existingMajor.name} (ID: ${existingMajor.id})`);
 };
