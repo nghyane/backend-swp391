@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun --smol --watch src/server.ts | pino-pretty",
     "build": "bun build ./src/server.ts --outdir ./dist --target node",
-    "start": "bun --smol dist/server.js",
+    "start": "bun --smol src/server.ts",
     "start:node": "node -r dotenv/config dist/server.js",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
