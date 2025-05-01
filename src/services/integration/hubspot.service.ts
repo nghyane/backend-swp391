@@ -1,4 +1,7 @@
 import env from '@/config/env';
+import { createNamespace } from '@/utils/pino-logger';
+
+const logger = createNamespace('hubspot-service');
 
 /**
  * Interface for HubSpot contact properties
@@ -130,5 +133,62 @@ export const searchContactsByEmail = async (email: string): Promise<HubSpotConta
 
   const result = await response.json();
   return result.results || [];
+};
+
+/**
+ * Create or update a contact in HubSpot
+ * @param email Email of the contact
+ * @param properties Additional contact properties
+ * @returns Object with contact ID, created flag, and updated fields
+ */
+export const createOrUpdateContact = async (
+  email: string,
+  properties: Omit<HubSpotContactProperties, 'email'>
+): Promise<{ contactId: string; created: boolean; updatedFields: string[] }> => {
+  logger.debug({ email }, 'Processing HubSpot contact');
+
+  // Check if contact already exists in HubSpot
+  const existingContacts = await searchContactsByEmail(email);
+  let contactId: string;
+  let created = false;
+  let updatedFields: string[] = [];
+
+  if (existingContacts.length > 0) {
+    // Contact exists, update it
+    const existingContact = existingContacts[0];
+    contactId = existingContact.id;
+
+    // Determine which fields are being updated
+    const currentProps = existingContact.properties;
+    updatedFields = Object.keys(properties).filter(key =>
+      properties[key] !== undefined &&
+      properties[key] !== currentProps[key as keyof HubSpotContactProperties]
+    );
+
+    if (updatedFields.length > 0) {
+      // Only update if there are changes
+      await updateContact(contactId, {
+        email,
+        ...properties
+      });
+      logger.info({ contactId, email, updatedFields }, 'Updated existing HubSpot contact');
+    } else {
+      logger.info({ contactId, email }, 'No changes needed for existing HubSpot contact');
+    }
+  } else {
+    // Contact doesn't exist, create it
+    const newContact = await createContact({
+      email,
+      ...properties
+    });
+
+    contactId = newContact.id;
+    created = true;
+    updatedFields = Object.keys(properties).filter(key => properties[key] !== undefined);
+
+    logger.info({ contactId, email, created }, 'Created new HubSpot contact');
+  }
+
+  return { contactId, created, updatedFields };
 };
 
