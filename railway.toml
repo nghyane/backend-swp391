@@ -3,7 +3,6 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-preDeployCommand = ["bun run db:push"]
 startCommand = "bun --smol dist/server.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 300

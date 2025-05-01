@@ -26,9 +26,6 @@ type EnvironmentVariables = {
 const requiredEnvVars: Array<keyof EnvironmentVariables> = [
   "DATABASE_URL",
   "PORT",
-  "ZALO_APP_ACCESS_TOKEN",
-  "AI_AGENT_BASE_URL",
-  "AI_AGENT_APP_NAME",
   "HUBSPOT_ACCESS_TOKEN",
   "JWT_SECRET"
 ];
