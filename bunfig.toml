@@ -1,0 +1,27 @@
+[build]
+target = "node"
+outdir = "./dist"
+
+[test]
+coverage = true
+
+[install]
+exact = true
+
+[resolve]
+paths = { 
+  "@" = "./src",
+  "@api" = "./src/api",
+  "@controllers" = "./src/api/controllers",
+  "@routes" = "./src/api/routes",
+  "@db" = "./src/db",
+  "@middlewares" = "./src/middlewares",
+  "@services" = "./src/services",
+  "@academic" = "./src/services/academic",
+  "@campus" = "./src/services/campus",
+  "@integration" = "./src/services/integration",
+  "@session" = "./src/services/session",
+  "@types" = "./src/types",
+  "@utils" = "./src/utils",
+  "@config" = "./src/config"
+}
