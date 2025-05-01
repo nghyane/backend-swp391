@@ -4,11 +4,14 @@ Backend API và chatbot tư vấn tuyển sinh, cung cấp thông tin về ngàn
 
 ## Công nghệ sử dụng
 - **Ngôn ngữ:** TypeScript
+- **Runtime:** Bun
 - **Framework:** Express.js
 - **Database:** PostgreSQL với Drizzle ORM
-- **Authentication:** JWT
+- **Authentication:** JWT (với Argon2)
 - **Validation:** Zod
 - **Documentation:** Swagger/OpenAPI
+- **Logging:** Pino
+- **Deployment:** Docker & Railway
 
 ## Tính năng chính
 - **API thông tin tuyển sinh:** Ngành học, cơ sở, học bổng, ký túc xá, phương thức xét tuyển
@@ -76,6 +79,62 @@ Khi server đang chạy, truy cập tài liệu API tại:
 ```
 http://localhost:4000/docs
 ```
+
+## Triển khai trên Railway
+
+### Chuẩn bị
+1. Đăng ký tài khoản trên [Railway](https://railway.app/)
+2. Cài đặt Railway CLI (tùy chọn):
+   ```bash
+   npm i -g @railway/cli
+   railway login
+   ```
+
+### Triển khai
+1. **Sử dụng Railway Dashboard**:
+   - Tạo project mới trên Railway
+   - Liên kết với GitHub repository
+   - Railway sẽ tự động phát hiện `railway.toml` và `Dockerfile`
+
+2. **Sử dụng Railway CLI**:
+   ```bash
+   # Từ thư mục dự án
+   railway link # Liên kết với project đã tạo
+   railway up   # Triển khai ứng dụng
+   ```
+
+### Thiết lập biến môi trường
+1. **Thông qua Railway Dashboard**:
+   - Vào project > Service > Variables
+   - Thêm các biến môi trường cần thiết:
+     - `DATABASE_URL` (tự động nếu sử dụng PostgreSQL của Railway)
+     - `JWT_SECRET`
+     - `HUBSPOT_ACCESS_TOKEN`
+     - Các biến khác theo yêu cầu
+
+2. **Thông qua Railway CLI**:
+   ```bash
+   railway variables set JWT_SECRET=your_secret_key
+   railway variables set HUBSPOT_ACCESS_TOKEN=your_hubspot_token
+   ```
+
+3. **Tham chiếu biến từ service khác**:
+   - Trong `railway.toml`, bạn có thể tham chiếu biến từ service khác:
+   ```toml
+   [variables]
+   DATABASE_URL = "${{postgres.DATABASE_URL}}"
+   ```
+
+### Cấu hình Railway
+Dự án đã được cấu hình sẵn với:
+- `railway.toml`: Cấu hình build và deploy
+- `Dockerfile`: Multi-stage build tối ưu cho Bun
+- Healthcheck và restart policy
+
+### Theo dõi và quản lý
+- Xem logs: Railway Dashboard > Service > Logs
+- Theo dõi metrics: Railway Dashboard > Service > Metrics
+- Quản lý deployments: Railway Dashboard > Service > Deployments
 
 ## Quy tắc phát triển
 - Sử dụng TypeScript strict mode
