@@ -1,8 +1,8 @@
 import { Router } from "express";
-import * as campusController from "../controllers/campus.controller";
-import { campusValidators } from "../../middlewares/validators/campus.validator";
-import { validateId } from "../../middlewares/validators/zod.validator";
-import { verifyTokenMiddleware, checkRole } from "../../middlewares/auth.middleware";
+import * as campusController from "@controllers/campus.controller";
+import { campusValidators } from "@middlewares/validators/campus.validator";
+import { validateId } from "@middlewares/validators/zod.validator";
+import { verifyTokenMiddleware, checkRole } from "@middlewares/auth.middleware";
 
 const router = Router();
 

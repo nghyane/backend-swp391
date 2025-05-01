@@ -1,8 +1,8 @@
 import { Router } from "express";
 import * as admissionMethodController from "../controllers/admission-method.controller";
-import { admissionMethodValidators } from "../../middlewares/validators/admission-method.validator";
-import { validateId } from "../../middlewares/validators/zod.validator";
-import { verifyTokenMiddleware, checkRole } from "../../middlewares/auth.middleware";
+import { admissionMethodValidators } from "@middlewares/validators/admission-method.validator";
+import { validateId } from "@middlewares/validators/zod.validator";
+import { verifyTokenMiddleware, checkRole } from "@middlewares/auth.middleware";
 
 const router = Router();
 

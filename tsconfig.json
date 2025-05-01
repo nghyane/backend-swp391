@@ -28,7 +28,7 @@
       "@session/*": ["src/services/session/*"],
       "@types/*": ["src/types/*"],
       "@utils/*": ["src/utils/*"],
-      "@config/*": ["src/config/*"]
+      "@config/*": ["src/config/*"],
     }
   },
   "include": ["src/**/*"],
