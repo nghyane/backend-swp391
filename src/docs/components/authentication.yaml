@@ -1,0 +1,33 @@
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token authentication. Add token to Authorization header.
+        Example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        
+        To obtain a token, use the `/auth/login` endpoint.
+        
+  schemas:
+    AuthRequirements:
+      type: object
+      properties:
+        endpoints:
+          type: array
+          items:
+            type: object
+            properties:
+              method:
+                type: string
+                enum: [GET, POST, PUT, DELETE]
+              path:
+                type: string
+              roles:
+                type: array
+                items:
+                  type: string
+                  enum: [admin, staff]
+              description:
+                type: string
