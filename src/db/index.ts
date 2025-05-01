@@ -3,7 +3,7 @@ import { Pool } from "pg";
 import * as schema from "./schema";
 import * as relations from "./schema-relations";
 import env from "../config/env";
-import { logger } from "../utils/logger";
+import logger from "../utils/pino-logger";
 
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
@@ -21,7 +21,7 @@ export const db = drizzle(pool, { schema: { ...schema, ...relations } });
 export const initDb = async () => {
   // Simple connection test - will throw an error if connection fails
   await pool.query("SELECT 1");
-  logger.info("✅ Database connected");
+  logger.info('Database connected successfully');
 };
 
 /**

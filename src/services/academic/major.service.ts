@@ -14,7 +14,9 @@ import {
 } from '@/db/schema';
 import { MajorQueryParams, MajorCreateParams, MajorUpdateParams } from '@/middlewares/validators/major.validator';
 import { NotFoundError } from '@/utils/errors';
-import { logger } from '@/utils/logger';
+import { createNamespace } from '@/utils/pino-logger';
+
+const logger = createNamespace('major-service');
 
 // ===== QUERY CONFIGURATIONS =====
 

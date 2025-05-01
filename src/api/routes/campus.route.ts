@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as campusController from "../controllers/campus.controller";
 import { campusValidators } from "../../middlewares/validators/campus.validator";
 import { validateId } from "../../middlewares/validators/zod.validator";
+import { verifyTokenMiddleware, checkRole } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -59,6 +60,8 @@ router.get("/:id/majors", validateId, campusController.getCampusMajors);
  *   post:
  *     summary: Tạo cơ sở mới
  *     tags: [Campuses]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -70,8 +73,12 @@ router.get("/:id/majors", validateId, campusController.getCampusMajors);
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.post("/", campusValidators.create, campusController.createCampus);
+router.post("/", verifyTokenMiddleware, checkRole(["admin", "staff"]), campusValidators.create, campusController.createCampus);
 
 /**
  * @swagger
@@ -79,6 +86,8 @@ router.post("/", campusValidators.create, campusController.createCampus);
  *   put:
  *     summary: Cập nhật thông tin cơ sở
  *     tags: [Campuses]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     requestBody:
@@ -92,10 +101,14 @@ router.post("/", campusValidators.create, campusController.createCampus);
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put("/:id", validateId, campusValidators.update, campusController.updateCampus);
+router.put("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, campusValidators.update, campusController.updateCampus);
 
 /**
  * @swagger
@@ -103,14 +116,20 @@ router.put("/:id", validateId, campusValidators.update, campusController.updateC
  *   delete:
  *     summary: Xóa cơ sở
  *     tags: [Campuses]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete("/:id", validateId, campusController.deleteCampus);
+router.delete("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, campusController.deleteCampus);
 
 export default router;

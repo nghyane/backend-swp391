@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { isNotFoundError, isValidationError, isAuthorizationError } from "../utils/errors";
+import { isNotFoundError, isValidationError, isAuthorizationError, isAuthenticationError } from "../utils/errors";
 import { replyError } from "../utils/response";
-import { logger } from "../utils/logger";
+import logger from "../utils/pino-logger";
 
 /**
  * Centralized error handling middleware for the application
@@ -9,7 +9,11 @@ import { logger } from "../utils/logger";
  */
 export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   // Log error with structured logger
-  logger.error(`${req.method} ${req.path}:`, err);
+  logger.error({
+    err,
+    path: req.path,
+    method: req.method
+  }, 'Request error occurred');
 
   if (isNotFoundError(err)) {
     replyError(res, err.message, 404);
@@ -23,6 +27,11 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
 
   if (isAuthorizationError(err)) {
     replyError(res, err.message, 403);
+    return;
+  }
+
+  if (isAuthenticationError(err)) {
+    replyError(res, err.message, 401);
     return;
   }
 

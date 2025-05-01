@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as majorController from "../controllers/major.controller";
 import { majorValidators } from "../../middlewares/validators/major.validator";
 import { validateId, validateCampusId, validateMajorCode } from "../../middlewares/validators/zod.validator";
+import { verifyTokenMiddleware, checkRole } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -58,6 +59,8 @@ router.get("/:major_code", validateMajorCode, majorController.getMajorByCode);
  *   post:
  *     summary: Tạo ngành học mới
  *     tags: [Majors]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -67,8 +70,12 @@ router.get("/:major_code", validateMajorCode, majorController.getMajorByCode);
  *     responses:
  *       201:
  *         $ref: '#/components/responses/SuccessResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.post("/", majorValidators.create, majorController.createMajor);
+router.post("/", verifyTokenMiddleware, checkRole(["admin", "staff"]), majorValidators.create, majorController.createMajor);
 
 /**
  * @swagger
@@ -76,6 +83,8 @@ router.post("/", majorValidators.create, majorController.createMajor);
  *   put:
  *     summary: Cập nhật thông tin ngành học
  *     tags: [Majors]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     requestBody:
@@ -87,8 +96,12 @@ router.post("/", majorValidators.create, majorController.createMajor);
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.put("/:id", validateId, majorValidators.update, majorController.updateMajor);
+router.put("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, majorValidators.update, majorController.updateMajor);
 
 /**
  * @swagger
@@ -96,12 +109,18 @@ router.put("/:id", validateId, majorValidators.update, majorController.updateMaj
  *   delete:
  *     summary: Xóa ngành học
  *     tags: [Majors]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.delete("/:id", validateId, majorController.deleteMajor);
+router.delete("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, majorController.deleteMajor);
 
 export default router;

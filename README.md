@@ -1,157 +1,98 @@
 # Admission Consulting Chatbot Backend
 
-_Last updated: 2025-04-19_
+Backend API và chatbot tư vấn tuyển sinh, cung cấp thông tin về ngành học, cơ sở, học bổng, ký túc xá và phương thức xét tuyển.
 
-## 1. Purpose & Goals
-This project provides the backend infrastructure for an AI-powered admission consulting platform designed to guide prospective students through the college admission process. The system combines a conversational chatbot interface with comprehensive data APIs to deliver personalized admission guidance, program recommendations, and scholarship information.
-
-## 2. Technology Stack
-- **Language:** TypeScript (strict mode enabled)
+## Công nghệ sử dụng
+- **Ngôn ngữ:** TypeScript
 - **Framework:** Express.js
-- **ORM:** Drizzle ORM (PostgreSQL)
-- **Other Libraries:** body-parser, dotenv, morgan, swagger-jsdoc, swagger-ui-express, uuid
+- **Database:** PostgreSQL với Drizzle ORM
+- **Authentication:** JWT
+- **Validation:** Zod
+- **Documentation:** Swagger/OpenAPI
 
-## 3. Directory Structure
-```
-src/
-├── api/           # Routes and controllers
-├── config/        # Application configuration
-├── db/            # Database connection and schema
-├── docs/          # API documentation (OpenAPI/Swagger)
-├── middlewares/   # Common middlewares (error, session)
-├── services/      # Business logic (planned)
-├── utils/         # Utilities (logger, helpers)
-├── app.ts         # App initialization
-└── server.ts      # Server bootstrap
-```
+## Tính năng chính
+- **API thông tin tuyển sinh:** Ngành học, cơ sở, học bổng, ký túc xá, phương thức xét tuyển
+- **Chatbot tư vấn:** Tích hợp với Zalo OA, xử lý tin nhắn tự nhiên
+- **Quản lý phiên:** Lưu trữ lịch sử tương tác và thông tin người dùng
+- **Admin Panel:** Quản lý dữ liệu và theo dõi thống kê
+- **HubSpot Integration:** Đồng bộ thông tin liên hệ
 
-## 4. Key Features
+## Cài đặt và chạy
 
-### Conversational AI
-- **Intelligent Chatbot Interface** that understands natural language queries about admissions
-- **Contextual Session Management** to maintain conversation history and user preferences
-- **Personalized Recommendations** based on student interests, academic background, and career goals
-
-### Data Services
-- **Comprehensive Program Information** for all majors and specializations
-- **Campus Details** including facilities, location, and student life
-- **Financial Planning Tools** with tuition information and scholarship matching
-- **Admission Requirements** and application guidance for different entry methods
-- **Dormitory Information** to help with accommodation planning
-
-### Technical Features
-- **RESTful API Architecture** with TypeScript type safety
-- **Interactive API Documentation** using Swagger/OpenAPI
-- **Robust Validation** for all inputs using Zod
-- **Centralized Error Handling** with consistent response formats
-- **Type-safe Database Access** using Drizzle ORM
-- **Configurable Environment** via environment variables
-- **Comprehensive Logging** for monitoring and debugging
-
-## 5. Coding & Project Rules
-- TypeScript strict mode, no `any` (unless justified)
-- Clear type declarations for all variables/functions
-- One export per file, clear naming conventions
-- Controllers: handle request/response only
-- Services: business logic (planned)
-- Middlewares: reusable logic (auth, error, session)
-- No hardcoded values—use env/config
-- Use logger (not console.log)
-- Follows commit and branch naming conventions (see `.commitrules`)
-
-## 6. Database
-- **PostgreSQL** via Drizzle ORM
-- Tables: academic_years, majors, curriculums, careers, campuses, major_campus_admission, scholarships, sessions, dormitories, admission_methods
-- All table names in `snake_case`
-
-## 7. Getting Started
-
-### Prerequisites
-- Node.js 18+ and pnpm
+### Yêu cầu
+- Node.js 18+ và Bun
 - PostgreSQL database
+- HubSpot API key (cho tính năng tích hợp HubSpot)
 
-### Installation
+### Cài đặt
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/admission-chatbot-backend.git
-cd admission-chatbot-backend
+# Clone repository
+git clone https://github.com/nghyane/backend-swp391.git
+cd backend-swp391
 
-# Install dependencies
-pnpm install
+# Cài đặt dependencies
+bun install
 
-# Set up environment variables
+# Thiết lập biến môi trường
 cp .env.example .env
-# Edit .env with your database credentials and other settings
+# Chỉnh sửa .env với thông tin database và cấu hình khác
 
-# Run database migrations
-pnpm run migrate
-
-# Start development server
-pnpm run dev
+# Chạy server phát triển
+bun dev
 ```
 
-### Interactive API Documentation
-The project includes interactive API documentation using Swagger/OpenAPI.
+### Cấu hình HubSpot
+1. Đăng ký tài khoản HubSpot Developer (https://developers.hubspot.com/)
+2. Tạo Private App và lấy API key
+3. Thêm API key vào biến môi trường `HUBSPOT_ACCESS_TOKEN` trong file .env
+4. Sử dụng API `/api/hubspot/contact` để tạo hoặc cập nhật contact và liên kết với session
 
-When the server is running, you can access the documentation at:
+#### Sử dụng HubSpot API
+```
+POST /api/hubspot/contact
+```
+
+Body:
+```json
+{
+  "email": "example@example.com",
+  "session_id": "session_123456",
+  "firstname": "Nguyen",
+  "lastname": "Van A",
+  "phone": "0123456789",
+  "school": "FPT University",
+  "school_rank": "Top 10"
+}
+```
+
+Chỉ có `email` và `session_id` là bắt buộc, các trường khác là tùy chọn. API sẽ:
+- Kiểm tra xem email đã tồn tại trên HubSpot chưa
+- Nếu đã tồn tại: cập nhật thông tin và liên kết contact ID với session
+- Nếu chưa tồn tại: tạo contact mới và liên kết ID với session
+- Cập nhật trạng thái `anonymous` của session thành `false`
+
+### Tài liệu API
+Khi server đang chạy, truy cập tài liệu API tại:
 ```
 http://localhost:4000/docs
 ```
 
-This provides a complete, interactive documentation of all API endpoints with the ability to try them directly from the browser.
+## Quy tắc phát triển
+- Sử dụng TypeScript strict mode
+- Controllers chỉ xử lý request/response
+- Services chứa business logic
+- Sử dụng logger thay vì console.log
+- Tuân thủ quy tắc đặt tên và commit (xem `.commitrules`)
 
-### Testing the Chatbot
-You can test the Zalo webhook endpoint using:
-```bash
-# Verify webhook
-curl -X GET "http://localhost:3000/api/chatbot/zalo/webhook"
-
-# Send a message
-curl -X POST "http://localhost:3000/api/chatbot/zalo/webhook" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "app_id": "your_app_id",
-    "event_name": "user_send_text",
-    "sender": {
-      "id": "user_id"
-    },
-    "message": {
-      "text": "Tell me about Computer Science programs"
-    }
-  }'
+## Cấu trúc thư mục
 ```
-
-## 8. Contribution Guidelines
-
-### Development Workflow
-1. Create a feature branch following naming convention: `feat/feature-name`
-2. Implement changes following project coding standards
-3. Write or update tests as needed
-4. Submit a pull request with a clear description of changes
-5. Address review feedback
-
-### Commit Messages
-Follow the conventional commits format (see `.commitrules` for details):
+src/
+├── api/           # Routes và controllers
+├── db/            # Kết nối và schema database
+├── middlewares/   # Middlewares (auth, error, validation)
+├── services/      # Business logic
+└── utils/         # Tiện ích
 ```
-type(scope): subject
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Code Review Checklist
-- Does the code follow TypeScript best practices?
-- Are types properly defined and used?
-- Is validation properly implemented?
-- Are error cases handled appropriately?
-- Is the code well-documented?
-- Do changes maintain backward compatibility?
-
----
-
-## 9. License
-This project is proprietary and confidential. Unauthorized copying, transfer, or reproduction of the contents is strictly prohibited.
 
 ---
 

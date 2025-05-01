@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as admissionMethodController from "../controllers/admission-method.controller";
 import { admissionMethodValidators } from "../../middlewares/validators/admission-method.validator";
 import { validateId } from "../../middlewares/validators/zod.validator";
+import { verifyTokenMiddleware, checkRole } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -100,6 +101,8 @@ router.get("/:id/majors", validateId, admissionMethodController.getMajorsByAdmis
  *   post:
  *     summary: Tạo phương thức xét tuyển mới
  *     tags: [Admission Methods]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -111,8 +114,12 @@ router.get("/:id/majors", validateId, admissionMethodController.getMajorsByAdmis
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.post("/", admissionMethodValidators.create, admissionMethodController.createAdmissionMethod);
+router.post("/", verifyTokenMiddleware, checkRole(["admin", "staff"]), admissionMethodValidators.create, admissionMethodController.createAdmissionMethod);
 
 /**
  * @swagger
@@ -120,6 +127,8 @@ router.post("/", admissionMethodValidators.create, admissionMethodController.cre
  *   post:
  *     summary: Liên kết ngành học với phương thức xét tuyển
  *     tags: [Admission Methods]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -139,10 +148,14 @@ router.post("/", admissionMethodValidators.create, admissionMethodController.cre
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.post("/associate-major", admissionMethodValidators.associateMajor, admissionMethodController.associateMajorWithAdmissionMethod);
+router.post("/associate-major", verifyTokenMiddleware, checkRole(["admin", "staff"]), admissionMethodValidators.associateMajor, admissionMethodController.associateMajorWithAdmissionMethod);
 
 /**
  * @swagger
@@ -150,6 +163,8 @@ router.post("/associate-major", admissionMethodValidators.associateMajor, admiss
  *   post:
  *     summary: Tạo đơn xét tuyển toàn cầu
  *     tags: [Admission Methods]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -170,8 +185,12 @@ router.post("/associate-major", admissionMethodValidators.associateMajor, admiss
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.post("/global-application", admissionMethodValidators.globalApplication, admissionMethodController.createGlobalAdmissionMethodApplication);
+router.post("/global-application", verifyTokenMiddleware, checkRole(["admin", "staff"]), admissionMethodValidators.globalApplication, admissionMethodController.createGlobalAdmissionMethodApplication);
 
 /**
  * @swagger
@@ -179,6 +198,8 @@ router.post("/global-application", admissionMethodValidators.globalApplication, 
  *   put:
  *     summary: Cập nhật thông tin phương thức xét tuyển
  *     tags: [Admission Methods]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     requestBody:
@@ -192,10 +213,14 @@ router.post("/global-application", admissionMethodValidators.globalApplication, 
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put("/:id", validateId, admissionMethodValidators.update, admissionMethodController.updateAdmissionMethod);
+router.put("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, admissionMethodValidators.update, admissionMethodController.updateAdmissionMethod);
 
 /**
  * @swagger
@@ -203,14 +228,20 @@ router.put("/:id", validateId, admissionMethodValidators.update, admissionMethod
  *   delete:
  *     summary: Xóa phương thức xét tuyển
  *     tags: [Admission Methods]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete("/:id", validateId, admissionMethodController.deleteAdmissionMethod);
+router.delete("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, admissionMethodController.deleteAdmissionMethod);
 
 export default router;

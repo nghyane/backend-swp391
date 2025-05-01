@@ -1,16 +1,14 @@
 import express, { Application } from "express";
 import bodyParser from "body-parser";
-import morgan from "morgan";
 import apiRouter from "./api";
 import { errorHandler } from "./middlewares/error.middleware";
 import { setupSwagger } from "./docs/swagger-config";
+import httpLogger from "./middlewares/logger.middleware";
 
 const app: Application = express();
 
 app.use(bodyParser.json());
-app.use(morgan(
-    "dev"
-));
+app.use(httpLogger);
 
 // API routes
 app.use("/api", apiRouter);

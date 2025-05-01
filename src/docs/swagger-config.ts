@@ -21,6 +21,21 @@ const swaggerOptions = {
         description: 'API Server',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT token authentication. Add token to Authorization header. Example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."'
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   // Bao gồm file định nghĩa components và các routes
   apis: [
@@ -29,12 +44,25 @@ const swaggerOptions = {
   ],
 };
 
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
+// Tạo tài liệu Swagger từ cấu hình
+export const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 // Hàm thiết lập Swagger UI
 export const setupSwagger = (app: Application) => {
+
+  app.get('/docs/json', (_, res) => {
+    res.setHeader('Content-Type', 'application/json');
+
+    res.send(swaggerDocs);
+  });
+
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'API Tư vấn tuyển sinh',
+    swaggerOptions: {
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+      docExpansion: 'none',
+    }
   }));
 };

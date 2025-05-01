@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as scholarshipService from "@/services/academic/scholarship.service";
 import { catch$ } from "@/utils/catch";
 import { reply } from "@/utils/response";
-import { ScholarshipQueryParams } from "@/types/scholarship.types";
+import { ScholarshipQueryParams, ScholarshipCreateParams, ScholarshipUpdateParams } from "@/types/scholarship.types";
 
 
 export const getAllScholarships = catch$(async (req: Request, res: Response): Promise<void> => {
@@ -52,13 +52,14 @@ export const getScholarshipById = catch$(async (req: Request, res: Response): Pr
  * This endpoint creates a new scholarship
  */
 export const createScholarship = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract scholarship data from request body
-  // 2. Validate data (can be done with middleware)
-  // 3. Call scholarshipService.createScholarship with the data
-  // 4. Return the created scholarship with appropriate status code
+  // Extract scholarship data from request body (already validated by middleware)
+  const scholarshipData = req.body as ScholarshipCreateParams;
 
-  reply(res, { message: 'Not implemented' }, 'Scholarship creation endpoint not implemented', 501);
+  // Call service to create scholarship
+  const newScholarship = await scholarshipService.createScholarship(scholarshipData);
+
+  // Return the created scholarship with 201 Created status
+  reply(res, newScholarship, 'Scholarship created successfully', 201);
 });
 
 /**
@@ -66,14 +67,17 @@ export const createScholarship = catch$(async (req: Request, res: Response): Pro
  * This endpoint updates a scholarship by ID
  */
 export const updateScholarship = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract scholarship ID from request params
-  // 2. Extract update data from request body
-  // 3. Validate data (can be done with middleware)
-  // 4. Call scholarshipService.updateScholarship with the ID and data
-  // 5. Return the updated scholarship
+  // Extract scholarship ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Scholarship update endpoint not implemented', 501);
+  // Extract update data from request body (already validated by middleware)
+  const updateData = req.body as ScholarshipUpdateParams;
+
+  // Call service to update scholarship
+  const updatedScholarship = await scholarshipService.updateScholarship(id, updateData);
+
+  // Return the updated scholarship
+  reply(res, updatedScholarship, 'Scholarship updated successfully');
 });
 
 /**
@@ -81,10 +85,12 @@ export const updateScholarship = catch$(async (req: Request, res: Response): Pro
  * This endpoint deletes a scholarship by ID
  */
 export const deleteScholarship = catch$(async (req: Request, res: Response): Promise<void> => {
-  // TODO: Implement the following steps:
-  // 1. Extract scholarship ID from request params
-  // 2. Call scholarshipService.deleteScholarship with the ID
-  // 3. Return success message
+  // Extract scholarship ID from request params (already validated by middleware)
+  const id = req.validatedParams?.id as number;
 
-  reply(res, { message: 'Not implemented' }, 'Scholarship deletion endpoint not implemented', 501);
+  // Call service to delete scholarship
+  await scholarshipService.deleteScholarship(id);
+
+  // Return success message with 200 OK status
+  reply(res, null, 'Scholarship deleted successfully');
 });

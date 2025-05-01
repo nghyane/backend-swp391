@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as dormitoryController from "../controllers/dormitory.controller";
 import { dormitoryValidators } from "../../middlewares/validators/dormitory.validator";
 import { validateId } from "../../middlewares/validators/zod.validator";
+import { verifyTokenMiddleware, checkRole } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -44,6 +45,8 @@ router.get("/:id", validateId, dormitoryController.getDormitoryById);
  *   post:
  *     summary: Tạo ký túc xá mới
  *     tags: [Dormitories]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -55,8 +58,12 @@ router.get("/:id", validateId, dormitoryController.getDormitoryById);
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.post("/", dormitoryValidators.create, dormitoryController.createDormitory);
+router.post("/", verifyTokenMiddleware, checkRole(["admin", "staff"]), dormitoryValidators.create, dormitoryController.createDormitory);
 
 /**
  * @swagger
@@ -64,6 +71,8 @@ router.post("/", dormitoryValidators.create, dormitoryController.createDormitory
  *   put:
  *     summary: Cập nhật thông tin ký túc xá
  *     tags: [Dormitories]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     requestBody:
@@ -77,10 +86,14 @@ router.post("/", dormitoryValidators.create, dormitoryController.createDormitory
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put("/:id", validateId, dormitoryValidators.update, dormitoryController.updateDormitory);
+router.put("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, dormitoryValidators.update, dormitoryController.updateDormitory);
 
 /**
  * @swagger
@@ -88,14 +101,20 @@ router.put("/:id", validateId, dormitoryValidators.update, dormitoryController.u
  *   delete:
  *     summary: Xóa ký túc xá
  *     tags: [Dormitories]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete("/:id", validateId, dormitoryController.deleteDormitory);
+router.delete("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, dormitoryController.deleteDormitory);
 
 export default router;

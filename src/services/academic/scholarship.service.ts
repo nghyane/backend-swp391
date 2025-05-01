@@ -229,12 +229,43 @@ export const getScholarshipsByCampusId = async (campusId: number): Promise<Schol
 
 /**
  * Create a new scholarship
- * @param data Scholarship data without id
+ * @param data Scholarship data without id and with availability information
  * @returns Created scholarship
  */
-export const createScholarship = async (data: Omit<Scholarship, 'id'>): Promise<Scholarship> => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
+export const createScholarship = async (data: ScholarshipCreateParams): Promise<Scholarship> => {
+  // Extract scholarship data and availability data
+  const { major_id, campus_id, ...scholarshipData } = data;
+
+  // Start a transaction to ensure data consistency
+  return await db.transaction(async (tx) => {
+    // 1. Insert the scholarship
+    const [newScholarship] = await tx
+      .insert(scholarships)
+      .values(scholarshipData)
+      .returning();
+
+    // 2. Get current academic year
+    const currentYear = new Date().getFullYear();
+    const academicYear = await tx.query.academicYears.findFirst({
+      where: eq(academicYears.year, currentYear),
+      columns: { id: true }
+    });
+
+    if (!academicYear) {
+      throw new Error(`Academic year ${currentYear} not found`);
+    }
+
+    // 3. Create scholarship availability record
+    await tx.insert(scholarshipAvailability).values({
+      scholarship_id: newScholarship.id,
+      academic_year_id: academicYear.id,
+      campus_id: campus_id,
+      major_id: major_id
+    });
+
+    // Return the created scholarship with relations
+    return newScholarship;
+  });
 };
 
 /**
@@ -242,17 +273,92 @@ export const createScholarship = async (data: Omit<Scholarship, 'id'>): Promise<
  * @param id Scholarship ID
  * @param data Updated scholarship data
  * @returns Updated scholarship
+ * @throws NotFoundError if scholarship not found
  */
-export const updateScholarship = async (id: number, data: Partial<Omit<Scholarship, 'id'>>): Promise<Scholarship> => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
+export const updateScholarship = async (id: number, data: ScholarshipUpdateParams): Promise<Scholarship> => {
+  // Check if scholarship exists
+  const existingScholarship = await db.query.scholarships.findFirst({
+    where: eq(scholarships.id, id)
+  });
+
+  if (!existingScholarship) {
+    throw new NotFoundError('Scholarship', id);
+  }
+
+  // Extract scholarship data and availability data
+  const { major_id, campus_id, ...scholarshipData } = data;
+
+  // Start a transaction to ensure data consistency
+  return await db.transaction(async (tx) => {
+    // 1. Update the scholarship
+    const [updatedScholarship] = await tx
+      .update(scholarships)
+      .set(scholarshipData)
+      .where(eq(scholarships.id, id))
+      .returning();
+
+    // 2. Update availability if major_id or campus_id is provided
+    if (major_id !== undefined || campus_id !== undefined) {
+      // Get current academic year
+      const currentYear = new Date().getFullYear();
+      const academicYear = await tx.query.academicYears.findFirst({
+        where: eq(academicYears.year, currentYear),
+        columns: { id: true }
+      });
+
+      if (!academicYear) {
+        throw new Error(`Academic year ${currentYear} not found`);
+      }
+
+      // Find existing availability record for current year
+      const existingAvailability = await tx.query.scholarshipAvailability.findFirst({
+        where: and(
+          eq(scholarshipAvailability.scholarship_id, id),
+          eq(scholarshipAvailability.academic_year_id, academicYear.id)
+        )
+      });
+
+      if (existingAvailability) {
+        // Update existing availability
+        const updateData: any = {};
+        if (major_id !== undefined) updateData.major_id = major_id;
+        if (campus_id !== undefined) updateData.campus_id = campus_id;
+
+        await tx
+          .update(scholarshipAvailability)
+          .set(updateData)
+          .where(eq(scholarshipAvailability.id, existingAvailability.id));
+      } else if (major_id || campus_id) {
+        // Create new availability if it doesn't exist
+        await tx.insert(scholarshipAvailability).values({
+          scholarship_id: id,
+          academic_year_id: academicYear.id,
+          campus_id: campus_id || null,
+          major_id: major_id || null
+        });
+      }
+    }
+
+    // Return the updated scholarship
+    return updatedScholarship;
+  });
 };
 
 /**
  * Delete a scholarship
  * @param id Scholarship ID
+ * @throws NotFoundError if scholarship not found
  */
 export const deleteScholarship = async (id: number): Promise<void> => {
-  // TODO: Implement this function
-  throw new Error('Not implemented');
+  // Check if scholarship exists
+  const existingScholarship = await db.query.scholarships.findFirst({
+    where: eq(scholarships.id, id)
+  });
+
+  if (!existingScholarship) {
+    throw new NotFoundError('Scholarship', id);
+  }
+
+  // Delete the scholarship (availability records will be deleted automatically due to CASCADE)
+  await db.delete(scholarships).where(eq(scholarships.id, id));
 };

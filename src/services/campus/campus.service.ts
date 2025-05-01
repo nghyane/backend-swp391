@@ -3,7 +3,9 @@ import { db } from '@/db/index';
 import { campuses, majorCampusAdmission } from '@/db/schema';
 import { Campus, CampusQueryParams } from '@/types/campus.types';
 import { NotFoundError } from '@/utils/errors';
-import { logger } from '@/utils/logger';
+import { createNamespace } from '@/utils/pino-logger';
+
+const logger = createNamespace('campus-service');
 
 const DEFAULT_QUERY_OPTIONS = {
   orderBy: campuses.name

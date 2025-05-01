@@ -1,7 +1,8 @@
 import { Router } from "express";
 import * as scholarshipController from "../controllers/scholarship.controller";
 import { scholarshipValidators } from "../../middlewares/validators/scholarship.validator";
-import { validateId } from "../../middlewares/validators/zod.validator";
+import { validateId, validateMajorCode } from "../../middlewares/validators/zod.validator";
+import { verifyTokenMiddleware, checkRole } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -41,10 +42,28 @@ router.get("/:id", validateId, scholarshipController.getScholarshipById);
 
 /**
  * @swagger
+ * /scholarships/major/{majorCode}:
+ *   get:
+ *     summary: Lấy danh sách học bổng theo mã ngành
+ *     tags: [Scholarships]
+ *     parameters:
+ *       - $ref: '#/components/parameters/MajorCodeParam'
+ *     responses:
+ *       200:
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
+router.get("/major/:majorCode", validateMajorCode, scholarshipController.getScholarshipsByMajor);
+
+/**
+ * @swagger
  * /scholarships:
  *   post:
  *     summary: Tạo học bổng mới
  *     tags: [Scholarships]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -56,8 +75,12 @@ router.get("/:id", validateId, scholarshipController.getScholarshipById);
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  */
-router.post("/", scholarshipValidators.create, scholarshipController.createScholarship);
+router.post("/", verifyTokenMiddleware, checkRole(["admin", "staff"]), scholarshipValidators.create, scholarshipController.createScholarship);
 
 /**
  * @swagger
@@ -65,6 +88,8 @@ router.post("/", scholarshipValidators.create, scholarshipController.createSchol
  *   put:
  *     summary: Cập nhật thông tin học bổng
  *     tags: [Scholarships]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     requestBody:
@@ -78,10 +103,14 @@ router.post("/", scholarshipValidators.create, scholarshipController.createSchol
  *         $ref: '#/components/responses/SuccessResponse'
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.put("/:id", validateId, scholarshipValidators.update, scholarshipController.updateScholarship);
+router.put("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, scholarshipValidators.update, scholarshipController.updateScholarship);
 
 /**
  * @swagger
@@ -89,14 +118,20 @@ router.put("/:id", validateId, scholarshipValidators.update, scholarshipControll
  *   delete:
  *     summary: Xóa học bổng
  *     tags: [Scholarships]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete("/:id", validateId, scholarshipController.deleteScholarship);
+router.delete("/:id", verifyTokenMiddleware, checkRole(["admin", "staff"]), validateId, scholarshipController.deleteScholarship);
 
 export default router;

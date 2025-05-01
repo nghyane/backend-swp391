@@ -26,6 +26,13 @@ export class AuthorizationError extends Error {
   }
 }
 
+export class AuthenticationError extends Error {
+  constructor(message?: string) {
+    super(message || 'Authentication failed');
+    this.name = 'AuthenticationError';
+  }
+}
+
 export const isNotFoundError = (error: unknown): error is NotFoundError => {
   return error instanceof NotFoundError;
 };
@@ -36,4 +43,8 @@ export const isValidationError = (error: unknown): error is ValidationError => {
 
 export const isAuthorizationError = (error: unknown): error is AuthorizationError => {
   return error instanceof AuthorizationError;
+};
+
+export const isAuthenticationError = (error: unknown): error is AuthenticationError => {
+  return error instanceof AuthenticationError;
 };

@@ -4,10 +4,6 @@
  * This file should be imported first in the application entry point.
  */
 
-import dotenv from "dotenv";
-
-// Load environment variables from .env file
-dotenv.config();
 
 /**
  * Type definition for environment variables
@@ -21,6 +17,7 @@ type EnvironmentVariables = {
   AI_AGENT_BASE_URL: string;
   AI_AGENT_APP_NAME: string;
   HUBSPOT_ACCESS_TOKEN: string;
+  JWT_SECRET: string;
 };
 
 /**
@@ -32,7 +29,8 @@ const requiredEnvVars: Array<keyof EnvironmentVariables> = [
   "ZALO_APP_ACCESS_TOKEN",
   "AI_AGENT_BASE_URL",
   "AI_AGENT_APP_NAME",
-  "HUBSPOT_ACCESS_TOKEN"  
+  "HUBSPOT_ACCESS_TOKEN",
+  "JWT_SECRET"
 ];
 
 // Check for missing required environment variables
@@ -58,7 +56,9 @@ const env: EnvironmentVariables = {
   ZALO_APP_ACCESS_TOKEN: process.env.ZALO_APP_ACCESS_TOKEN!,
   AI_AGENT_BASE_URL: process.env.AI_AGENT_BASE_URL!,
   AI_AGENT_APP_NAME: process.env.AI_AGENT_APP_NAME!,
-  HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN!
+  HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN!,
+
+  JWT_SECRET: process.env.JWT_SECRET!
 };
 
 export default env;
