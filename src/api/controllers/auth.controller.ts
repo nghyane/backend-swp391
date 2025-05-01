@@ -25,15 +25,6 @@ export const login = catch$(async (req: Request, res: Response): Promise<void> =
   reply(res, { user, token }, 'Login successful');
 });
 
-/**
- * Logout a user
- * This endpoint returns a success message
- * Note: Actual token invalidation should be handled on the client side
- */
-export const logout = catch$(async (req: Request, res: Response): Promise<void> => {
-  // Return success message
-  reply(res, null, 'Logout successful');
-});
 
 /**
  * Get current user info

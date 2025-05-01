@@ -34,18 +34,6 @@ const router = Router();
  */
 router.post("/login", authValidators.login, authController.login);
 
-/**
- * @swagger
- * /auth/logout:
- *   post:
- *     summary: Đăng xuất
- *     tags: [Authentication]
- *     description: Đăng xuất khỏi hệ thống. Lưu ý rằng token vẫn có thể sử dụng được cho đến khi hết hạn. Client nên xóa token khỏi bộ nhớ cục bộ.
- *     responses:
- *       200:
- *         $ref: '#/components/responses/SuccessResponse'
- */
-router.post("/logout", authController.logout);
 
 /**
  * @swagger
