@@ -3,9 +3,9 @@
  * Provides functions to interact with Zalo OA API and process webhook events
  */
 
-import { ZaloWebhookEvent } from "@/types/webhook.types";
-import { getOrCreateSession } from "@/services/session/session.service";
-import env from "@/config/env";
+import { ZaloWebhookEvent } from "../../types/webhook.types";
+import { getOrCreateSession } from "@session/session.service";
+import env from "@config/env";
 
 /**
  * Verify Zalo webhook with provided tokens

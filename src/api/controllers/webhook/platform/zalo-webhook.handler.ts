@@ -5,7 +5,7 @@
 
 import { Request, Response } from "express";
 import { reply } from "@/utils/response";
-import { zaloWebhookService } from "@/services/integration/webhook/zalo.service";
+import { zaloWebhookService } from "@/services/integration/zalo.service";
 import { queueZaloMessage } from "@/queue/webhook.queue";
 
 /**
@@ -19,6 +19,7 @@ const verifyWebhook = async (req: Request, res: Response): Promise<void> => {
         req.query.access_token as string,
         req.query.challenge_code as string
     );
+    
     reply(res, result, "Zalo webhook verified");
 };
 

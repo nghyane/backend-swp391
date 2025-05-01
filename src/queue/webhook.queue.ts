@@ -4,7 +4,7 @@
 import fastq from 'fastq';
 import type { queueAsPromised } from 'fastq';
 import { ZaloWebhookEvent } from '@/types/webhook.types';
-import { handleUserSendText } from '@/services/integration/webhook/zalo.service';
+import { handleUserSendText } from '@/services/integration/zalo.service';
 import { createNamespace } from '@/utils/pino-logger';
 
 // Create a namespace logger for Zalo queue
