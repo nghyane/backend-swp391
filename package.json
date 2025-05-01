@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "bun --smol --watch src/server.ts | pino-pretty",
     "build": "bun build ./src/server.ts --outdir ./dist --target node",
-    "start": "bun --smol src/server.ts",
+    "start": "bun --smol dist/server.js",
     "start:node": "node -r dotenv/config dist/server.js",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "user:create": "bun run src/scripts/create-user.ts",
+    "user:create-samples": "bun run src/scripts/create-sample-users.ts",
+    "user:create-from-json": "bun run src/scripts/create-users-from-json.ts"
   },
   "keywords": [],
   "author": "Nghia <hoangvananhnghia@gmail.com>",
