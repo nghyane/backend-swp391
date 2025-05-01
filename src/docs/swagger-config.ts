@@ -39,8 +39,8 @@ const swaggerOptions = {
   },
   // Bao gồm file định nghĩa components và các routes
   apis: [
-    './src/docs/components/*.yaml',
-    './src/api/routes/*.ts',
+    `${process.cwd()}/src/docs/components/*.yaml`,
+    `${process.cwd()}/src/api/routes/*.ts`,
   ],
 };
 
