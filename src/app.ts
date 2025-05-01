@@ -10,15 +10,12 @@ const app: Application = express();
 app.use(bodyParser.json());
 app.use(httpLogger);
 
-// Healthcheck endpoint for Railway
+
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Root path redirect to docs
-app.get("/", (_req: Request, res: Response) => {
-  res.redirect("/docs");
-});
+
 
 // API routes
 app.use("/api", apiRouter);
