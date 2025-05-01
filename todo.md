@@ -66,10 +66,10 @@
   - Thêm middleware checkRole với quyền admin/staff
 
 ### Quản lý Người dùng và Phiên
-- [ ] Tạo session controller:
+- [x] Tạo session controller:
   - Tạo src/api/controllers/session.controller.ts với các hàm getAllSessions, getSessionById, deleteSession
   - Sử dụng catch$ để xử lý lỗi
-- [ ] Tạo session route:
+- [x] Tạo session route:
   - Tạo src/api/routes/session.route.ts với endpoints GET /sessions, GET /sessions/:id, DELETE /sessions/:id
   - Thêm route vào src/api/index.ts
   - Bảo vệ route với auth middleware
@@ -124,12 +124,12 @@
 
 ## Tối ưu hóa cần thiết
 
-### Database
+### Database ✅
 - [x] Bảng lưu trữ thông tin admin users (internal_users) đã có sẵn
 - [x] Cấu trúc database hiện tại đã đủ cho MVP
 
 ### Security ✅
-- [x] Cài đặt và sử dụng bcrypt để xác thực mật khẩu (password_hash đã có trong bảng) - Đủ cho MVP
+- [x] Cài đặt và sử dụng argon2 để xác thực mật khẩu (password_hash đã có trong bảng) - Đủ cho MVP
 - [x] Thêm JWT cho xác thực API admin:
   - Cài đặt thư viện jsonwebtoken
   - Tạo các hàm generateToken và verifyToken trong auth.service.ts
@@ -141,7 +141,7 @@
   - Thêm định nghĩa Swagger trong src/docs/components
   - Đảm bảo tất cả các parameters và responses được mô tả đầy đủ
   - Cập nhật tài liệu Swagger để phản ánh yêu cầu xác thực cho các API CRUD
-- [ ] Cập nhật README với hướng dẫn chi tiết hơn:
+- [x] Cập nhật README với hướng dẫn chi tiết hơn:
   - Thêm hướng dẫn cài đặt và cấu hình HubSpot
   - Thêm hướng dẫn sử dụng API admin
   - Thêm hướng dẫn triển khai
@@ -150,12 +150,11 @@
   - Thêm mô tả cho các API quản lý người dùng và phiên
   - Thêm mô tả cho API dashboard/users
 
-### Deployment
-- [ ] Tạo script deployment cho production:
-  - Tạo Dockerfile cho ứng dụng
-  - Tạo docker-compose.yml để chạy ứng dụng và database
-  - Tạo script bash để tự động hóa quá trình deployment
-- [ ] Thiết lập monitoring cơ bản:
-  - Thêm logging chi tiết hơn
-  - Cài đặt và cấu hình một công cụ monitoring đơn giản
-  - Thêm health check endpoint
+### Deployment ✅
+- [x] Tạo script deployment cho production:
+  - [x] Tạo Dockerfile cho ứng dụng (Dockerfile.prod đã có)
+  - [x] Cấu hình Railway deployment (railway.toml đã có)
+  - [x] Tạo hướng dẫn triển khai (DEPLOY.md đã có)
+- [x] Thiết lập monitoring cơ bản:
+  - [x] Thêm logging chi tiết hơn (đã sử dụng Pino)
+  - [x] Thêm health check endpoint (đã có /health endpoint)

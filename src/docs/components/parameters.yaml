@@ -7,7 +7,7 @@ components:
       schema:
         type: integer
       description: ID của bản ghi
-    
+
     CampusIdParam:
       in: path
       name: campus_id
@@ -15,7 +15,7 @@ components:
       schema:
         type: integer
       description: ID của cơ sở
-    
+
     MajorCodeParam:
       in: path
       name: major_code
@@ -23,7 +23,7 @@ components:
       schema:
         type: string
       description: Mã ngành học
-    
+
     MajorIdParam:
       in: path
       name: major_id
@@ -31,7 +31,7 @@ components:
       schema:
         type: integer
       description: ID của ngành học
-    
+
     ScholarshipIdParam:
       in: path
       name: scholarship_id
@@ -39,7 +39,7 @@ components:
       schema:
         type: integer
       description: ID của học bổng
-    
+
     DormitoryIdParam:
       in: path
       name: dormitory_id
@@ -47,7 +47,7 @@ components:
       schema:
         type: integer
       description: ID của ký túc xá
-    
+
     AdmissionMethodIdParam:
       in: path
       name: admission_method_id
@@ -55,7 +55,7 @@ components:
       schema:
         type: integer
       description: ID của phương thức xét tuyển
-    
+
     PlatformParam:
       in: path
       name: platform
@@ -64,52 +64,81 @@ components:
         type: string
         enum: [zalo, facebook, hubspot]
       description: Nền tảng gửi webhook
-    
+
     AcademicYearQuery:
       in: query
       name: academic_year
       schema:
         type: integer
       description: "Năm học (ví dụ: 2024)"
-    
+
     NameQuery:
       in: query
       name: name
       schema:
         type: string
       description: Tìm kiếm theo tên
-    
+
     CampusIdQuery:
       in: query
       name: campus_id
       schema:
         type: integer
       description: Lọc theo ID cơ sở
-    
+
     CampusCodeQuery:
       in: query
       name: campus_code
       schema:
         type: string
       description: Lọc theo mã cơ sở
-    
+
     MajorIdQuery:
       in: query
       name: major_id
       schema:
         type: integer
       description: Lọc theo ID ngành học
-    
+
     MajorCodeQuery:
       in: query
       name: major_code
       schema:
         type: string
       description: Lọc theo mã ngành học
-    
+
     IsActiveQuery:
       in: query
       name: is_active
       schema:
         type: boolean
       description: Lọc theo trạng thái hoạt động
+
+    SessionIdParam:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+      description: ID của phiên
+
+    PlatformQuery:
+      in: query
+      name: platform
+      schema:
+        type: string
+      description: Nền tảng của phiên
+
+    AnonymousQuery:
+      in: query
+      name: anonymous
+      schema:
+        type: boolean
+      description: Lọc theo trạng thái ẩn danh
+
+    HubspotContactIdQuery:
+      in: query
+      name: hubspot_contact_id
+      schema:
+        type: string
+      description: ID liên hệ HubSpot
