@@ -1,6 +1,6 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+dockerfilePath = "Dockerfile.dev"
 
 [deploy]
 startCommand = "bun --smol dist/server.js"

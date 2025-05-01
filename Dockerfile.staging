@@ -1,0 +1,29 @@
+# Sử dụng hình ảnh Bun chính thức
+FROM oven/bun:1 AS base
+
+# Thiết lập thư mục làm việc
+WORKDIR /usr/src/app
+
+# Cài đặt các công cụ build cần thiết cho argon2
+RUN apt-get update && apt-get install -y python3 make g++
+
+# Sao chép package.json và bun.lock
+COPY package.json bun.lock ./
+
+# Cài đặt tất cả dependencies (bao gồm devDependencies)
+RUN bun install --frozen-lockfile
+
+# Sao chép toàn bộ mã nguồn
+COPY . .
+
+# Thiết lập biến môi trường
+ENV NODE_ENV=production
+
+# Chuyển sang user bun cho bảo mật
+USER bun
+
+# Railway sẽ tự động cung cấp biến PORT
+EXPOSE 8080/tcp
+
+# Chạy ứng dụng trực tiếp từ mã nguồn TypeScript
+CMD ["bun", "--smol", "src/server.ts"]
