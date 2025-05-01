@@ -5,7 +5,7 @@
 
 import { Request, Response } from "express";
 import { reply } from "@/utils/response";
-import { zaloWebhookService } from "@/services/integration/webhook/zalo-webhook.service";
+import { zaloWebhookService } from "@/services/integration/webhook/zalo.service";
 import { queueZaloMessage } from "@/queue/webhook.queue";
 
 /**
