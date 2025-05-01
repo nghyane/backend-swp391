@@ -17,6 +17,7 @@ const router = Router();
  *       - $ref: '#/components/parameters/MajorCodeQuery'
  *       - $ref: '#/components/parameters/CampusCodeQuery'
  *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *       - $ref: '#/components/parameters/IsActiveQuery'
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
@@ -34,6 +35,7 @@ router.get("/", admissionMethodValidators.query, admissionMethodController.getAl
  *     parameters:
  *       - $ref: '#/components/parameters/MajorCodeParam'
  *       - $ref: '#/components/parameters/AcademicYearQuery'
+ *       - $ref: '#/components/parameters/IsActiveQuery'
  *     responses:
  *       200:
  *         $ref: '#/components/responses/SuccessResponse'
