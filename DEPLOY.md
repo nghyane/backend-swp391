@@ -97,7 +97,7 @@ Nếu gặp vấn đề khi triển khai:
 2. Đảm bảo tất cả biến môi trường bắt buộc đã được cấu hình
 3. Kiểm tra kết nối đến cơ sở dữ liệu Neon
 4. Đảm bảo Dockerfile đã được cấu hình đúng
-5. Kiểm tra healthcheck endpoint (`/`) đang hoạt động đúng
+5. Kiểm tra healthcheck endpoint (`/health`) đang hoạt động đúng
 
 ## Các lệnh Railway hữu ích
 
@@ -140,7 +140,7 @@ Nếu gặp vấn đề khi triển khai:
 - Kiểm tra logs để xem lỗi chi tiết
 - Đảm bảo Dockerfile không có lỗi
 - Kiểm tra các biến môi trường bắt buộc đã được cấu hình đầy đủ
-- Kiểm tra healthcheck endpoint đang hoạt động đúng
+- Kiểm tra healthcheck endpoint (`/health`) đang hoạt động đúng
 
 ### Vấn đề với Bun
 
