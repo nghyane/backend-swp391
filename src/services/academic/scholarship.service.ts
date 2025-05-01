@@ -12,7 +12,7 @@ import {
   scholarshipAvailability,
   academicYears
 } from "@/db/schema";
-import { Scholarship, ScholarshipQueryParams } from '@/types/scholarship.types';
+import { Scholarship, ScholarshipQueryParams, ScholarshipCreateParams, ScholarshipUpdateParams } from '@/types/scholarship.types';
 import { NotFoundError } from '@/utils/errors';
 
 // ===== QUERY STRUCTURE CONSTANTS =====

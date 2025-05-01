@@ -4,11 +4,11 @@
  */
 
 import { eq, and, like, ilike, inArray, SQL } from "drizzle-orm";
-import { db } from "@/db/index";
-import { dormitories, campuses } from "@/db/schema";
-import { Dormitory, DormitoryQueryParams } from "@/types/dormitory.types";
-import { NotFoundError } from "@/utils/errors";
-import { createNamespace } from "@/utils/pino-logger";
+import { db } from "@db/index";
+import { dormitories, campuses } from "@db/schema";
+import { Dormitory, DormitoryQueryParams } from "../../types/dormitory.types";
+import { NotFoundError } from "@utils/errors";
+import { createNamespace } from "@utils/pino-logger";
 
 const logger = createNamespace('dormitory-service');
 

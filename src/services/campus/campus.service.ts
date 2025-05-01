@@ -1,9 +1,10 @@
-import { eq, ilike, or, SQL } from 'drizzle-orm';
-import { db } from '@/db/index';
-import { campuses, majorCampusAdmission } from '@/db/schema';
+import { eq, ilike, or, SQL, and } from 'drizzle-orm';
+import { db } from '@db/index';
+import { campuses, majorCampusAdmission } from '@db/schema';
 import { Campus, CampusQueryParams } from '@/types/campus.types';
-import { NotFoundError } from '@/utils/errors';
-import { createNamespace } from '@/utils/pino-logger';
+import { NotFoundError } from '@utils/errors';
+import { createNamespace } from '@utils/pino-logger';
+import { dormitories, academicYears } from '@db/schema';
 
 const logger = createNamespace('campus-service');
 

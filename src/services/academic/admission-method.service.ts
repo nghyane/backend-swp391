@@ -1,8 +1,8 @@
 import { eq, ilike, and, or, SQL, inArray, isNull } from 'drizzle-orm';
-import { db } from '@/db/index';
-import { admissionMethods, admissionMethodApplications, majors, campuses, academicYears } from '@/db/schema';
-import { AdmissionMethodQueryParams } from '@/middlewares/validators/admission-method.validator';
-import { NotFoundError } from '@/utils/errors';
+import { db } from '@db/index';
+import { admissionMethods, admissionMethodApplications, majors, campuses, academicYears } from '@db/schema';
+import { AdmissionMethodQueryParams } from '@middlewares/validators/admission-method.validator';
+import { NotFoundError } from '@utils/errors';
 
 const DEFAULT_QUERY_OPTIONS = {
   orderBy: admissionMethods.name,

@@ -4,13 +4,13 @@
  */
 
 import { eq } from "drizzle-orm";
-import { db } from "@/db";
-import { internalUsers } from "@/db/schema";
-import { AuthenticationError, NotFoundError } from "@/utils/errors";
-import env from "@/config/env";
+import { db } from "@db/index";
+import { internalUsers } from "@db/schema";
+import { AuthenticationError, NotFoundError } from "@utils/errors";
+import env from "@config/env";
 import * as argon2 from "argon2";
 import * as jwt from "jsonwebtoken";
-import { InternalUserRole } from "@/db/schema";
+import { InternalUserRole } from "@db/schema";
 import { Secret, SignOptions } from "jsonwebtoken";
 
 /**
@@ -97,7 +97,7 @@ export const login = async (credentials: LoginCredentials): Promise<{ user: Auth
  */
 export const generateToken = (payload: JwtPayload): string => {
   const options: SignOptions = {
-    expiresIn: '24h' 
+    expiresIn: '24h'
   };
 
   return jwt.sign(

@@ -1,5 +1,5 @@
-import env from '@/config/env';
-import { createNamespace } from '@/utils/pino-logger';
+import env from '@config/env';
+import { createNamespace } from '@utils/pino-logger';
 
 const logger = createNamespace('hubspot-service');
 
@@ -161,8 +161,8 @@ export const createOrUpdateContact = async (
     // Determine which fields are being updated
     const currentProps = existingContact.properties;
     updatedFields = Object.keys(properties).filter(key =>
-      properties[key] !== undefined &&
-      properties[key] !== currentProps[key as keyof HubSpotContactProperties]
+      properties[key as keyof Omit<HubSpotContactProperties, 'email'>] !== undefined &&
+      properties[key as keyof Omit<HubSpotContactProperties, 'email'>] !== currentProps[key as keyof HubSpotContactProperties]
     );
 
     if (updatedFields.length > 0) {
@@ -184,7 +184,9 @@ export const createOrUpdateContact = async (
 
     contactId = newContact.id;
     created = true;
-    updatedFields = Object.keys(properties).filter(key => properties[key] !== undefined);
+    updatedFields = Object.keys(properties).filter(key => 
+      properties[key as keyof Omit<HubSpotContactProperties, 'email'>] !== undefined
+    );
 
     logger.info({ contactId, email, created }, 'Created new HubSpot contact');
   }

@@ -4,17 +4,17 @@
  */
 
 import { eq, ilike, or, and, SQL, inArray } from 'drizzle-orm';
-import { db } from '@/db/index';
+import { db } from '@db/index';
 import {
   majors,
   majorCampusAdmission,
   academicYears,
   campuses,
   scholarshipAvailability
-} from '@/db/schema';
-import { MajorQueryParams, MajorCreateParams, MajorUpdateParams } from '@/middlewares/validators/major.validator';
-import { NotFoundError } from '@/utils/errors';
-import { createNamespace } from '@/utils/pino-logger';
+} from '@db/schema';
+import { MajorQueryParams, MajorCreateParams, MajorUpdateParams } from '@middlewares/validators/major.validator';
+import { NotFoundError } from '@utils/errors';
+import { createNamespace } from '@utils/pino-logger';
 
 const logger = createNamespace('major-service');
 
