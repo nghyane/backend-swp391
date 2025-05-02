@@ -1,6 +1,24 @@
 import { pgTable, serial, varchar, integer, text, boolean, timestamp, pgEnum, uniqueIndex, index, jsonb } from "drizzle-orm/pg-core";
 
 /**
+ * Integration tokens for external services
+ */
+export const integrationTokens = pgTable("integration_tokens", {
+  id: serial("id").primaryKey(),
+  provider: varchar("provider", { length: 50 }).notNull(),
+  token_type: varchar("token_type", { length: 50 }).notNull(),
+  token_value: text("token_value").notNull(),
+  expires_at: timestamp("expires_at"),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  // Ensure no duplicate records for the same provider and token type
+  uniqueIndex("uniq_provider_token_type").on(table.provider, table.token_type),
+  // Index to optimize queries
+  index("idx_integration_provider").on(table.provider),
+]);
+
+/**
  * Enum for internal user roles
  */
 export const INTERNAL_USER_ROLES = ["admin", "staff"] as const;
