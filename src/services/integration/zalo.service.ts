@@ -3,9 +3,10 @@
  * Provides functions to interact with Zalo OA API and process webhook events
  */
 
-import { ZaloWebhookEvent } from "../../types/webhook.types";
+import { ZaloWebhookEvent } from "@/types/webhook.types";
 import { getOrCreateSession } from "@session/session.service";
 import env from "@config/env";
+import logger from "@/utils/pino-logger";
 
 /**
  * Verify Zalo webhook with provided tokens
@@ -43,6 +44,8 @@ export const handleUserSendText = async (eventData: ZaloWebhookEvent): Promise<v
     await sendResponsesToZalo(aiResponses, userId);
   } catch (error) {
     console.error('Error processing Zalo message:', error);
+
+    await sendResponsesToZalo(['Đã xảy ra lỗi khi xử lý tin nhắn của bạn. Vui lòng thử lại sau.'], userId);
   }
 };
 
@@ -87,7 +90,7 @@ async function sendMessageToAI(message: string, userId: string, sessionId: strin
  */
 async function sendResponsesToZalo(responses: string[], userId: string): Promise<void> {
   for (const responseText of responses) {
-    await fetch(`https://openapi.zalo.me/v3.0/oa/message/cs`, {
+    const response = await fetch(`https://openapi.zalo.me/v3.0/oa/message/cs`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,6 +101,11 @@ async function sendResponsesToZalo(responses: string[], userId: string): Promise
         message: { text: responseText }
       })
     });
+
+    if (!response.ok) {
+      throw new Error(`Failed to send response to Zalo: ${response.statusText}`);
+    }
+
   }
 };
 

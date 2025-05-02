@@ -31,12 +31,6 @@ export const httpLogger = pinoHttp({
       return false;
     }
   },
-  // Thêm thông tin custom vào log
-  customProps: (_req, _res) => {
-    return {
-      context: 'http',
-    };
-  },
   // Tùy chỉnh cách log request
   customLogLevel: (_req, res, err) => {
     if (err) return 'error';
@@ -71,6 +65,7 @@ export const httpLogger = pinoHttp({
         url: req.url,
         query: req.query,
         params: req.params,
+        body: req.body ? '[REDACTED]' : undefined,
       };
 
       // Chỉ thêm body trong môi trường development và không phải là file upload
@@ -79,7 +74,7 @@ export const httpLogger = pinoHttp({
         if (contentType.includes('application/json')) {
           return {
             ...reqInfo,
-            body: req.body
+            body: req.body 
           };
         }
       }
