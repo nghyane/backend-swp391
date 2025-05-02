@@ -50,6 +50,37 @@ bun dev
 3. Thêm API key vào biến môi trường `HUBSPOT_ACCESS_TOKEN` trong file .env
 4. Sử dụng API `/api/hubspot/contact` để tạo hoặc cập nhật contact và liên kết với session
 
+### Cấu hình Zalo OA
+1. Đăng ký tài khoản Zalo Developer (https://developers.zalo.me/)
+2. Tạo ứng dụng Zalo OA và lấy App ID, App Secret
+3. Lấy Access Token và Refresh Token theo hướng dẫn của Zalo
+4. Thêm các thông tin vào biến môi trường:
+   - `ZALO_APP_ID`: ID của ứng dụng Zalo
+   - `ZALO_APP_SECRET`: Secret key của ứng dụng Zalo
+   - `ZALO_APP_ACCESS_TOKEN`: Access token để gọi Zalo API
+   - `ZALO_APP_REFRESH_TOKEN`: Refresh token để làm mới access token khi hết hạn
+5. Hoặc lưu các token vào database (xem phần Quản lý Token)
+
+### Quản lý Token
+Hệ thống hỗ trợ lưu trữ token tích hợp (Zalo) trong database:
+
+1. **Di chuyển token từ .env vào database**:
+   ```bash
+   bun run token:migrate
+   ```
+
+2. **Làm mới token Zalo**:
+   ```bash
+   bun run token:refresh-zalo
+   ```
+   Lệnh này sẽ sử dụng refresh token để lấy access token mới và refresh token mới từ Zalo API. Nên chạy định kỳ trước khi token hết hạn (access token có thời hạn 1 giờ, refresh token có thời hạn 3 tháng và chỉ dùng được một lần).
+
+3. **Cấu trúc lưu trữ**:
+   - Token được lưu trong bảng `integration_tokens`
+   - Mỗi token được xác định bởi `provider` (ví dụ: 'zalo') và `token_type` (ví dụ: 'access_token', 'refresh_token')
+   - Đối với Zalo, hệ thống sẽ tự động sử dụng token từ database, nếu không tìm thấy sẽ dùng token từ biến môi trường
+   - Đối với HubSpot, token luôn được lấy từ biến môi trường
+
 #### Sử dụng HubSpot API
 ```
 POST /api/hubspot/contact
