@@ -26,16 +26,27 @@ export interface HubSpotContact {
 }
 
 /**
+ * Get HubSpot access token from environment variables
+ * @returns Access token
+ */
+const getHubspotAccessToken = (): string => {
+  // Always use token from environment variables
+  return env.HUBSPOT_ACCESS_TOKEN;
+};
+
+/**
  * Create a new contact in HubSpot
  * @param properties Contact properties
  * @returns Created contact
  */
 export const createContact = async (properties: HubSpotContactProperties): Promise<HubSpotContact> => {
+  const accessToken = getHubspotAccessToken();
+
   const response = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${env.HUBSPOT_ACCESS_TOKEN}`
+      'Authorization': `Bearer ${accessToken}`
     },
     body: JSON.stringify({ properties })
   });
@@ -55,11 +66,13 @@ export const createContact = async (properties: HubSpotContactProperties): Promi
  * @returns Updated contact
  */
 export const updateContact = async (contactId: string, properties: HubSpotContactProperties): Promise<HubSpotContact> => {
+  const accessToken = getHubspotAccessToken();
+
   const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${env.HUBSPOT_ACCESS_TOKEN}`
+      'Authorization': `Bearer ${accessToken}`
     },
     body: JSON.stringify({ properties })
   });
@@ -78,10 +91,12 @@ export const updateContact = async (contactId: string, properties: HubSpotContac
  * @returns Contact or null if not found
  */
 export const getContactById = async (contactId: string): Promise<HubSpotContact | null> => {
+  const accessToken = getHubspotAccessToken();
+
   const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}?properties=firstname,lastname,email,phone,school_rank,school`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${env.HUBSPOT_ACCESS_TOKEN}`
+      'Authorization': `Bearer ${accessToken}`
     }
   });
 
@@ -103,11 +118,13 @@ export const getContactById = async (contactId: string): Promise<HubSpotContact 
  * @returns Array of matching contacts
  */
 export const searchContactsByEmail = async (email: string): Promise<HubSpotContact[]> => {
+  const accessToken = getHubspotAccessToken();
+
   const response = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${env.HUBSPOT_ACCESS_TOKEN}`
+      'Authorization': `Bearer ${accessToken}`
     },
     body: JSON.stringify({
       filterGroups: [
@@ -184,7 +201,7 @@ export const createOrUpdateContact = async (
 
     contactId = newContact.id;
     created = true;
-    updatedFields = Object.keys(properties).filter(key => 
+    updatedFields = Object.keys(properties).filter(key =>
       properties[key as keyof Omit<HubSpotContactProperties, 'email'>] !== undefined
     );
 
