@@ -13,7 +13,7 @@
     "db:studio": "drizzle-kit studio",
     "user:create": "bun run src/scripts/create-user.ts",
     "user:create-samples": "bun run src/scripts/create-sample-users.ts",
-    "user:create-from-json": "bun run src/scripts/create-users-from-json.ts"
+    "token:refresh-zalo": "bun run src/scripts/refresh-zalo-token.ts"
   },
   "keywords": [],
   "author": "Nghia <hoangvananhnghia@gmail.com>",
