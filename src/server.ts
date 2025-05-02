@@ -12,9 +12,8 @@ logger.info('Connecting to database...');
 await initDb();
 
 // 🚀 Start Server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '::', () => {
   logger.info(`Server running http://localhost:${PORT}/docs`);
-  
 });
 
 // 🧼 Graceful shutdown
