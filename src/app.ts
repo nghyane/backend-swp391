@@ -15,6 +15,9 @@ app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).send('<meta name="zalo-platform-site-verification" content="MO64CPsZ43TwjxS8-fSR2NwqpXIImXX8D38v" />');
+});
 
 
 // API routes
