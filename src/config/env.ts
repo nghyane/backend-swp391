@@ -14,6 +14,9 @@ type EnvironmentVariables = {
   DATABASE_URL: string;
   FACEBOOK_VERIFY_TOKEN: string;
   ZALO_APP_ACCESS_TOKEN: string;
+  ZALO_APP_REFRESH_TOKEN: string;
+  ZALO_APP_ID: string;
+  ZALO_APP_SECRET: string;
   AI_AGENT_BASE_URL: string;
   AI_AGENT_APP_NAME: string;
   HUBSPOT_ACCESS_TOKEN: string;
@@ -51,6 +54,9 @@ const env: EnvironmentVariables = {
   FACEBOOK_VERIFY_TOKEN: process.env.FACEBOOK_VERIFY_TOKEN!,
 
   ZALO_APP_ACCESS_TOKEN: process.env.ZALO_APP_ACCESS_TOKEN!,
+  ZALO_APP_REFRESH_TOKEN: process.env.ZALO_APP_REFRESH_TOKEN!,
+  ZALO_APP_ID: process.env.ZALO_APP_ID!,
+  ZALO_APP_SECRET: process.env.ZALO_APP_SECRET!,
   AI_AGENT_BASE_URL: process.env.AI_AGENT_BASE_URL!,
   AI_AGENT_APP_NAME: process.env.AI_AGENT_APP_NAME!,
   HUBSPOT_ACCESS_TOKEN: process.env.HUBSPOT_ACCESS_TOKEN!,
