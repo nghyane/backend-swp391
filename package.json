@@ -13,13 +13,15 @@
     "db:studio": "drizzle-kit studio",
     "user:create": "bun run src/scripts/create-user.ts",
     "user:create-samples": "bun run src/scripts/create-sample-users.ts",
-    "token:refresh-zalo": "bun run src/scripts/refresh-zalo-token.ts"
+    "token:refresh-zalo": "bun run src/scripts/refresh-zalo-token.ts",
+    "token:refresh-zalo:manual": "bun run --smol src/cron/manual-refresh-zalo.ts"
   },
   "keywords": [],
   "author": "Nghia <hoangvananhnghia@gmail.com>",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@types/node-cron": "3.0.11",
     "argon2": "0.43.0",
     "body-parser": "2.2.0",
     "dotenv": "16.5.0",
@@ -28,6 +30,7 @@
     "fastq": "1.19.1",
     "jsonwebtoken": "9.0.2",
     "morgan": "1.10.0",
+    "node-cron": "3.0.3",
     "pg": "8.15.6",
     "pino": "9.6.0",
     "pino-http": "10.4.0",

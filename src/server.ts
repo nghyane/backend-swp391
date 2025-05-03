@@ -3,6 +3,7 @@ import app from "./app";
 import { initDb, closeDb } from "./db";
 import logger from "./utils/pino-logger";
 import { zaloQueue } from "./queue";
+import { startAllCronJobs, stopAllCronJobs } from "./cron";
 
 const PORT = Number(env.PORT) || 3000;
 const SHUTDOWN_TIMEOUT = 10000;
@@ -16,6 +17,10 @@ const server = app.listen(PORT, '::', () => {
   logger.info(`Server running http://localhost:${PORT}/docs`);
 });
 
+// 🕒 Start cron jobs
+logger.info('Starting cron jobs...');
+startAllCronJobs();
+
 // 🧼 Graceful shutdown
 async function shutdown(signal: string) {
   logger.warn({ signal }, 'Received signal, cleaning up');
@@ -26,6 +31,9 @@ async function shutdown(signal: string) {
   }, SHUTDOWN_TIMEOUT);
 
   try {
+    logger.info('Stopping cron jobs');
+    stopAllCronJobs();
+
     logger.info('Draining queue');
     await zaloQueue.drain();
 

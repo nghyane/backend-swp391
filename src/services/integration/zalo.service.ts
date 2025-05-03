@@ -2,7 +2,7 @@ import { ZaloWebhookEvent } from "@/types/webhook.types";
 import { getOrCreateSession } from "@session/session.service";
 import env from "@config/env";
 import logger from "@/utils/pino-logger";
-import { getToken, saveToken } from "./token.service";
+import { getTokenInfo, saveToken, isTokenExpired } from "./token.service";
 
 // Constants
 const PROVIDER = "zalo";
@@ -35,12 +35,26 @@ const parseJsonSafe = async (res: Response): Promise<any> => {
 
 /**
  * Get access or refresh token
+ * Nếu token là access_token và đã hết hạn, tự động làm mới token
+ * Nếu token là refresh_token, chỉ trả về giá trị từ database
  */
 const getZaloToken = async (
   type: "access_token" | "refresh_token"
 ): Promise<string> => {
-  const token = await getToken(PROVIDER, type);
-  return token || (type === "access_token"
+  // Lấy thông tin đầy đủ của token từ database
+  const tokenInfo = await getTokenInfo(PROVIDER, type);
+
+  // Nếu là access_token và token đã hết hạn hoặc sắp hết hạn, tự động làm mới
+  if (type === "access_token" && isTokenExpired(tokenInfo)) {
+    logger.info("Access token expired or not found, refreshing...");
+    const newToken = await refreshZaloToken();
+    if (newToken) {
+      return newToken;
+    }
+  }
+
+  // Trả về token từ database hoặc fallback về biến môi trường
+  return tokenInfo?.token_value || (type === "access_token"
     ? env.ZALO_APP_ACCESS_TOKEN
     : env.ZALO_APP_REFRESH_TOKEN);
 };
