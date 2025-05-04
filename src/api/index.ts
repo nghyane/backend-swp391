@@ -9,6 +9,7 @@ import webhookRoutes from "./routes/webhook.route";
 import authRoutes from "./routes/auth.route";
 import hubspotRoutes from "./routes/hubspot.route";
 import sessionRoutes from "./routes/session.route";
+import academicYearRoutes from "./routes/academic-year.route";
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use("/webhooks", webhookRoutes);
 router.use("/auth", authRoutes);
 router.use("/hubspot", hubspotRoutes);
 router.use("/sessions", sessionRoutes);
+router.use("/academic-years", academicYearRoutes);
 
 export default router;

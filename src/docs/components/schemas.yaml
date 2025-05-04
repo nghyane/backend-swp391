@@ -1,5 +1,17 @@
 components:
   schemas:
+    AcademicYear:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID của năm học
+        year:
+          type: integer
+          description: Năm học (ví dụ 2024 cho năm học 2024-2025)
+      required:
+        - year
+
     Campus:
       type: object
       properties:
