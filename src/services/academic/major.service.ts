@@ -102,49 +102,96 @@ export const getAllMajors = async (filters?: MajorQueryParams) => {
   if (filters.name) nameConditions.push(ilike(majors.name, `%${filters.name}%`));
   if (filters.major_code) nameConditions.push(ilike(majors.code, `%${filters.major_code}%`));
 
-  // If no campus or academic year filter, just filter by name/code
-  if (!filters.campus_id && !filters.academic_year) {
-    return await db.query.majors.findMany({
-      columns: QUERY_CONFIG.majorFields,
-      with: QUERY_CONFIG.defaultRelations,
-      where: nameConditions.length > 0 ? or(...nameConditions) : undefined
+  // If filtering by campus ID only (no academic year filter)
+  if (filters.campus_id && !filters.academic_year) {
+    // Get major IDs from campus admissions
+    const admissions = await db.query.majorCampusAdmission.findMany({
+      where: eq(majorCampusAdmission.campus_id, filters.campus_id),
+      columns: { major_id: true }
     });
+
+    if (admissions.length > 0) {
+      const majorIds = admissions.map(a => a.major_id);
+      const majorIdCondition = majorIds.length === 1
+        ? eq(majors.id, majorIds[0])
+        : inArray(majors.id, majorIds);
+
+      // Combine conditions
+      const whereCondition = nameConditions.length > 0
+        ? and(or(...nameConditions), majorIdCondition)
+        : majorIdCondition;
+
+      return await db.query.majors.findMany({
+        columns: QUERY_CONFIG.majorFields,
+        with: QUERY_CONFIG.defaultRelations,
+        where: whereCondition
+      });
+    }
+
+    // No majors found for this campus, return empty array
+    return [];
   }
 
-  // Handle filtering by campus and/or academic year
-  const admissionConditions: SQL[] = [];
-
-  if (filters.campus_id) {
-    admissionConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
+  // For all other cases (including academic year filter), get all majors but filter relations
+  let whereCondition = undefined;
+  if (nameConditions.length > 0) {
+    whereCondition = or(...nameConditions);
   }
 
+  // Get academic year ID if provided
+  let academicYearId: number | undefined;
   if (filters.academic_year) {
     const yearId = await getAcademicYearId(filters.academic_year);
-    if (!yearId) return []; // Year not found, return empty array
-    admissionConditions.push(eq(majorCampusAdmission.academic_year_id, yearId));
+    if (yearId) academicYearId = yearId;
   }
 
-  // Get major IDs from admission records
-  const admissions = await db.query.majorCampusAdmission.findMany({
-    where: and(...admissionConditions),
-    columns: { major_id: true }
-  });
+  // Define relations with filtered majorCampusAdmissions
+  let relations: any = {
+    careers: true as const,
+    majorCampusAdmissions: {
+      with: {
+        campus: { columns: { code: true, name: true } },
+        academicYear: { columns: { year: true } }
+      },
+      columns: {
+        tuition_fee: true,
+        quota: true
+      }
+    }
+  };
 
-  if (admissions.length === 0) return [];
+  // Apply filters to majorCampusAdmissions if needed
+  if (filters.campus_id || academicYearId) {
+    const whereConditions: SQL[] = [];
 
-  const majorIds = admissions.map(a => a.major_id);
-  const majorIdCondition = majorIds.length === 1
-    ? eq(majors.id, majorIds[0])
-    : inArray(majors.id, majorIds);
+    if (filters.campus_id) {
+      whereConditions.push(eq(majorCampusAdmission.campus_id, filters.campus_id));
+    }
 
-  // Combine conditions
-  const whereCondition = nameConditions.length > 0
-    ? and(or(...nameConditions), majorIdCondition)
-    : majorIdCondition;
+    if (academicYearId) {
+      whereConditions.push(eq(majorCampusAdmission.academic_year_id, academicYearId));
+    }
 
+    relations = {
+      careers: true as const,
+      majorCampusAdmissions: {
+        where: whereConditions.length > 1 ? and(...whereConditions) : whereConditions[0],
+        with: {
+          campus: { columns: { code: true, name: true } },
+          academicYear: { columns: { year: true } }
+        },
+        columns: {
+          tuition_fee: true,
+          quota: true
+        }
+      }
+    };
+  }
+
+  // Return all majors with filtered relations
   return await db.query.majors.findMany({
     columns: QUERY_CONFIG.majorFields,
-    with: QUERY_CONFIG.defaultRelations,
+    with: relations,
     where: whereCondition
   });
 };
