@@ -30,18 +30,7 @@ const refreshZaloTokenTask = async (): Promise<void> => {
   }
 };
 
-/**
- * Cron job làm mới token Zalo
- * Chạy mỗi 50 phút (token Zalo hết hạn sau 1 giờ)
- * 
- * Cron expression: '0 */50 * * * *'
- * - Giây: 0 (chạy vào giây thứ 0)
- * - Phút: */50 (chạy mỗi 50 phút)
- * - Giờ: * (mọi giờ)
- * - Ngày trong tháng: * (mọi ngày)
- * - Tháng: * (mọi tháng)
- * - Ngày trong tuần: * (mọi ngày trong tuần)
- */
+
 export const zaloTokenRefreshCron = cron.schedule('0 */50 * * * *', refreshZaloTokenTask, {
   scheduled: false, // Không tự động khởi động, sẽ được khởi động trong startAllCronJobs
   timezone: 'Asia/Ho_Chi_Minh' // Múi giờ Việt Nam
