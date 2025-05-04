@@ -31,7 +31,7 @@ components:
       required:
         - name
         - code
-    
+
     Major:
       type: object
       properties:
@@ -50,7 +50,7 @@ components:
       required:
         - name
         - code
-    
+
     MajorCampusLink:
       type: object
       properties:
@@ -62,7 +62,7 @@ components:
           description: ID của cơ sở
         academic_year:
           type: integer
-          description: Năm học
+          description: Năm học (ví dụ 2024 cho năm học 2024-2025)
         quota:
           type: integer
           description: Chỉ tiêu tuyển sinh
@@ -73,7 +73,36 @@ components:
         - major_id
         - campus_id
         - academic_year
-    
+
+    MajorCampusAdd:
+      type: object
+      properties:
+        campus_id:
+          type: integer
+          description: ID của cơ sở
+        academic_year:
+          type: integer
+          description: Năm học (ví dụ 2024 cho năm học 2024-2025)
+        quota:
+          type: integer
+          description: Chỉ tiêu tuyển sinh
+        tuition_fee:
+          type: integer
+          description: Học phí
+      required:
+        - campus_id
+        - academic_year
+
+    MajorCampusUpdate:
+      type: object
+      properties:
+        quota:
+          type: integer
+          description: Chỉ tiêu tuyển sinh
+        tuition_fee:
+          type: integer
+          description: Học phí
+
     Scholarship:
       type: object
       properties:
@@ -104,7 +133,7 @@ components:
       required:
         - name
         - amount
-    
+
     Dormitory:
       type: object
       properties:
@@ -126,7 +155,7 @@ components:
       required:
         - name
         - campus_id
-    
+
     AdmissionMethod:
       type: object
       properties:
@@ -144,7 +173,7 @@ components:
           description: URL để đăng ký xét tuyển
       required:
         - name
-    
+
     AdmissionMethodAssociate:
       type: object
       properties:

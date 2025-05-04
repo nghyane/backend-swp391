@@ -1,5 +1,6 @@
 import { Router } from "express";
 import majorRoutes from "./routes/major.route";
+import majorCampusRoutes from "./routes/major-campus.route";
 import campusRoutes from "./routes/campus.route";
 import scholarshipRoutes from "./routes/scholarship.route";
 import dormitoryRoutes from "./routes/dormitory.route";
@@ -12,6 +13,7 @@ import sessionRoutes from "./routes/session.route";
 const router = Router();
 
 router.use("/majors", majorRoutes);
+router.use("/majors", majorCampusRoutes);
 router.use("/campuses", campusRoutes);
 router.use("/scholarships", scholarshipRoutes);
 router.use("/dormitories", dormitoryRoutes);

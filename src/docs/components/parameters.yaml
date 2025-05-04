@@ -142,3 +142,11 @@ components:
       schema:
         type: string
       description: ID liên hệ HubSpot
+
+    AcademicYearParam:
+      in: path
+      name: academic_year
+      required: true
+      schema:
+        type: integer
+      description: Năm học (ví dụ 2024 cho năm học 2024-2025)
