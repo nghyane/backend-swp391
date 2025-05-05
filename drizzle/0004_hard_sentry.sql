@@ -1,0 +1,1 @@
+ALTER TABLE "campuses" ADD COLUMN "description" text;
