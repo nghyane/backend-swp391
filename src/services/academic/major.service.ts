@@ -341,10 +341,23 @@ export const createMajor = async (data: MajorCreateParams) => {
  * @param data Updated major data
  * @returns Updated major
  * @throws NotFoundError if major not found
+ * @throws Error if trying to update code to one that already exists
  */
 export const updateMajor = async (id: number, data: MajorUpdateParams) => {
   // Check if major exists
-  await getMajorById(id);
+  const existingMajor = await getMajorById(id);
+
+  // If code is being updated, check if the new code already exists
+  if (data.code && data.code !== existingMajor.code) {
+    const majorWithSameCode = await db.query.majors.findFirst({
+      where: eq(majors.code, data.code),
+      columns: { id: true }
+    });
+
+    if (majorWithSameCode) {
+      throw new Error(`Major with code '${data.code}' already exists`);
+    }
+  }
 
   // Update major in database
   const [updatedMajor] = await db

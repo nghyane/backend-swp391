@@ -28,7 +28,8 @@ export const majorCreateSchema = z.object({
 // Update schema
 export const majorUpdateSchema = z.object({
   name: z.string().optional(),
-  description: z.string().optional()
+  description: z.string().optional(),
+  code: z.string().min(1).optional()
 }).strict();
 
 // Schema for major-campus link
