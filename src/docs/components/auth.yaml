@@ -34,6 +34,23 @@ components:
                 type: string
                 example: Forbidden
 
+    ConflictError:
+      description: Xung đột dữ liệu
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Resource conflict
+              error:
+                type: string
+                example: Conflict
+
   schemas:
     LoginRequest:
       type: object

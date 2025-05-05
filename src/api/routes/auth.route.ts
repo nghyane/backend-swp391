@@ -93,6 +93,7 @@ router.get("/users", verifyTokenMiddleware, checkRole(["admin"]), authValidators
  *       - bearerAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/IdParam'
+ *       - $ref: '#/components/parameters/IsActiveQuery'
  *     responses:
  *       200:
  *         description: Thông tin người dùng
@@ -107,7 +108,7 @@ router.get("/users", verifyTokenMiddleware, checkRole(["admin"]), authValidators
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get("/users/:id", verifyTokenMiddleware, checkRole(["admin"]), validateId, authController.getUserById);
+router.get("/users/:id", verifyTokenMiddleware, checkRole(["admin"]), validateId, authValidators.queryUsers, authController.getUserById);
 
 /**
  * @swagger
@@ -137,7 +138,21 @@ router.get("/users/:id", verifyTokenMiddleware, checkRole(["admin"]), validateId
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       409:
- *         $ref: '#/components/responses/ConflictError'
+ *         description: Xung đột dữ liệu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Resource conflict
+ *                 error:
+ *                   type: string
+ *                   example: Conflict
  */
 router.post("/users", verifyTokenMiddleware, checkRole(["admin"]), authValidators.createUser, authController.createUser);
 
@@ -173,7 +188,21 @@ router.post("/users", verifyTokenMiddleware, checkRole(["admin"]), authValidator
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  *       409:
- *         $ref: '#/components/responses/ConflictError'
+ *         description: Xung đột dữ liệu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Resource conflict
+ *                 error:
+ *                   type: string
+ *                   example: Conflict
  */
 router.put("/users/:id", verifyTokenMiddleware, checkRole(["admin"]), validateId, authValidators.updateUser, authController.updateUser);
 
