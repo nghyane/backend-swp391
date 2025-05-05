@@ -19,6 +19,7 @@ declare global {
         username: string;
         email: string;
         role: InternalUserRole;
+        is_active: boolean;
       };
       token?: string;
     }
@@ -48,8 +49,8 @@ export const verifyTokenMiddleware = async (req: Request, res: Response, next: N
     // Verify token
     const decoded = verifyToken(token);
 
-    // Get user from database
-    const user = await getUserById(decoded.userId);
+    // Get user from database (only active users for authentication)
+    const user = await getUserById(decoded.userId, true);
 
     if (!user) {
       throw new AuthenticationError('User not found or inactive');

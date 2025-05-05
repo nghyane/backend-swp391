@@ -30,6 +30,7 @@ export interface AuthUser {
   username: string;
   email: string;
   role: InternalUserRole;
+  is_active: boolean;
 }
 
 /**
@@ -85,7 +86,8 @@ export const login = async (credentials: LoginCredentials): Promise<{ user: Auth
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role
+      role: user.role,
+      is_active: user.is_active
     },
     token
   };
@@ -126,14 +128,24 @@ export const verifyToken = (token: string): JwtPayload => {
 /**
  * Get user by ID
  * @param userId User ID
+ * @param is_active Optional parameter to filter by active status (default: true)
  * @returns User or null if not found
  */
-export const getUserById = async (userId: number): Promise<AuthUser | null> => {
+export const getUserById = async (userId: number, is_active: boolean = true): Promise<AuthUser | null> => {
+  // Build where conditions
+  const whereConditions = [eq(internalUsers.id, userId)];
+
+  // Add is_active filter if specified
+  if (is_active) {
+    whereConditions.push(eq(internalUsers.is_active, true));
+  }
+
+  // Query user with filters
   const user = await db.query.internalUsers.findFirst({
-    where: eq(internalUsers.id, userId)
+    where: and(...whereConditions)
   });
 
-  if (!user || !user.is_active) {
+  if (!user) {
     return null;
   }
 
@@ -141,7 +153,8 @@ export const getUserById = async (userId: number): Promise<AuthUser | null> => {
     id: user.id,
     username: user.username,
     email: user.email,
-    role: user.role
+    role: user.role,
+    is_active: user.is_active ?? false
   };
 };
 
@@ -202,7 +215,8 @@ export const getAllUsers = async (filters?: {
     id: user.id,
     username: user.username,
     email: user.email,
-    role: user.role
+    role: user.role,
+    is_active: user.is_active ?? false
   }));
 };
 
@@ -253,7 +267,8 @@ export const createUser = async (userData: {
     id: newUser.id,
     username: newUser.username,
     email: newUser.email,
-    role: newUser.role
+    role: newUser.role,
+    is_active: newUser.is_active ?? false
   };
 };
 
@@ -326,7 +341,8 @@ export const updateUser = async (
     id: updatedUser.id,
     username: updatedUser.username,
     email: updatedUser.email,
-    role: updatedUser.role
+    role: updatedUser.role,
+    is_active: updatedUser.is_active ?? false
   };
 };
 

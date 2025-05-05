@@ -76,8 +76,12 @@ export const getUserById = catch$(async (req: Request, res: Response): Promise<v
   // Extract user ID from request parameters
   const userId = req.validatedParams?.id as number;
 
+  // Extract is_active from validated query parameters (default: true)
+  const filters = req.validatedQuery as UserQueryParams || {};
+  const is_active = filters.is_active !== undefined ? filters.is_active : true;
+
   // Call service to get user
-  const user = await authService.getUserById(userId);
+  const user = await authService.getUserById(userId, is_active);
 
   if (!user) {
     throw new AuthenticationError('User not found or inactive');
