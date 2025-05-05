@@ -48,3 +48,14 @@ export const isAuthorizationError = (error: unknown): error is AuthorizationErro
 export const isAuthenticationError = (error: unknown): error is AuthenticationError => {
   return error instanceof AuthenticationError;
 };
+
+export class ConflictError extends Error {
+  constructor(message?: string) {
+    super(message || 'Resource conflict');
+    this.name = 'ConflictError';
+  }
+}
+
+export const isConflictError = (error: unknown): error is ConflictError => {
+  return error instanceof ConflictError;
+};

@@ -92,3 +92,87 @@ components:
           type: string
           enum: [admin, staff]
           description: Vai trò người dùng
+
+    UserCreateRequest:
+      type: object
+      required:
+        - username
+        - password
+        - email
+        - role
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+          description: Tên đăng nhập
+        password:
+          type: string
+          minLength: 6
+          maxLength: 64
+          description: Mật khẩu
+        email:
+          type: string
+          format: email
+          description: Email
+        role:
+          type: string
+          enum: [admin, staff]
+          description: Vai trò người dùng
+        is_active:
+          type: boolean
+          default: true
+          description: Trạng thái hoạt động
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 64
+          description: Tên đăng nhập
+        password:
+          type: string
+          minLength: 6
+          maxLength: 64
+          description: Mật khẩu mới
+        email:
+          type: string
+          format: email
+          description: Email
+        role:
+          type: string
+          enum: [admin, staff]
+          description: Vai trò người dùng
+        is_active:
+          type: boolean
+          description: Trạng thái hoạt động
+
+    UserResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/UserProfile"
+        message:
+          type: string
+        success:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+
+    UserListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserProfile"
+        message:
+          type: string
+        success:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time

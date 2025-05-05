@@ -1,5 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { isNotFoundError, isValidationError, isAuthorizationError, isAuthenticationError } from "../utils/errors";
+import {
+  isNotFoundError,
+  isValidationError,
+  isAuthorizationError,
+  isAuthenticationError,
+  isConflictError
+} from "../utils/errors";
 import { replyError } from "../utils/response";
 import logger from "../utils/pino-logger";
 
@@ -32,6 +38,11 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
 
   if (isAuthenticationError(err)) {
     replyError(res, err.message, 401);
+    return;
+  }
+
+  if (isConflictError(err)) {
+    replyError(res, err.message, 409);
     return;
   }
 
