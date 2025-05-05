@@ -1,0 +1,83 @@
+components:
+  schemas:
+    OverallStats:
+      type: object
+      properties:
+        total_majors:
+          type: integer
+          description: Tổng số ngành học
+        total_campuses:
+          type: integer
+          description: Tổng số cơ sở
+        total_dormitories:
+          type: integer
+          description: Tổng số ký túc xá
+        total_scholarships:
+          type: integer
+          description: Tổng số học bổng
+        total_admission_methods:
+          type: integer
+          description: Tổng số phương thức xét tuyển
+        total_sessions:
+          type: integer
+          description: Tổng số phiên người dùng
+        total_users:
+          type: integer
+          description: Tổng số người dùng hệ thống
+
+    UserStats:
+      type: object
+      properties:
+        total_users:
+          type: integer
+          description: Tổng số người dùng
+        active_users:
+          type: integer
+          description: Số người dùng đang hoạt động
+        inactive_users:
+          type: integer
+          description: Số người dùng không hoạt động
+        admin_count:
+          type: integer
+          description: Số người dùng có vai trò admin
+        staff_count:
+          type: integer
+          description: Số người dùng có vai trò staff
+
+    PlatformStats:
+      type: object
+      properties:
+        platform:
+          type: string
+          description: Tên nền tảng
+        session_count:
+          type: integer
+          description: Số phiên
+        percentage:
+          type: number
+          format: float
+          description: Phần trăm
+
+    AcademicYearStats:
+      type: object
+      properties:
+        year:
+          type: integer
+          description: Năm học
+        major_count:
+          type: integer
+          description: Số ngành học
+        admission_count:
+          type: integer
+          description: Số phương thức xét tuyển
+
+    SessionDateStats:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: Ngày
+        count:
+          type: integer
+          description: Số phiên

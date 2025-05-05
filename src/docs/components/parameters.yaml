@@ -181,3 +181,20 @@ components:
         type: boolean
         default: true
       description: Xóa mềm (vô hiệu hóa) hoặc xóa cứng
+
+    # Dashboard parameters
+    StartDateQuery:
+      in: query
+      name: start_date
+      schema:
+        type: string
+        format: date
+      description: Ngày bắt đầu (mặc định là 30 ngày trước)
+
+    EndDateQuery:
+      in: query
+      name: end_date
+      schema:
+        type: string
+        format: date
+      description: Ngày kết thúc (mặc định là ngày hiện tại)

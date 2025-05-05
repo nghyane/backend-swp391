@@ -114,3 +114,43 @@ export const validateParam = (paramName: string) => {
  * Middleware to validate common queries
  */
 export const validateCommonQuery = validateZod(commonQuerySchema, 'query');
+
+/**
+ * Interface for validation schemas
+ */
+export interface ValidationSchemas {
+  body?: z.ZodTypeAny;
+  query?: z.ZodTypeAny;
+  params?: z.ZodTypeAny;
+}
+
+/**
+ * Create validation middleware from schemas
+ * @param schemas Object containing schemas for body, query, and params
+ * @returns Express middleware function
+ */
+export const createValidationMiddleware = (schemas: ValidationSchemas) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Validate each part of the request if schema is provided
+      if (schemas.body) {
+        req.body = schemas.body.parse(req.body);
+      }
+
+      if (schemas.query) {
+        req.validatedQuery = schemas.query.parse(req.query);
+      }
+
+      if (schemas.params) {
+        req.validatedParams = schemas.params.parse(req.params);
+      }
+
+      next();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return handleZodError(error, res);
+      }
+      next(error);
+    }
+  };
+};
