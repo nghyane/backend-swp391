@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from "express";
 import bodyParser from "body-parser";
+import cors from "cors";
 import apiRouter from "./api";
 import { errorHandler } from "./middlewares/error.middleware";
 import { setupSwagger } from "./docs/swagger-config";
@@ -9,6 +10,13 @@ const app: Application = express();
 
 app.use(bodyParser.json());
 app.use(httpLogger);
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 
 app.get("/health", (_req: Request, res: Response) => {
