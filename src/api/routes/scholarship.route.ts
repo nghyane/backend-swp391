@@ -26,22 +26,6 @@ router.get("/", scholarshipValidators.query, scholarshipController.getAllScholar
 
 /**
  * @swagger
- * /scholarships/{id}:
- *   get:
- *     summary: Lấy thông tin học bổng theo ID
- *     tags: [Scholarships]
- *     parameters:
- *       - $ref: '#/components/parameters/IdParam'
- *     responses:
- *       200:
- *         $ref: '#/components/responses/SuccessResponse'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- */
-router.get("/:id", validateId, scholarshipController.getScholarshipById);
-
-/**
- * @swagger
  * /scholarships/major/{majorCode}:
  *   get:
  *     summary: Lấy danh sách học bổng theo mã ngành
@@ -55,6 +39,22 @@ router.get("/:id", validateId, scholarshipController.getScholarshipById);
  *         $ref: '#/components/responses/NotFoundError'
  */
 router.get("/major/:majorCode", validateMajorCode, scholarshipController.getScholarshipsByMajor);
+
+/**
+ * @swagger
+ * /scholarships/{id}:
+ *   get:
+ *     summary: Lấy thông tin học bổng theo ID
+ *     tags: [Scholarships]
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200:
+ *         $ref: '#/components/responses/SuccessResponse'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
+router.get("/:id", validateId, scholarshipController.getScholarshipById);
 
 /**
  * @swagger

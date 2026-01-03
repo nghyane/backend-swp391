@@ -14,8 +14,11 @@ import dashboardRoutes from "./routes/dashboard.route";
 
 const router = Router();
 
-router.use("/majors", majorRoutes);
+// Register more specific routes first to avoid conflicts
+// majorCampusRoutes has paths like /:major_id/campus-admissions which are more specific
+// than majorRoutes' /:major_code catch-all pattern
 router.use("/majors", majorCampusRoutes);
+router.use("/majors", majorRoutes);
 router.use("/campuses", campusRoutes);
 router.use("/scholarships", scholarshipRoutes);
 router.use("/dormitories", dormitoryRoutes);
